@@ -14,7 +14,6 @@ concurrency:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository_owner }}/greenx7-fe
 
 jobs:
   build-and-push:
@@ -25,13 +24,19 @@ jobs:
 
     outputs:
       image_tag: ${{ steps.meta.outputs.short_sha }}
+      image_name: ${{ steps.meta.outputs.image_name }}
 
     steps:
       - uses: actions/checkout@v4
 
       - id: meta
-        name: Tạo tag từ commit SHA
-        run: echo "short_sha=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+        name: Tính tag và tên image
+        run: |
+          echo "short_sha=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+          # GHCR BẮT BUỘC tên repository viết thường, trong khi github.repository_owner
+          # giữ nguyên hoa/thường của username => phải tự hạ chữ, nếu không build sẽ
+          # chết với lỗi "repository name must be lowercase".
+          echo "image_name=$(echo '${{ github.repository_owner }}/greenx7-fe' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
 
       - uses: docker/setup-buildx-action@v3
 
@@ -49,8 +54,8 @@ jobs:
           push: true
           # Gắn 2 tag: SHA để rollback chính xác, latest để server pull nhanh
           tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.short_sha }}
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            ${{ env.REGISTRY }}/${{ steps.meta.outputs.image_name }}:${{ steps.meta.outputs.short_sha }}
+            ${{ env.REGISTRY }}/${{ steps.meta.outputs.image_name }}:latest
           # Cache layer trên GitHub => build sau nhanh hơn nhiều
           cache-from: type=gha
           cache-to: type=gha,mode=max
