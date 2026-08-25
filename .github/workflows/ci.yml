@@ -1,0 +1,30 @@
+name: FE CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    env:
+      API_URL: http://localhost:8000/api/v1
+      JWT_ACCESS_SECRET: ci_access_secret_at_least_32_characters_long_xx
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm run lint:check
+      - run: npm run typecheck
+      - run: npm run test
+      - run: npm run build

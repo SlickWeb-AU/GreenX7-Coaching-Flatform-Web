@@ -1,0 +1,95 @@
+name: Deploy Frontend
+
+# Merge vào develop => tự động deploy.
+# main để dành cho production (thêm environment protection rule khi cần duyệt tay).
+on:
+  push:
+    branches: [develop]
+  workflow_dispatch: {}
+
+concurrency:
+  # Push liên tiếp thì chỉ deploy lần cuối, tránh 2 lần deploy giẫm chân nhau
+  group: deploy-web
+  cancel-in-progress: false
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository_owner }}/greenx7-fe
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    outputs:
+      image_tag: ${{ steps.meta.outputs.short_sha }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: meta
+        name: Tạo tag từ commit SHA
+        run: echo "short_sha=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Đăng nhập GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          # Gắn 2 tag: SHA để rollback chính xác, latest để server pull nhanh
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.short_sha }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          # Cache layer trên GitHub => build sau nhanh hơn nhiều
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    # Tạo environment "production" trong Settings để thêm bước duyệt tay nếu muốn
+    environment: production
+
+    steps:
+      - name: SSH vào server và cập nhật service
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          script_stop: true
+          script: |
+            set -euo pipefail
+            cd /opt/greenx7
+
+            echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+            # Ghim tag theo SHA để biết chính xác bản nào đang chạy
+            sed -i "s|^WEB_TAG=.*|WEB_TAG=${{ needs.build-and-push.outputs.image_tag }}|" .env
+
+            docker compose -f docker-compose.prod.yml --env-file .env pull web
+            docker compose -f docker-compose.prod.yml --env-file .env up -d --no-deps web
+            docker image prune -f
+
+            echo "==> Chờ healthcheck..."
+            for i in $(seq 1 30); do
+              STATUS=$(docker inspect --format='{{.State.Health.Status}}' greenx7-web-1 2>/dev/null || echo starting)
+              [ "$STATUS" = "healthy" ] && echo "✅ web healthy" && exit 0
+              sleep 5
+            done
+
+            echo "❌ web không healthy sau 150s — xem log:"
+            docker compose -f docker-compose.prod.yml --env-file .env logs --tail 80 web
+            exit 1
