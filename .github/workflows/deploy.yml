@@ -89,9 +89,15 @@ jobs:
             docker image prune -f
 
             echo "==> Chờ healthcheck..."
+            # Dùng if/then/fi chứ KHÔNG dùng `[ ... ] && ... && exit 0`:
+            # dưới `set -e`, khi phép so sánh sai thì cả chuỗi && trả mã lỗi 1 và
+            # script chết ngay ở vòng lặp đầu tiên, trước khi container kịp healthy.
             for i in $(seq 1 30); do
               STATUS=$(docker inspect --format='{{.State.Health.Status}}' greenx7-web-1 2>/dev/null || echo starting)
-              [ "$STATUS" = "healthy" ] && echo "✅ web healthy" && exit 0
+              if [ "$STATUS" = "healthy" ]; then
+                echo "✅ web healthy sau $((i * 5))s"
+                exit 0
+              fi
               sleep 5
             done
 
