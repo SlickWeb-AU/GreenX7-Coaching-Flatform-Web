@@ -36,7 +36,7 @@ jobs:
           # GHCR BẮT BUỘC tên repository viết thường, trong khi github.repository_owner
           # giữ nguyên hoa/thường của username => phải tự hạ chữ, nếu không build sẽ
           # chết với lỗi "repository name must be lowercase".
-          echo "image_name=$(echo '${{ github.repository_owner }}/greenx7-fe' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
+          echo "image_name=$(echo '${{ github.repository_owner }}/greenx7-web' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
 
       - uses: docker/setup-buildx-action@v3
 
