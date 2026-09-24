@@ -1,86 +1,119 @@
 'use client';
 
-import { Leaf, PanelLeftClose, PanelLeftOpen, X } from 'lucide-react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { X } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
+import { BaseButton } from '@/components/base';
+import { AvatarPlaceholderIcon, LogoutIcon } from '@/components/icons';
 import { NavLink } from '@/components/layout/nav-link';
-import { Button } from '@/components/ui/button';
 import { ADMIN_NAVIGATION } from '@/config/navigation';
 import { ROUTES } from '@/config/routes';
+import { authApi } from '@/features/auth/api/auth.api';
 import { useAuth } from '@/features/auth/auth-provider';
-import { cn } from '@/lib/utils';
 import { useUiStore } from '@/stores/ui.store';
 
-function SidebarBody({ collapsed, onNavigate }: { collapsed: boolean; onNavigate?: () => void }) {
-  const { can } = useAuth();
+interface SidebarBodyProps {
+  onNavigate?: () => void;
+}
+
+function SidebarContent({ onNavigate }: SidebarBodyProps) {
+  const { user, setUser, can } = useAuth();
+  const router = useRouter();
+  const queryClient = useQueryClient();
+
+  const logout = useMutation({
+    mutationFn: authApi.logout,
+    onSuccess: () => {
+      setUser(null);
+      queryClient.clear();
+      toast.success('Signed out successfully');
+      router.replace(ROUTES.login);
+      router.refresh();
+    },
+    onError: () => toast.error('Sign out failed, please try again'),
+  });
 
   return (
-    <nav className="flex-1 space-y-6 overflow-y-auto px-3 py-4">
-      {ADMIN_NAVIGATION.map((group, index) => {
-        // Lọc theo quyền TRƯỚC khi render tiêu đề nhóm, tránh hiện nhóm rỗng
-        const visibleItems = group.items.filter(
-          (item) => !item.permissions || can(item.permissions),
-        );
-        if (!visibleItems.length) return null;
+    <div className="flex h-full flex-col justify-between px-4 py-6">
+      {/* Top section: Logo & Nav items */}
+      <div className="flex flex-col">
+        {/* Logo */}
+        <div className="mb-12">
+          <Link href={ROUTES.admin.dashboard} className="inline-block">
+            <Image
+              src="/icons/greenx7-logo.svg"
+              alt="GreenX7"
+              width={140}
+              height={34}
+              className="h-7 w-auto"
+              priority
+            />
+          </Link>
+        </div>
 
-        return (
-          <div key={group.title ?? index} className="space-y-1">
-            {group.title && !collapsed && (
-              <p className="px-3 pb-1 text-xs font-semibold uppercase tracking-wider text-sidebar-foreground/50">
-                {group.title}
-              </p>
-            )}
-            {visibleItems.map((item) => (
-              <NavLink key={item.href} item={item} collapsed={collapsed} onNavigate={onNavigate} />
-            ))}
+        {/* Navigation list */}
+        <nav className="space-y-1.5">
+          {ADMIN_NAVIGATION.map((group, index) => {
+            const visibleItems = group.items.filter(
+              (item) => !item.permissions || can(item.permissions),
+            );
+            if (!visibleItems.length) return null;
+
+            return (
+              <div key={group.title ?? index} className="space-y-1">
+                {visibleItems.map((item) => (
+                  <NavLink key={item.href} item={item} onNavigate={onNavigate} />
+                ))}
+              </div>
+            );
+          })}
+        </nav>
+      </div>
+
+      {/* Bottom section: User Info & Sign Out */}
+      <div className="space-y-1">
+        <div className="mb-4 border-t border-neutral-grey-5" />
+
+        {/* User profile */}
+        <div className="flex items-center gap-3 px-4">
+          <AvatarPlaceholderIcon className="shrink-0" />
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-bold text-neutral-grey-1">{user?.fullName}</p>
+            <p className="truncate text-xs text-neutral-grey-3">
+              {user?.role === 'ADMINISTRATOR' ? 'Administrator' : 'User'}
+            </p>
           </div>
-        );
-      })}
-    </nav>
+        </div>
+
+        {/* Sign out button */}
+        <BaseButton
+          variant="ghost"
+          size="medium"
+          fullWidth
+          className="justify-start"
+          onClick={() => logout.mutate()}
+          disabled={logout.isPending}
+          startIcon={<LogoutIcon className="shrink-0" />}
+        >
+          Sign Out
+        </BaseButton>
+      </div>
+    </div>
   );
 }
 
 export function AdminSidebar() {
-  const { sidebarCollapsed, toggleSidebar, mobileSidebarOpen, setMobileSidebarOpen } = useUiStore();
+  const { mobileSidebarOpen, setMobileSidebarOpen } = useUiStore();
 
   return (
     <>
       {/* Sidebar cố định — desktop */}
-      <aside
-        className={cn(
-          'fixed inset-y-0 left-0 z-30 hidden flex-col border-r border-sidebar-border bg-sidebar transition-[width] duration-200 lg:flex',
-          sidebarCollapsed ? 'w-16' : 'w-64',
-        )}
-      >
-        <div className="flex h-16 items-center justify-between border-b border-sidebar-border px-3">
-          <Link
-            href={ROUTES.admin.dashboard}
-            className={cn('flex items-center gap-2 text-white', sidebarCollapsed && 'justify-center')}
-          >
-            <Leaf className="h-6 w-6 shrink-0" aria-hidden />
-            {!sidebarCollapsed && <span className="font-semibold">GreenX7</span>}
-          </Link>
-        </div>
-
-        <SidebarBody collapsed={sidebarCollapsed} />
-
-        <div className="border-t border-sidebar-border p-2">
-          <button
-            type="button"
-            onClick={toggleSidebar}
-            className="flex w-full items-center justify-center gap-2 rounded-md px-3 py-2 text-sm text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent/60 hover:text-white"
-            aria-label={sidebarCollapsed ? 'Mở rộng menu' : 'Thu gọn menu'}
-          >
-            {sidebarCollapsed ? (
-              <PanelLeftOpen className="h-4 w-4" />
-            ) : (
-              <>
-                <PanelLeftClose className="h-4 w-4" />
-                Thu gọn
-              </>
-            )}
-          </button>
-        </div>
+      <aside className="border-r-0.5 fixed inset-y-0 left-0 z-30 hidden w-56 flex-col border-neutral-grey-5 bg-neutral-grey-7 lg:flex">
+        <SidebarContent />
       </aside>
 
       {/* Drawer — mobile */}
@@ -92,22 +125,18 @@ export function AdminSidebar() {
             onClick={() => setMobileSidebarOpen(false)}
             aria-label="Đóng menu"
           />
-          <aside className="relative flex h-full w-64 animate-slide-up flex-col bg-sidebar">
-            <div className="flex h-16 items-center justify-between border-b border-sidebar-border px-4">
-              <span className="flex items-center gap-2 font-semibold text-white">
-                <Leaf className="h-5 w-5" aria-hidden />
-                GreenX7
-              </span>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-white hover:bg-sidebar-accent"
+          <aside className="border-r-0.5 relative flex h-full w-56 animate-slide-up flex-col border-neutral-grey-5 bg-neutral-grey-7">
+            <div className="absolute right-3 top-4 z-10">
+              <button
+                type="button"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-neutral-grey-2 transition-colors hover:bg-neutral-grey-6"
                 onClick={() => setMobileSidebarOpen(false)}
+                aria-label="Đóng menu"
               >
-                <X />
-              </Button>
+                <X className="h-5 w-5" />
+              </button>
             </div>
-            <SidebarBody collapsed={false} onNavigate={() => setMobileSidebarOpen(false)} />
+            <SidebarContent onNavigate={() => setMobileSidebarOpen(false)} />
           </aside>
         </div>
       )}

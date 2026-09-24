@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
-import { Be_Vietnam_Pro } from 'next/font/google';
+import localFont from 'next/font/local';
+import type { ReactNode } from 'react';
 
 import { AppProviders } from '@/components/providers/app-providers';
 import { serverGet } from '@/lib/server-api';
@@ -7,11 +8,18 @@ import type { AuthUser } from '@/types/auth';
 
 import './globals.css';
 
-// Be Vietnam Pro hỗ trợ đầy đủ dấu tiếng Việt — thay bằng font trong Figma nếu khác
-const fontSans = Be_Vietnam_Pro({
-  subsets: ['latin', 'vietnamese'],
-  weight: ['400', '500', '600', '700'],
-  variable: '--font-sans',
+const Satoshi = localFont({
+  src: [
+    {
+      path: '../../public/fonts/Satoshi-Variable.woff2',
+      style: 'normal',
+    },
+    {
+      path: '../../public/fonts/Satoshi-VariableItalic.woff2',
+      style: 'italic',
+    },
+  ],
+  variable: '--font-satoshi',
   display: 'swap',
 });
 
@@ -21,9 +29,9 @@ export const metadata: Metadata = {
     template: '%s | GreenX7',
   },
   description: 'Nền tảng thực phẩm sạch GreenX7',
-  // Dùng APP_URL (không phải NEXT_PUBLIC_) vì metadata chỉ chạy phía server.
-  // Biến NEXT_PUBLIC_ bị "nướng" vào bundle lúc build => image Docker sẽ dính cứng
-  // một domain, không tái dùng được cho staging/production.
+  // Use APP_URL (not NEXT_PUBLIC_) because metadata only runs on the server.
+  // NEXT_PUBLIC_ values are baked into the bundle at build time, so the Docker
+  // image would stick to one domain and could not be reused for staging/production.
   metadataBase: new URL(process.env.APP_URL ?? 'http://localhost:3000'),
 };
 
@@ -33,19 +41,19 @@ export const viewport: Viewport = {
   themeColor: '#1b7a4d',
 };
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: ReactNode }) {
   /**
-   * Lấy user NGAY TRÊN SERVER và truyền xuống provider.
-   * Nhờ đó HTML trả về lần đầu đã đúng vai trò người dùng — không có cảnh
-   * hiện menu khách rồi mới nhảy sang menu admin sau khi JS chạy xong.
+   * Fetch the user ON THE SERVER and pass it down to the provider.
+   * The first HTML already matches the user role — no guest-menu flash
+   * before JS swaps in the admin menu.
    *
-   * Access token hết hạn đã được middleware gia hạn trước khi request tới đây.
+   * An expired access token was already renewed by middleware before this request.
    */
   const user = await serverGet<AuthUser>('/auth/me');
 
   return (
-    <html lang="vi" suppressHydrationWarning>
-      <body className={`${fontSans.variable} font-sans`}>
+    <html lang="vi" className={Satoshi.variable} suppressHydrationWarning>
+      <body className="font-satoshi">
         <AppProviders initialUser={user}>{children}</AppProviders>
       </body>
     </html>

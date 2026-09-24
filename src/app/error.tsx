@@ -1,33 +1,33 @@
 'use client';
 
-import { AlertTriangle } from 'lucide-react';
 import { useEffect } from 'react';
+import { AlertTriangle } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
+import { BaseButton } from '@/components/base';
 
-export default function GlobalError({
-  error,
-  reset,
-}: {
+interface ErrorProps {
   error: Error & { digest?: string };
   reset: () => void;
-}) {
+}
+
+export default function ErrorPage({ error, reset }: ErrorProps) {
   useEffect(() => {
-    // Thay bằng Sentry.captureException(error) khi tích hợp APM
+    // Replace with Sentry.captureException(error) when APM is integrated
     console.error('[GlobalError]', error);
   }, [error]);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 text-center">
-      <div className="rounded-full bg-destructive/10 p-4">
-        <AlertTriangle className="h-8 w-8 text-destructive" aria-hidden />
+      <div className="rounded-full bg-secondary-red-2 p-4">
+        <AlertTriangle className="h-8 w-8 text-secondary-red-4" aria-hidden />
       </div>
-      <h1 className="text-2xl font-semibold">Đã có lỗi xảy ra</h1>
-      <p className="max-w-md text-muted-foreground">
-        Hệ thống gặp sự cố ngoài dự kiến. Vui lòng thử lại, nếu vẫn lỗi hãy liên hệ bộ phận kỹ thuật.
+      <h1 className="text-2xl font-semibold text-neutral-grey-1">Something went wrong</h1>
+      <p className="max-w-md text-neutral-grey-3">
+        An unexpected error occurred. Please try again or contact support if the issue persists.
       </p>
-      {error.digest && <code className="text-xs text-muted-foreground">Mã lỗi: {error.digest}</code>}
-      <Button onClick={reset}>Thử lại</Button>
+      {error.digest && <code className="text-xs text-neutral-grey-3">Error ID: {error.digest}</code>}
+      <BaseButton onClick={reset}>Try again</BaseButton>
     </main>
   );
 }
+

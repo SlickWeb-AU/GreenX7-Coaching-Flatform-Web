@@ -111,7 +111,7 @@
   }
 
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-background text-foreground antialiased font-satoshi;
     font-feature-settings: 'rlig' 1, 'calt' 1;
   }
 
@@ -132,6 +132,47 @@
 }
 
 @layer utilities {
+  /* Dashboard typography ported from battery-check Tailwind v4 */
+  .heading-64-bold {
+    @apply text-[64px]/[68px] font-bold tracking-tight;
+  }
+  .heading-48-bold {
+    @apply text-[48px]/[52px] font-bold tracking-tight;
+  }
+  .heading-28-bold {
+    @apply text-[28px]/[32px] font-bold tracking-tight;
+  }
+  .heading-20-bold {
+    @apply text-xl/[26px] font-bold tracking-tight;
+  }
+  .body-32-bold {
+    @apply text-[32px]/[38px] font-bold tracking-tight;
+  }
+  .body-18-bold {
+    @apply text-lg/[24px] font-bold tracking-tight;
+  }
+  .body-18-medium {
+    @apply text-lg/[24px] font-medium tracking-tight;
+  }
+  .body-16-bold {
+    @apply text-base/[22px] font-bold tracking-tight;
+  }
+  .body-16-medium {
+    @apply text-base/[22px] font-medium tracking-tight;
+  }
+  .body-14-bold {
+    @apply text-sm/[20px] font-bold tracking-tight;
+  }
+  .body-14-medium {
+    @apply text-sm/[20px] font-medium tracking-tight;
+  }
+  .body-12-medium {
+    @apply text-xs/[18px] font-medium tracking-tight;
+  }
+  .caption-12-regular {
+    @apply text-xs/[18px] font-normal tracking-tight;
+  }
+
   /* Ẩn spinner của input[type=number] */
   .no-spinner::-webkit-outer-spin-button,
   .no-spinner::-webkit-inner-spin-button {
