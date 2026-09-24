@@ -1,44 +1,37 @@
-import type { UserRole } from '@/types/auth';
+import { USER_ROLES, type UserRole } from '@/types/auth';
 
 export const ROUTES = {
   home: '/',
   login: '/login',
-  register: '/register',
   forbidden: '/forbidden',
 
-  // Khu vực khách hàng
-  shop: {
-    products: '/products',
-    productDetail: (slug: string) => `/products/${slug}`,
-    profile: '/profile',
-  },
-
-  // Khu vực quản trị
+  // Admin area
   admin: {
-    dashboard: '/admin',
-    users: '/admin/users',
-    products: '/admin/products',
-    categories: '/admin/categories',
+    dashboard: '/admin/dashboard',
+    clients: '/admin/clients',
+    clientNew: '/admin/clients/new',
+    clientDetail: (id: string) => `/admin/clients/${id}`,
+    clientEdit: (id: string) => `/admin/clients/${id}/edit`,
+    departmentDetail: (clientId: string, deptId: string) =>
+      `/admin/clients/${clientId}/departments/${deptId}`,
+    settings: '/admin/settings',
+    login: '/login',
   },
 } as const;
 
-/** Route công khai — không cần đăng nhập */
-export const PUBLIC_ROUTES = ['/', '/products', '/forbidden'];
-
-/** Route chỉ dành cho khách CHƯA đăng nhập — đã đăng nhập vào đây sẽ bị đẩy về trang chủ theo role */
-export const GUEST_ONLY_ROUTES = ['/login', '/register'];
+/** Guest-only routes — signed-in users here are redirected home by role */
+export const GUEST_ONLY_ROUTES = ['/login'];
 
 /**
- * Bảo vệ theo tiền tố đường dẫn.
- * Middleware duyệt từ trên xuống, lấy match ĐẦU TIÊN.
+ * Path-prefix protection.
+ * Middleware scans top-down and takes the FIRST match.
  */
 export const PROTECTED_ROUTE_RULES: { prefix: string; roles: UserRole[] }[] = [
-  { prefix: '/admin', roles: ['ADMIN'] },
-  { prefix: '/profile', roles: ['ADMIN', 'CUSTOMER'] },
+  { prefix: '/admin', roles: [USER_ROLES.ADMINISTRATOR] },
 ];
 
-/** Sau khi đăng nhập, mỗi role được đưa về đâu */
+/** Where each role lands after sign-in */
 export const DEFAULT_REDIRECT_BY_ROLE: Record<UserRole, string> = {
-  ADMIN: ROUTES.admin.dashboard,
-  CUSTOMER: ROUTES.shop.products,
+  [USER_ROLES.ADMINISTRATOR]: ROUTES.admin.dashboard,
+  [USER_ROLES.GUEST]: ROUTES.login,
 };

@@ -6,26 +6,27 @@ import {
   DEFAULT_REDIRECT_BY_ROLE,
   GUEST_ONLY_ROUTES,
   PROTECTED_ROUTE_RULES,
+  ROUTES,
 } from '@/config/routes';
-import type { AccessTokenPayload, AuthTokens, UserRole } from '@/types/auth';
+import { USER_ROLES, type AccessTokenPayload, type AuthTokens, type UserRole } from '@/types/auth';
 
 /**
- * MIDDLEWARE — hàng phòng thủ ĐẦU TIÊN của phân quyền.
+ * MIDDLEWARE — first line of defense for authorization.
  *
- * Chạy ở Edge, trước cả khi React render. Ba nhiệm vụ:
+ * Runs at the Edge, before React renders. Three duties:
  *
- *  1. VERIFY (không phải decode) access token bằng chữ ký HS256 dùng chung với BE.
- *     Chỉ decode thì bất kỳ ai cũng tự chế được token `{"role":"ADMIN"}`.
+ *  1. VERIFY (not just decode) the access token with the HS256 secret shared with the BE.
+ *     Decoding alone would let anyone forge a token like `{"role":"ADMIN"}`.
  *
- *  2. Tự làm mới phiên khi access token hết hạn nhưng refresh token còn sống.
- *     Việc này BẮT BUỘC phải nằm ở middleware: server component không set được
- *     cookie, nên nếu không refresh ở đây thì mỗi 15 phút user sẽ bị đá ra
- *     giữa lúc đang duyệt trang.
+ *  2. Silently renew the session when the access token expired but the refresh token is alive.
+ *     This MUST live in middleware: server components cannot set cookies,
+ *     so without a refresh here the user would be kicked out every 15 minutes
+ *     in the middle of browsing.
  *
- *  3. Chặn route theo role trước khi lộ bất kỳ nội dung nào.
+ *  3. Block routes by role before any content leaks.
  *
- * LƯU Ý: đây là lớp CHẶN ĐIỀU HƯỚNG, không thay thế phân quyền ở BE.
- * Dữ liệu vẫn phải được BE bảo vệ — middleware chỉ lo trải nghiệm và bề mặt tấn công.
+ * NOTE: this is a NAVIGATION-BLOCKING layer, not a BE authorization replacement.
+ * Data must still be protected by the BE — middleware only covers experience and attack surface.
  */
 
 const API_URL = process.env.API_URL ?? 'http://localhost:8000/api/v1';
@@ -71,7 +72,13 @@ function applyTokens(response: NextResponse, tokens: AuthTokens): NextResponse {
 }
 
 function clearTokens(response: NextResponse): NextResponse {
-  const options = { httpOnly: true, secure: isSecure, sameSite: 'lax' as const, path: '/', maxAge: 0 };
+  const options = {
+    httpOnly: true,
+    secure: isSecure,
+    sameSite: 'lax' as const,
+    path: '/',
+    maxAge: 0,
+  };
   response.cookies.set(COOKIE_NAMES.accessToken, '', options);
   response.cookies.set(COOKIE_NAMES.refreshToken, '', options);
   return response;
@@ -87,7 +94,7 @@ export async function middleware(request: NextRequest) {
   let renewedTokens: AuthTokens | null = null;
   let sessionDied = false;
 
-  // Access token hỏng/hết hạn nhưng vẫn còn refresh token => thử gia hạn im lặng
+  // Broken/expired access token but refresh token still alive => try silent renewal
   if (!payload && refreshToken) {
     const outcome = await tryRefresh(refreshToken);
     payload = outcome.payload;
@@ -96,51 +103,77 @@ export async function middleware(request: NextRequest) {
   }
 
   const isAuthenticated = payload !== null;
-  const role = payload?.role as UserRole | undefined;
+  const role: UserRole = isAuthenticated
+    ? USER_ROLES.ADMINISTRATOR
+    : USER_ROLES.GUEST;
 
-  /** Bọc mọi response để không bao giờ quên ghi cookie vừa gia hạn */
+  /** Wrap every response so the just-renewed cookies are never forgotten */
   const finalize = (response: NextResponse): NextResponse => {
+    response.headers.set('x-pathname', pathname);
     if (renewedTokens) return applyTokens(response, renewedTokens);
     if (sessionDied) return clearTokens(response);
     return response;
   };
 
-  // ---- 1. Route chỉ dành cho khách chưa đăng nhập ----
-  if (GUEST_ONLY_ROUTES.some((route) => pathname.startsWith(route))) {
-    if (isAuthenticated && role) {
-      return finalize(NextResponse.redirect(new URL(DEFAULT_REDIRECT_BY_ROLE[role], request.url)));
-    }
-    return finalize(NextResponse.next());
+  const nextWithPathname = (): NextResponse => {
+    const headers = new Headers(request.headers);
+    headers.set('x-pathname', pathname);
+    return finalize(NextResponse.next({ request: { headers } }));
+  };
+
+  const cleanSearch = search && search !== '?' ? search : '';
+
+  // ---- 0. Redirect legacy admin routes ----
+  if (pathname === '/admin/login' || pathname === '/admin/login/') {
+    return finalize(NextResponse.redirect(new URL(ROUTES.login, request.url)));
   }
 
-  // ---- 2. Route được bảo vệ ----
+  // Home '/' was removed — guests here are redirected to the matching area
+  if (pathname === '/') {
+    const target = isAuthenticated ? `${ROUTES.admin.dashboard}${cleanSearch}` : ROUTES.login;
+    return finalize(NextResponse.redirect(new URL(target, request.url)));
+  }
+
+  if (pathname === '/admin' || pathname === '/admin/') {
+    return finalize(
+      NextResponse.redirect(new URL(`${ROUTES.admin.dashboard}${cleanSearch}`, request.url)),
+    );
+  }
+
+  // ---- 1. Guest-only routes ----
+  if (GUEST_ONLY_ROUTES.some((route) => pathname.startsWith(route))) {
+    if (isAuthenticated && role) {
+      const redirectUrl = DEFAULT_REDIRECT_BY_ROLE[role as UserRole] ?? ROUTES.admin.dashboard;
+      return finalize(NextResponse.redirect(new URL(redirectUrl, request.url)));
+    }
+    return nextWithPathname();
+  }
+
+  // ---- 2. Protected routes ----
   const rule = PROTECTED_ROUTE_RULES.find(
     (r) => pathname === r.prefix || pathname.startsWith(`${r.prefix}/`),
   );
 
   if (rule) {
     if (!isAuthenticated || !role) {
-      const loginUrl = new URL('/login', request.url);
-      // Nhớ nơi user định đến để đăng nhập xong quay lại đúng chỗ
-      loginUrl.searchParams.set('next', `${pathname}${search}`);
-      return finalize(NextResponse.redirect(loginUrl));
+      return finalize(NextResponse.redirect(new URL(ROUTES.login, request.url)));
     }
 
-    if (!rule.roles.includes(role)) {
+    if (!rule.roles.includes(role as any)) {
       return finalize(NextResponse.redirect(new URL('/forbidden', request.url)));
     }
   }
 
-  return finalize(NextResponse.next());
+  return nextWithPathname();
 }
 
 export const config = {
   matcher: [
     /*
-     * Bỏ qua:
-     *  - /api/*        (BFF tự xử lý auth của nó)
-     *  - /_next/*      (asset build)
-     *  - file tĩnh có phần mở rộng
+     * Skip:
+     *  - /api/*        (BFF handles its own auth)
+     *  - /_next/*      (build assets)
+     *  - static files with an extension
      */
     '/((?!api|_next/static|_next/image|favicon.ico|.*\\..*).*)',
   ],

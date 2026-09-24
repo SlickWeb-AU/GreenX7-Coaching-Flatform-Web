@@ -42,21 +42,4 @@ export const queryKeys = {
   auth: {
     me: ['auth', 'me'] as const,
   },
-  users: {
-    all: ['users'] as const,
-    list: (params: unknown) => ['users', 'list', params] as const,
-    detail: (id: string) => ['users', 'detail', id] as const,
-    statistics: ['users', 'statistics'] as const,
-  },
-  products: {
-    all: ['products'] as const,
-    list: (params: unknown) => ['products', 'list', params] as const,
-    adminList: (params: unknown) => ['products', 'admin-list', params] as const,
-    detail: (idOrSlug: string) => ['products', 'detail', idOrSlug] as const,
-    statistics: ['products', 'statistics'] as const,
-  },
-  categories: {
-    all: ['categories'] as const,
-    list: ['categories', 'list'] as const,
-  },
 } as const;

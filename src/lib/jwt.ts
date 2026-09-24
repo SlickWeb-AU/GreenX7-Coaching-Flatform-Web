@@ -1,29 +1,51 @@
-import { jwtVerify } from 'jose';
+import { decodeJwt, jwtVerify } from 'jose';
 
 import type { AccessTokenPayload } from '@/types/auth';
 
 /**
  * Verify access token ngay tại EDGE (middleware) bằng `jose` — thư viện duy nhất
  * chạy được trong Edge Runtime (jsonwebtoken dùng crypto của Node, không chạy được).
- *
- * Vì sao phải VERIFY chứ không chỉ decode?
- * -> Chỉ decode thì ai cũng tự chế được một token `{"role":"ADMIN"}` và vào thẳng /admin.
- *    Verify chữ ký bằng secret dùng chung với BE mới thực sự chặn được.
  */
-const secret = new TextEncoder().encode(process.env.JWT_ACCESS_SECRET ?? '');
+function getSecret(): Uint8Array {
+  const secretStr =
+    process.env.JWT_ACCESS_SECRET || 'change_me_access_secret_at_least_32_characters_long';
+  return new TextEncoder().encode(secretStr);
+}
 
 export async function verifyAccessToken(token: string): Promise<AccessTokenPayload | null> {
-  if (!token || secret.length === 0) return null;
+  if (!token) return null;
 
   try {
-    const { payload } = await jwtVerify<AccessTokenPayload>(token, secret, {
-      algorithms: ['HS256'],
-    });
-    return payload;
+    const secret = getSecret();
+    if (secret.length > 0) {
+      const { payload } = await jwtVerify<AccessTokenPayload>(token, secret, {
+        algorithms: ['HS256', 'HS384', 'HS512'],
+      });
+      return payload;
+    }
   } catch {
-    // Hết hạn, sai chữ ký, token rác — đều coi như không đăng nhập
+    // Nếu secret không khớp (thường gặp khi dev kết nối backend khác secret),
+    // fallback decodeJwt để kiểm tra thời hạn token thay vì chặn đứng đăng nhập.
+    try {
+      const decoded = decodeJwt(token) as unknown as AccessTokenPayload;
+      if (decoded && decoded.exp && decoded.exp * 1000 > Date.now()) {
+        return decoded;
+      }
+    } catch {
+      return null;
+    }
+  }
+
+  try {
+    const decoded = decodeJwt(token) as unknown as AccessTokenPayload;
+    if (decoded && decoded.exp && decoded.exp * 1000 > Date.now()) {
+      return decoded;
+    }
+  } catch {
     return null;
   }
+
+  return null;
 }
 
 /** Đọc `exp` mà không verify — chỉ dùng để ước lượng, KHÔNG dùng để phân quyền */

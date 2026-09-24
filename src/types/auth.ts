@@ -1,15 +1,22 @@
 import type { Permission } from '@/config/permissions';
 
-export type UserRole = 'ADMIN' | 'CUSTOMER';
+export const USER_ROLES = {
+  ADMINISTRATOR: 'ADMINISTRATOR',
+  GUEST: 'GUEST',
+} as const;
+
+export type UserRole = (typeof USER_ROLES)[keyof typeof USER_ROLES];
 export type UserStatus = 'ACTIVE' | 'INACTIVE' | 'BANNED';
 
 export interface AuthUser {
   id: string;
   email: string;
-  fullName: string;
+  firstName?: string;
+  lastName?: string;
+  fullName?: string;
   role: UserRole;
-  avatarUrl: string | null;
-  phone: string | null;
+  avatarUrl?: string | null;
+  phone?: string | null;
   permissions: Permission[];
 }
 
@@ -25,7 +32,7 @@ export interface AuthResult {
   tokens: AuthTokens;
 }
 
-/** Payload bên trong access token — middleware đọc để phân quyền ở edge */
+/** Access-token payload — middleware reads it for edge authorization */
 export interface AccessTokenPayload {
   sub: string;
   email: string;

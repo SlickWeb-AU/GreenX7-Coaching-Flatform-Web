@@ -1,56 +1,56 @@
-import type { UserRole } from '@/types/auth';
+import { USER_ROLES, type UserRole } from '@/types/auth';
 
 /**
- * PHẢI GIỮ ĐỒNG BỘ với src/common/constants/permission.constant.ts bên BE.
+ * Permission-based RBAC, not hardcoded roles.
  *
- * Lưu ý quan trọng: bảng này chỉ để QUYẾT ĐỊNH HIỂN THỊ UI.
- * Ẩn một cái nút KHÔNG phải là bảo mật — BE mới là nơi thực sự chặn.
- * Vì vậy sai lệch nhỏ ở đây chỉ gây khó chịu về UX, không gây lỗ hổng.
+ * Only the ADMINISTRATOR role holds everything today. Keep the permission layer because the
+ * Settings screen suggests more roles later (e.g. report-only viewers who cannot edit
+ * clients). Then only one ROLE_PERMISSIONS line is added instead of touching
+ * decorators across dozens of controllers.
  */
 export const PERMISSIONS = {
-  USER_READ: 'user:read',
-  USER_CREATE: 'user:create',
-  USER_UPDATE: 'user:update',
-  USER_DELETE: 'user:delete',
+  // Organization clients
+  CLIENT_READ: 'client:read',
+  CLIENT_CREATE: 'client:create',
+  CLIENT_UPDATE: 'client:update',
+  CLIENT_DELETE: 'client:delete',
 
-  PRODUCT_READ: 'product:read',
-  PRODUCT_CREATE: 'product:create',
-  PRODUCT_UPDATE: 'product:update',
-  PRODUCT_DELETE: 'product:delete',
+  // Client contacts & departments
+  CONTACT_MANAGE: 'contact:manage',
+  DEPARTMENT_MANAGE: 'department:manage',
 
-  CATEGORY_READ: 'category:read',
-  CATEGORY_MANAGE: 'category:manage',
+  // Check-in participants
+  PARTICIPANT_READ: 'participant:read',
+  PARTICIPANT_MANAGE: 'participant:manage',
 
+  // Check-in cycles
+  CHECKIN_READ: 'checkin:read',
+  CHECKIN_MANAGE: 'checkin:manage',
+
+  // Reports
   DASHBOARD_VIEW: 'dashboard:view',
 
+  // Administrators (Settings screen)
+  ADMIN_READ: 'admin:read',
+  ADMIN_MANAGE: 'admin:manage',
+
+  // Personal profile
   PROFILE_READ: 'profile:read',
   PROFILE_UPDATE: 'profile:update',
 } as const;
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
 
-const CUSTOMER_PERMISSIONS: Permission[] = [
-  PERMISSIONS.PROFILE_READ,
-  PERMISSIONS.PROFILE_UPDATE,
-  PERMISSIONS.PRODUCT_READ,
-  PERMISSIONS.CATEGORY_READ,
-];
+const ALL_PERMISSIONS = Object.values(PERMISSIONS) as Permission[];
 
 export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
-  CUSTOMER: CUSTOMER_PERMISSIONS,
-  ADMIN: [
-    ...CUSTOMER_PERMISSIONS,
-    PERMISSIONS.USER_READ,
-    PERMISSIONS.USER_CREATE,
-    PERMISSIONS.USER_UPDATE,
-    PERMISSIONS.USER_DELETE,
-    PERMISSIONS.PRODUCT_CREATE,
-    PERMISSIONS.PRODUCT_UPDATE,
-    PERMISSIONS.PRODUCT_DELETE,
-    PERMISSIONS.CATEGORY_MANAGE,
-    PERMISSIONS.DASHBOARD_VIEW,
-  ],
+  [USER_ROLES.ADMINISTRATOR]: ALL_PERMISSIONS,
+  [USER_ROLES.GUEST]: [],
 };
+
+export function getPermissionsForRole(role: UserRole): Permission[] {
+  return ROLE_PERMISSIONS[role] ?? [];
+}
 
 export function hasPermission(
   userPermissions: readonly Permission[] | undefined,
