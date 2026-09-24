@@ -38,6 +38,60 @@ const config: Config = {
         secondary: {
           DEFAULT: 'hsl(var(--secondary))',
           foreground: 'hsl(var(--secondary-foreground))',
+          green: {
+            1: '#9ACC63',
+            2: '#E6F2D8',
+            4: '#087452',
+          },
+          yellow: {
+            1: '#EBD343',
+            2: '#FAF4D0',
+          },
+          orange: {
+            1: '#F09E5D',
+            2: '#FBE7D7',
+          },
+          cyan: {
+            1: '#5FC8C9',
+            2: '#D7F1F2',
+          },
+          violet: {
+            1: '#AC8ED4',
+            2: '#EBE4F5',
+          },
+          rose: {
+            1: '#EE8F9F',
+            2: '#FCDADD',
+          },
+          red: {
+            1: '#F56C77',
+            2: '#FBE3E7',
+            4: '#B43E47',
+          },
+          teal: {
+            1: '#83ADB9',
+            2: '#E1EBEE',
+          },
+        },
+        neutral: {
+          white: {
+            solid: '#FFFFFF',
+          },
+          grey: {
+            1: '#12211C',
+            2: '#53635C',
+            3: '#6A7A72',
+            4: '#BFCFC5',
+            5: '#CBD1CD',
+            6: '#DFE5E1',
+            7: '#EDF3EF',
+            8: '#F6F8F5',
+          },
+        },
+        brand: {
+          green: {
+            2: '#005943',
+          },
         },
         destructive: {
           DEFAULT: 'hsl(var(--destructive))',
@@ -74,13 +128,16 @@ const config: Config = {
           border: 'hsl(var(--sidebar-border))',
         },
       },
+      borderWidth: {
+        '0.5': '0.5px',
+      },
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
       },
       fontFamily: {
-        sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
+        satoshi: ['var(--font-satoshi)', 'sans-serif'],
       },
       keyframes: {
         'accordion-down': {
