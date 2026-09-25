@@ -78,11 +78,20 @@ const config: Config = {
         brand: {
           green: {
             2: '#005943',
+            3: '#63D556',
+            4: '#C7E3A9',
           },
         },
       },
       borderWidth: {
         '0.5': '0.5px',
+      },
+      spacing: {
+        '1.25': '5px',
+      },
+      boxShadow: {
+        'pill-tab': '0px 1px 3px 0px #003F3226',
+        'live-dot': '0px 0px 0px 4px #58E3AA2B',
       },
       fontFamily: {
         satoshi: ['var(--font-satoshi)', 'sans-serif'],
