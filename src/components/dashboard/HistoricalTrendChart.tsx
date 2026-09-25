@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, type ReactNode } from 'react';
 import {
   CartesianGrid,
   Line,
@@ -11,7 +11,10 @@ import {
   YAxis,
 } from 'recharts';
 
-import type { DashboardTrendPointDto } from './types';
+import { BaseCard } from '@/components/base';
+import { cn } from '@/lib/utils';
+
+import type { DashboardTrendPointDto } from '@/types';
 
 const MONTH_NAMES = [
   'Jan',
@@ -47,10 +50,18 @@ export function HistoricalTrendChart({
   data,
   title = 'Platform Historical Trend',
   subtitle,
+  lineColor = '#005943',
+  dotColor,
+  footerNote,
+  className,
 }: {
   data?: DashboardTrendPointDto[];
   title?: string;
   subtitle?: string;
+  lineColor?: string;
+  dotColor?: string;
+  footerNote?: ReactNode;
+  className?: string;
 }) {
   const chartData = useMemo(
     () =>
@@ -63,21 +74,18 @@ export function HistoricalTrendChart({
 
   if (!data || data.length === 0) {
     return (
-      <div className="flex h-full min-h-[260px] flex-col rounded-2xl bg-white p-6 shadow-none">
-        <div className="mb-6 flex flex-col gap-0.5">
-          <h2 className="heading-20-bold text-neutral-grey-1">{title}</h2>
-          {subtitle && <p className="body-14-medium text-neutral-grey-3">{subtitle}</p>}
-        </div>
-      </div>
+      <BaseCard
+        title={title}
+        subtitle={subtitle}
+        className={cn('flex h-full min-h-[260px] flex-col', className)}
+      >
+        {null}
+      </BaseCard>
     );
   }
 
   return (
-    <div className="flex h-full flex-col rounded-2xl bg-white p-6 shadow-none">
-      <div className="mb-6 flex flex-col gap-0.5">
-        <h2 className="heading-20-bold text-neutral-grey-1">{title}</h2>
-        {subtitle && <p className="body-14-medium text-neutral-grey-3">{subtitle}</p>}
-      </div>
+    <BaseCard title={title} subtitle={subtitle} className={cn('flex h-full flex-col', className)}>
       <div className="h-52 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 10, right: 16, left: 16, bottom: 0 }}>
@@ -107,14 +115,15 @@ export function HistoricalTrendChart({
             <Line
               type="monotone"
               dataKey="score"
-              stroke="#005943"
+              stroke={lineColor}
               strokeWidth={3}
-              dot={{ r: 5, fill: '#FFFFFF', stroke: '#005943', strokeWidth: 2.5 }}
-              activeDot={{ r: 7, fill: '#FFFFFF', stroke: '#005943', strokeWidth: 3 }}
+              dot={{ r: 5, fill: '#FFFFFF', stroke: dotColor ?? lineColor, strokeWidth: 2.5 }}
+              activeDot={{ r: 7, fill: '#FFFFFF', stroke: dotColor ?? lineColor, strokeWidth: 3 }}
             />
           </LineChart>
         </ResponsiveContainer>
       </div>
-    </div>
+      {footerNote && <div className="mt-auto flex items-center gap-2 pt-2">{footerNote}</div>}
+    </BaseCard>
   );
 }

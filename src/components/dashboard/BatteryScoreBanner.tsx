@@ -2,7 +2,7 @@
 
 import { BatteryIcon } from '@/components/icons';
 
-import type { DashboardOverviewDto } from './types';
+import type { DashboardOverviewDto } from '@/types';
 
 export function BatteryScoreBanner({
   overview,

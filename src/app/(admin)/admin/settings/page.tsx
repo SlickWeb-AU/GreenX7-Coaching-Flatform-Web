@@ -1,26 +1,26 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Pencil } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 
 import {
   BaseButton,
   BaseDialog,
-  BaseErrorState,
   BaseHeader,
   BaseIconButton,
   BaseInput,
   BaseLoading,
 } from '@/components/base';
-import { PlusIcon, TrashIcon, UserPlusIcon } from '@/components/icons';
+import { EditIcon, PlusIcon, TrashIcon, UserPlusIcon } from '@/components/icons';
 
-import { settingsApi } from '@/features/admin-settings/settings.api';
-import { AdminsTable } from '@/features/admin-settings/AdminsTable';
-import { validateIndustryName, validateInvite } from '@/features/admin-settings/settings-valid';
+import { useConfirm } from '@/components/providers';
+import { AdminsTable } from '@/components/settings';
+import { settingsApi } from '@/features/admin-settings';
+import { validateIndustryName, validateInvite } from '@/validations';
 
 export default function SettingsPage() {
   const queryClient = useQueryClient();
+  const { showConfirm } = useConfirm();
   const industriesQuery = useQuery({
     queryKey: ['admin-industries'],
     queryFn: settingsApi.getIndustries,
@@ -41,8 +41,11 @@ export default function SettingsPage() {
   const [formError, setFormError] = useState('');
   const [inviteSuccess, setInviteSuccess] = useState(false);
 
-  const invalidate = () => {
+  const invalidateIndustries = () => {
     queryClient.invalidateQueries({ queryKey: ['admin-industries'] });
+  };
+
+  const invalidateAdmins = () => {
     queryClient.invalidateQueries({ queryKey: ['admin-admins'] });
   };
 
@@ -52,7 +55,7 @@ export default function SettingsPage() {
       setShowIndustry(false);
       setIndustryName('');
       setEditingId(null);
-      invalidate();
+      invalidateIndustries();
     },
     onError: (e: unknown) => setFormError(e instanceof Error ? e.message : 'Save failed'),
   });
@@ -63,13 +66,13 @@ export default function SettingsPage() {
       setShowIndustry(false);
       setIndustryName('');
       setEditingId(null);
-      invalidate();
+      invalidateIndustries();
     },
     onError: (e: unknown) => setFormError(e instanceof Error ? e.message : 'Save failed'),
   });
   const deleteIndustry = useMutation({
     mutationFn: settingsApi.deleteIndustry,
-    onSuccess: invalidate,
+    onSuccess: invalidateIndustries,
   });
   const inviteAdmin = useMutation({
     mutationFn: settingsApi.inviteAdmin,
@@ -81,37 +84,15 @@ export default function SettingsPage() {
         setInviteName('');
         setInviteEmail('');
       }, 1500);
-      invalidate();
+      invalidateAdmins();
     },
     onError: (e: unknown) => setFormError(e instanceof Error ? e.message : 'Invite failed'),
   });
 
   const loading = industriesQuery.isLoading || adminsQuery.isLoading;
-  const error = industriesQuery.error || adminsQuery.error;
 
   if (loading) {
-    return (
-      <>
-        <BaseHeader title="Settings" />
-        <BaseLoading message="Loading settings..." fullScreen={false} />
-      </>
-    );
-  }
-
-  if (error) {
-    return (
-      <>
-        <BaseHeader title="Settings" />
-        <BaseErrorState
-          title="Unable to load settings"
-          message={error instanceof Error ? error.message : 'Request failed'}
-          onRetry={() => {
-            industriesQuery.refetch();
-            adminsQuery.refetch();
-          }}
-        />
-      </>
-    );
+    return <BaseLoading message="Loading settings..." fullScreen />;
   }
 
   const industries = industriesQuery.data ?? [];
@@ -177,7 +158,7 @@ export default function SettingsPage() {
                 <BaseIconButton
                   aria-label={`Rename ${ind.name}`}
                   size={40}
-                  icon={<Pencil size={20} className="h-4 w-4" />}
+                  icon={<EditIcon size={20} />}
                   className="text-neutral-grey-3 hover:text-brand-green-2"
                   onClick={() => {
                     setEditingId(ind.id);
@@ -191,8 +172,17 @@ export default function SettingsPage() {
                   size={40}
                   icon={<TrashIcon size={20} />}
                   className="text-neutral-grey-3 hover:text-secondary-red-4"
-                  onClick={() => {
-                    if (window.confirm('Delete this industry?')) deleteIndustry.mutate(ind.id);
+                  onClick={async () => {
+                    const confirmed = await showConfirm({
+                      title: 'Delete industry',
+                      message: `Are you sure you want to delete "${ind.name}"? This action cannot be undone.`,
+                      confirmText: 'Delete',
+                      cancelText: 'Cancel',
+                      variant: 'danger',
+                    });
+                    if (confirmed) {
+                      deleteIndustry.mutate(ind.id);
+                    }
                   }}
                 />
               </div>
@@ -233,6 +223,7 @@ export default function SettingsPage() {
           <form onSubmit={submitIndustry} noValidate>
             <BaseInput
               label="Industry name"
+              placeholder="Enter industry name"
               value={industryName}
               onChange={(e) => setIndustryName(e.target.value)}
               error={Boolean(formError)}
@@ -259,11 +250,13 @@ export default function SettingsPage() {
               <div className="flex flex-col gap-3">
                 <BaseInput
                   label="Name"
+                  placeholder="Enter name"
                   value={inviteName}
                   onChange={(e) => setInviteName(e.target.value)}
                 />
                 <BaseInput
                   label="Email"
+                  placeholder="Enter email"
                   type="email"
                   value={inviteEmail}
                   onChange={(e) => setInviteEmail(e.target.value)}

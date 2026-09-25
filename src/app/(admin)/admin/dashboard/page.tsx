@@ -8,19 +8,22 @@ import { BaseButton, BaseHeader, BaseLoading, BaseSelectInside } from '@/compone
 import { ExportIcon } from '@/components/icons';
 import { get } from '@/lib/axios';
 
-import { BatteryScoreBanner } from '@/features/admin-dashboard/BatteryScoreBanner';
-import { HistoricalTrendChart } from '@/features/admin-dashboard/HistoricalTrendChart';
-import { PlatformPerformanceBar } from '@/features/admin-dashboard/PlatformPerformanceBar';
-import { WellbeingGrid } from '@/features/admin-dashboard/WellbeingGrid';
-import { buildDashboardQuery } from '@/features/admin-dashboard/query';
-import type { AdminDashboardDto } from '@/features/admin-dashboard/types';
 import {
-  DASHBOARD_INDUSTRY_OPTIONS,
+  BatteryScoreBanner,
+  HistoricalTrendChart,
+  PlatformPerformanceBar,
+  WellbeingGrid,
+} from '@/components/dashboard';
+import { settingsApi } from '@/features/admin-settings';
+import { buildDashboardQuery } from '@/lib/dashboard';
+import type { AdminDashboardDto } from '@/types';
+import {
+  ALL_FILTER_VALUE,
   DASHBOARD_MONTH_OPTIONS,
   DASHBOARD_YEAR_OPTIONS,
   FIXED_WELLBEING_AREAS,
   FIXED_ZONES,
-} from '@/constants/dashboard';
+} from '@/constants';
 
 function DashboardContent() {
   const router = useRouter();
@@ -28,13 +31,32 @@ function DashboardContent() {
   const searchParams = useSearchParams();
   const month = Number(searchParams.get('month')) || new Date().getMonth() + 1;
   const year = Number(searchParams.get('year')) || new Date().getFullYear();
-  const industry = searchParams.get('industry') || 'ALL';
+  const industry = searchParams.get('industry') || ALL_FILTER_VALUE;
 
   const setParam = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set(key, value);
     router.replace(`${pathname}?${params.toString()}`);
   };
+
+  const industriesQuery = useQuery({
+    queryKey: ['admin-industries'],
+    queryFn: settingsApi.getIndustries,
+    retry: false,
+  });
+
+  const industryOptions = useMemo(() => {
+    const list = (industriesQuery.data ?? []).map((ind) => ({
+      value: ind.id,
+      label: ind.name,
+    }));
+    return [{ value: ALL_FILTER_VALUE, label: 'All Industries' }, ...list];
+  }, [industriesQuery.data]);
+
+  const selectedIndustryLabel = useMemo(() => {
+    if (industry === ALL_FILTER_VALUE) return null;
+    return industryOptions.find((opt) => opt.value === industry)?.label ?? null;
+  }, [industry, industryOptions]);
 
   const query = buildDashboardQuery({ month, year, industry });
   const { data, isLoading, isFetching } = useQuery({
@@ -117,12 +139,7 @@ function DashboardContent() {
   const historicalTrend = data?.historicalTrend ?? [];
 
   if ((isLoading || isFetching) && !data) {
-    return (
-      <>
-        <BaseHeader title="Dashboard" />
-        <BaseLoading message="Loading dashboard..." fullScreen={false} />
-      </>
-    );
+    return <BaseLoading message="Loading dashboard..." fullScreen />;
   }
 
   return (
@@ -133,31 +150,32 @@ function DashboardContent() {
           <>
             <BaseSelectInside
               label="Month"
+              placeholder="Select month"
               value={String(month)}
               options={DASHBOARD_MONTH_OPTIONS}
               onChange={(v) => setParam('month', v)}
             />
             <BaseSelectInside
               label="Year"
+              placeholder="Select year"
               value={String(year)}
               options={DASHBOARD_YEAR_OPTIONS}
               onChange={(v) => setParam('year', v)}
             />
             <BaseSelectInside
               label="Industry"
+              placeholder="Select industry"
               value={industry}
-              options={DASHBOARD_INDUSTRY_OPTIONS}
+              options={industryOptions}
               onChange={(v) => setParam('industry', v)}
             />
             <BaseButton
               variant="secondary"
               pill
-              size="medium"
-              className="border-neutral-grey-5 text-brand-green-2 hover:text-brand-green-2"
               startIcon={<ExportIcon aria-hidden />}
               onClick={() => window.print()}
             >
-              Export
+              Export PDF
             </BaseButton>
           </>
         }
@@ -165,7 +183,7 @@ function DashboardContent() {
       <div className="mb-8">
         <BatteryScoreBanner
           overview={overview}
-          industryName={industry !== 'ALL' ? industry : null}
+          industryName={selectedIndustryLabel}
           industryCount={overview.industryCount}
         />
       </div>
@@ -186,7 +204,7 @@ function DashboardContent() {
 
 export default function AdminDashboardPage() {
   return (
-    <Suspense fallback={<BaseLoading message="Loading dashboard..." fullScreen={false} />}>
+    <Suspense fallback={<BaseLoading message="Loading dashboard..." fullScreen />}>
       <DashboardContent />
     </Suspense>
   );

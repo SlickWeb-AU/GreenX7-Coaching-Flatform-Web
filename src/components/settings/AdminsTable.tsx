@@ -1,7 +1,8 @@
 import { BaseTable, type BaseColumn } from '@/components/base';
+import { CLIENT_STATUSES } from '@/constants/clients';
 import { cn } from '@/lib/utils';
 
-import type { AdminUser } from './settings.api';
+import type { AdminUser } from '@/types';
 
 export interface AdminsTableProps {
   admins: AdminUser[];
@@ -30,8 +31,8 @@ const columns: BaseColumn<AdminUser>[] = [
       record.status ? (
         <span
           className={cn(
-            'inline-flex items-center rounded-full px-2 py-0.5 body-12-medium',
-            record.status === 'ACTIVE'
+            'body-12-medium inline-flex items-center rounded-full px-2 py-0.5',
+            record.status === CLIENT_STATUSES.ACTIVE
               ? 'bg-secondary-green-2 text-secondary-green-4'
               : 'bg-neutral-grey-7 text-neutral-grey-2',
           )}

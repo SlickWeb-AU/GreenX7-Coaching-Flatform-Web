@@ -18,7 +18,7 @@ import {
 import { DASHBOARD_COLORS } from '@/constants/tokens';
 import { cn } from '@/lib/utils';
 
-import type { DashboardWellbeingAreaDto } from './types';
+import type { DashboardWellbeingAreaDto } from '@/types';
 
 const AREA_BADGE: Record<string, string> = {
   Physical: 'bg-secondary-orange-2',

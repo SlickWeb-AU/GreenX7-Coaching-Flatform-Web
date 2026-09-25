@@ -42,6 +42,12 @@ export interface DashboardTrendPointDto {
   score: number | null;
 }
 
+export interface DashboardQuery {
+  month: number;
+  year: number;
+  industry: string;
+}
+
 export interface AdminDashboardDto {
   filters?: {
     year: number;

@@ -3,10 +3,10 @@
 import { cn } from '@/lib/utils';
 import { ZONE_COLORS } from '@/constants/tokens';
 
-import type { DashboardZoneDistributionDto } from './types';
+import type { DashboardZoneDistributionDto } from '@/types';
 
 const ZONE_BAR: Record<string, string> = {
-  Thrive: 'bg-accent-green',
+  Thrive: 'bg-secondary-green-1',
   Momentum: 'bg-secondary-yellow-1',
   Function: 'bg-secondary-orange-1',
   Survive: 'bg-secondary-red-1',

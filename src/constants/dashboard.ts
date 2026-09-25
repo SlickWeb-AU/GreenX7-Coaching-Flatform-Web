@@ -1,3 +1,5 @@
+import { ALL_FILTER_VALUE } from './clients';
+
 export const DASHBOARD_MONTH_OPTIONS = [
   { value: '1', label: 'January' },
   { value: '2', label: 'February' },
@@ -13,13 +15,17 @@ export const DASHBOARD_MONTH_OPTIONS = [
   { value: '12', label: 'December' },
 ];
 
-export const DASHBOARD_YEAR_OPTIONS = [
-  { value: '2025', label: '2025' },
-  { value: '2026', label: '2026' },
-  { value: '2027', label: '2027' },
-];
+export const getDashboardYearOptions = (count = 10) => {
+  const currentYear = new Date().getFullYear();
+  return Array.from({ length: count }, (_, i) => {
+    const y = currentYear - i;
+    return { value: String(y), label: String(y) };
+  });
+};
 
-export const DASHBOARD_INDUSTRY_OPTIONS = [{ value: 'ALL', label: 'All Industries' }];
+export const DASHBOARD_YEAR_OPTIONS = getDashboardYearOptions(10);
+
+export const DASHBOARD_INDUSTRY_OPTIONS = [{ value: ALL_FILTER_VALUE, label: 'All Industries' }];
 
 export const FIXED_WELLBEING_AREAS = [
   { area: 'Physical', label: 'Physical' },

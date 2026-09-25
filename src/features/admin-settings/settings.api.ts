@@ -2,22 +2,9 @@
 
 import { del, get, patch, post } from '@/lib/axios';
 
-export interface Industry {
-  id: string;
-  name: string;
-  slug: string;
-  sortOrder: number;
-  isActive: boolean;
-  clientCount: number;
-}
+import type { AdminUser, Industry } from '@/types';
 
-export interface AdminUser {
-  id: string;
-  name?: string;
-  email: string;
-  role?: string;
-  status?: string;
-}
+export type { AdminUser, Industry };
 
 export const settingsApi = {
   getIndustries: () => get<Industry[]>('/industries'),
