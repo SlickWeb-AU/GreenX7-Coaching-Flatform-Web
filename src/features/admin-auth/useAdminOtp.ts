@@ -4,11 +4,7 @@ import { useMutation } from '@tanstack/react-query';
 
 import { type ApiError } from '@/lib/api-error';
 import { post } from '@/lib/axios';
-import type { AuthUser } from '@/types/auth';
-
-export interface RequestCodeResponse {
-  expiresIn?: number;
-}
+import type { AuthUser, RequestCodeResponse } from '@/types/auth';
 
 export function useAdminOtp() {
   const requestCode = useMutation<RequestCodeResponse, ApiError, string>({

@@ -1,14 +1,13 @@
 'use client';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { X } from 'lucide-react';
+import { CircleUser, LogOut, X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 import { BaseButton } from '@/components/base';
-import { AvatarPlaceholderIcon, LogoutIcon } from '@/components/icons';
 import { NavLink } from '@/components/layout/nav-link';
 import { ADMIN_NAVIGATION } from '@/config/navigation';
 import { ROUTES } from '@/config/routes';
@@ -79,15 +78,26 @@ function SidebarContent({ onNavigate }: SidebarBodyProps) {
         <div className="mb-4 border-t border-neutral-grey-5" />
 
         {/* User profile */}
-        <div className="flex items-center gap-3 px-4">
-          <AvatarPlaceholderIcon className="shrink-0" />
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-bold text-neutral-grey-1">{user?.fullName}</p>
-            <p className="truncate text-xs text-neutral-grey-3">
-              {user?.role === 'ADMINISTRATOR' ? 'Administrator' : 'User'}
-            </p>
-          </div>
-        </div>
+        {(() => {
+          const displayName =
+            [user?.firstName, user?.lastName].filter(Boolean).join(' ') ||
+            user?.email ||
+            'Administrator';
+
+          return (
+            <div className="flex items-center gap-3 px-4">
+              <CircleUser size={32} className="shrink-0 text-neutral-grey-3" aria-hidden />
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-bold text-neutral-grey-1" title={displayName}>
+                  {displayName}
+                </p>
+                <p className="truncate text-xs text-neutral-grey-3">
+                  {user?.role === 'ADMINISTRATOR' ? 'Administrator' : 'User'}
+                </p>
+              </div>
+            </div>
+          );
+        })()}
 
         {/* Sign out button */}
         <BaseButton
@@ -97,7 +107,7 @@ function SidebarContent({ onNavigate }: SidebarBodyProps) {
           className="justify-start gap-3"
           onClick={() => logout.mutate()}
           disabled={logout.isPending}
-          startIcon={<LogoutIcon className="shrink-0" />}
+          startIcon={<LogOut size={20} className="shrink-0" aria-hidden />}
         >
           Sign Out
         </BaseButton>

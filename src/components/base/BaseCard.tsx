@@ -12,6 +12,8 @@ export interface BaseCardProps {
   subtitle?: string;
   actions?: ReactNode;
   prefixIcon?: ReactNode;
+  isEmpty?: boolean;
+  emptyText?: ReactNode;
 }
 
 export function BaseCard({
@@ -22,6 +24,8 @@ export function BaseCard({
   subtitle,
   actions,
   prefixIcon,
+  isEmpty,
+  emptyText = 'No data available',
 }: BaseCardProps) {
   const hasHeader = Boolean(title || subtitle || prefixIcon || actions);
 
@@ -47,7 +51,17 @@ export function BaseCard({
           {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
         </div>
       )}
-      {children}
+      {isEmpty ? (
+        <div className="flex flex-1 items-center justify-center py-8 text-center">
+          {typeof emptyText === 'string' ? (
+            <p className="body-14-medium text-neutral-grey-3">{emptyText}</p>
+          ) : (
+            emptyText
+          )}
+        </div>
+      ) : (
+        children
+      )}
     </div>
   );
 }

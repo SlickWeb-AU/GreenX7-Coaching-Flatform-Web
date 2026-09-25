@@ -1,9 +1,8 @@
 'use client';
 
 import { useEffect, useId, useRef, useState } from 'react';
-import { Check } from 'lucide-react';
+import { Check, ChevronDown } from 'lucide-react';
 
-import { ChevronDownIcon } from '@/components/icons';
 import { cn } from '@/lib/utils';
 
 export type BaseSelectInsideVariant = 'primary' | 'secondary';
@@ -108,8 +107,12 @@ export function BaseSelectInside<T extends string>({
           <span className="body-16-bold min-w-0 truncate text-neutral-grey-1">
             {selectedOption?.label ?? (value ? value : resolvedPlaceholder)}
           </span>
-          <ChevronDownIcon
-            className={cn('shrink-0 transition-transform duration-200', isOpen && 'rotate-180')}
+          <ChevronDown
+            size={16}
+            className={cn(
+              'shrink-0 text-neutral-grey-3 transition-transform duration-200',
+              isOpen && 'rotate-180',
+            )}
             aria-hidden
           />
         </span>

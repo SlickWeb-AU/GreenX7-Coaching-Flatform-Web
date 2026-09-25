@@ -14,13 +14,14 @@ import {
   formatDayOfMonth,
   type BaseSelectOption,
 } from '@/components/base';
-import { PlusIcon } from '@/components/icons';
+import { Plus } from 'lucide-react';
 import {
   CLIENT_CHECK_IN_DAY_MAX,
   CLIENT_COMPANY_SIZE_OPTIONS,
   CLIENT_FORM_STATUS_OPTIONS,
   CLIENT_STATE_OPTIONS,
   CLIENT_STATUSES,
+  DEFAULT_CLIENT_TIMEZONE,
 } from '@/constants/clients';
 
 import {
@@ -76,7 +77,7 @@ export function CreateClientForm({
       departments: [],
       checkInStartDay: undefined,
       checkInEndDay: undefined,
-      timezone: 'Australia/Sydney',
+      timezone: DEFAULT_CLIENT_TIMEZONE,
       autoSendReport: true,
     },
   });
@@ -105,6 +106,13 @@ export function CreateClientForm({
       setSectionError(result.error.issues[0]?.message || 'Please enter a valid email address.');
       return;
     }
+    const isDuplicate = contactFields.some(
+      (c) => c.email.trim().toLowerCase() === result.data.email.trim().toLowerCase(),
+    );
+    if (isDuplicate) {
+      setSectionError('A contact with this email address already exists.');
+      return;
+    }
     appendContact({
       firstName: result.data.firstName,
       lastName: result.data.lastName,
@@ -126,6 +134,13 @@ export function CreateClientForm({
     });
     if (!result.success) {
       setSectionError(result.error.issues[0]?.message || 'Please enter a department name.');
+      return;
+    }
+    const isDuplicate = departmentFields.some(
+      (d) => d.name.trim().toLowerCase() === result.data.name.trim().toLowerCase(),
+    );
+    if (isDuplicate) {
+      setSectionError('A department with this name already exists.');
       return;
     }
     appendDepartment(result.data);
@@ -226,12 +241,13 @@ export function CreateClientForm({
             type="button"
             variant="secondary"
             pill
+            startIcon={<Plus size={16} aria-hidden />}
             onClick={() => {
               setNewContact(EMPTY_CONTACT);
               setSectionError('');
             }}
           >
-            <PlusIcon aria-hidden /> Add Contact
+            Add Contact
           </BaseButton>
         }
       >
@@ -339,13 +355,14 @@ export function CreateClientForm({
             type="button"
             variant="secondary"
             pill
+            startIcon={<Plus size={16} aria-hidden />}
             onClick={() => {
               setNewDeptName('');
               setNewDeptStatus(CLIENT_STATUSES.ACTIVE);
               setSectionError('');
             }}
           >
-            <PlusIcon aria-hidden /> Add Department
+            Add Department
           </BaseButton>
         }
       >

@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 
-import { ChevronDownIcon } from '@/components/icons';
+import { MONTH_NAMES } from '@/constants';
 import { cn } from '@/lib/utils';
 
 export { formatDayOfMonth, getOrdinalSuffix } from '@/lib/utils';
@@ -37,20 +37,6 @@ export interface BaseDatePickerProps {
 }
 
 const WEEKDAYS = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
-const MONTH_NAMES = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-];
 
 const defaultFormat = (date: Date): string => {
   const pad = (n: number) => String(n).padStart(2, '0');
@@ -248,8 +234,12 @@ export function BaseDatePicker({
             </span>
           </div>
           <span className="ml-3 shrink-0">
-            <ChevronDownIcon
-              className={cn('transition-transform duration-200', isOpen && 'rotate-180')}
+            <ChevronDown
+              size={16}
+              className={cn(
+                'text-neutral-grey-3 transition-transform duration-200',
+                isOpen && 'rotate-180',
+              )}
               aria-hidden
             />
           </span>

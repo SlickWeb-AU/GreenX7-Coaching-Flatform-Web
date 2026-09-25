@@ -2,7 +2,7 @@
 
 import type { ComponentType, SVGProps } from 'react';
 
-import { BaseCard } from '@/components/base';
+import { BaseCard, BaseTrend } from '@/components/base';
 import {
   BoltIcon,
   CloudIcon,
@@ -13,11 +13,9 @@ import {
   NutritionIcon,
   PurposeIcon,
   RelationshipsIcon,
-  TrendDownIcon,
-  TrendUpIcon,
 } from '@/components/icons';
 import { DASHBOARD_COLORS } from '@/constants/tokens';
-import { cn } from '@/lib/utils';
+import { cn, formatScoreToPercent } from '@/lib/utils';
 
 export interface WellbeingItemData {
   area: string;
@@ -74,17 +72,6 @@ const AREA_ICON_MAP: Record<
   Purpose: { Icon: PurposeIcon },
 };
 
-const DEFAULT_AREAS: WellbeingItemData[] = [
-  { area: 'Physical', score: 61, vsPreviousMonth: 2, vsFirstCheck: 5 },
-  { area: 'Sleep', score: 64, vsPreviousMonth: 1, vsFirstCheck: 3 },
-  { area: 'Nutrition', score: 70, vsPreviousMonth: 3, vsFirstCheck: 6 },
-  { area: 'Fun', score: 67, vsPreviousMonth: 4, vsFirstCheck: 7 },
-  { area: 'Mindset', score: 66, vsPreviousMonth: -1, vsFirstCheck: 2 },
-  { area: 'Friendships', score: 73, vsPreviousMonth: 2, vsFirstCheck: -2 },
-  { area: 'Relationships', score: 71, vsPreviousMonth: 1, vsFirstCheck: 4 },
-  { area: 'Purpose', score: 68, vsPreviousMonth: -1, vsFirstCheck: 3 },
-];
-
 export interface ClientWellbeingCardProps {
   items?: WellbeingItemData[];
   previousMonthLabel?: string;
@@ -92,17 +79,23 @@ export interface ClientWellbeingCardProps {
 }
 
 export function ClientWellbeingCard({
-  items = DEFAULT_AREAS,
-  previousMonthLabel = 'June',
+  items,
+  previousMonthLabel = '',
   className,
 }: ClientWellbeingCardProps) {
+  if (!items || items.length === 0) {
+    return <BaseCard title="Wellbeing areas" isEmpty className={cn('flex flex-col', className)} />;
+  }
+
   return (
     <BaseCard title="Wellbeing areas" className={cn('flex flex-col', className)}>
       {/* Header */}
       <div className="body-12-bold mb-2 flex items-center justify-between text-neutral-grey-3">
         <div className="flex-1">Area</div>
         <div className="flex items-center gap-3">
-          <div className="w-20 text-center">vs. {previousMonthLabel}</div>
+          <div className="w-20 text-center">
+            {previousMonthLabel ? `vs. ${previousMonthLabel}` : 'vs. Previous'}
+          </div>
           <div className="w-24 text-center">vs. First Check</div>
         </div>
       </div>
@@ -112,13 +105,12 @@ export function ClientWellbeingCard({
         {items.map((item) => {
           const areaKey = item.area;
           const { Icon } = AREA_ICON_MAP[areaKey] ?? AREA_ICON_MAP.Physical;
-          const isPrevPositive = item.vsPreviousMonth >= 0;
-          const isFirstPositive = item.vsFirstCheck >= 0;
+          const displayScore = formatScoreToPercent(item.score);
 
           return (
             <div key={item.area} className="flex items-center justify-between">
               {/* Area Info & Progress bar */}
-              <div className="flex flex-1 items-center gap-4 pr-6">
+              <div className="flex flex-1 items-center gap-4 pr-12">
                 {/* 24px icon + label (gap 8px) */}
                 <div className="flex items-center gap-2">
                   <div
@@ -140,13 +132,13 @@ export function ClientWellbeingCard({
                   <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-neutral-grey-7">
                     <div
                       className={cn('h-full rounded-full', AREA_BAR[areaKey] ?? 'bg-brand-green-2')}
-                      style={{ width: `${Math.min(100, Math.max(0, item.score))}%` }}
+                      style={{ width: `${Math.min(100, Math.max(0, displayScore ?? 0))}%` }}
                     />
                   </div>
 
                   {/* Score + Bolt icon (gap 4px, size 10) */}
                   <div className="body-14-bold flex shrink-0 items-center gap-1 text-neutral-grey-1">
-                    <span>{Math.round(item.score * 10) / 10}</span>
+                    <span>{displayScore ?? '—'}</span>
                     <BoltIcon size={10} aria-hidden="true" />
                   </div>
                 </div>
@@ -155,35 +147,11 @@ export function ClientWellbeingCard({
               {/* Comparison columns (gap 12px) */}
               <div className="flex items-center gap-3">
                 <div className="flex w-20 items-center justify-center">
-                  <span
-                    className={cn(
-                      'body-14-bold inline-flex items-center gap-1',
-                      isPrevPositive ? 'text-secondary-green-4' : 'text-secondary-red-4',
-                    )}
-                  >
-                    {isPrevPositive ? (
-                      <TrendUpIcon size={16} aria-hidden="true" />
-                    ) : (
-                      <TrendDownIcon size={16} aria-hidden="true" />
-                    )}
-                    {Math.round(Math.abs(item.vsPreviousMonth) * 10) / 10}%
-                  </span>
+                  <BaseTrend value={item.vsPreviousMonth} />
                 </div>
 
                 <div className="flex w-24 items-center justify-center">
-                  <span
-                    className={cn(
-                      'body-14-bold inline-flex items-center gap-1',
-                      isFirstPositive ? 'text-secondary-green-4' : 'text-secondary-red-4',
-                    )}
-                  >
-                    {isFirstPositive ? (
-                      <TrendUpIcon size={16} aria-hidden="true" />
-                    ) : (
-                      <TrendDownIcon size={16} aria-hidden="true" />
-                    )}
-                    {Math.round(Math.abs(item.vsFirstCheck) * 10) / 10}%
-                  </span>
+                  <BaseTrend value={item.vsFirstCheck} />
                 </div>
               </div>
             </div>

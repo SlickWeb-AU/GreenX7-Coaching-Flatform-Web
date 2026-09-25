@@ -89,6 +89,21 @@ export interface UpdateClientPayload {
   autoSendReport: boolean;
 }
 
+export interface DepartmentListQuery {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+  sortBy?: string;
+  sortOrder?: SortOrder;
+  year?: number;
+  month?: number;
+}
+
+export interface CreateDepartmentPayload {
+  name: string;
+  status: ClientStatus;
+}
+
 export interface DeltaDto {
   change: number | null;
   changePercent: number | null;

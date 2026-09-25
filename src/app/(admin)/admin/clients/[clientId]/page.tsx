@@ -8,23 +8,22 @@ import {
   ClientHistoryTab,
   useClient,
 } from '@/components/clients';
+import { CLIENT_TABS } from '@/constants/clients';
 
 export default function ClientDetailPage() {
   const { clientId, client } = useClient();
   const searchParams = useSearchParams();
-  const activeTab = searchParams.get('tab') || 'dashboard';
+  const activeTab = searchParams.get('tab') || CLIENT_TABS.DASHBOARD;
 
   return (
     <>
-      {activeTab === 'dashboard' && (
-        <ClientDashboardTab clientId={clientId} participantCount={182} batteryScore={68} />
-      )}
+      {activeTab === CLIENT_TABS.DASHBOARD && <ClientDashboardTab clientId={clientId} />}
 
-      {activeTab === 'departments' && (
+      {activeTab === CLIENT_TABS.DEPARTMENTS && (
         <ClientDepartmentsTab clientId={clientId} departments={client?.departments} />
       )}
 
-      {activeTab === 'check-in-history' && <ClientHistoryTab clientId={clientId} />}
+      {activeTab === CLIENT_TABS.CHECK_IN_HISTORY && <ClientHistoryTab clientId={clientId} />}
     </>
   );
 }

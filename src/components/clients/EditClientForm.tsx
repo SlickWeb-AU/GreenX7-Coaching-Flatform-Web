@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Pencil, Trash2 } from 'lucide-react';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 
@@ -19,7 +19,6 @@ import {
   ContactsIcon,
   DepartmentsIcon,
   MonthlyScheduleIcon,
-  PlusIcon,
 } from '@/components/icons';
 import {
   CHECK_IN_DAY_SELECT_OPTIONS,
@@ -113,6 +112,13 @@ export function EditClientForm({
       setContactError(result.error.issues[0]?.message || 'Please fill in contact details.');
       return;
     }
+    const isDuplicate = contactFields.some(
+      (c) => c.email.trim().toLowerCase() === result.data.email.trim().toLowerCase(),
+    );
+    if (isDuplicate) {
+      setContactError('A contact with this email address already exists.');
+      return;
+    }
     appendContact(result.data);
     setContactForm(EMPTY_CONTACT);
     setIsAddingContact(false);
@@ -123,6 +129,14 @@ export function EditClientForm({
     const result = clientContactSchema.safeParse(contactForm);
     if (!result.success) {
       setContactError(result.error.issues[0]?.message || 'Please fill in contact details.');
+      return;
+    }
+    const isDuplicate = contactFields.some(
+      (c, i) =>
+        i !== index && c.email.trim().toLowerCase() === result.data.email.trim().toLowerCase(),
+    );
+    if (isDuplicate) {
+      setContactError('A contact with this email address already exists.');
       return;
     }
     updateContact(index, result.data);
@@ -137,6 +151,13 @@ export function EditClientForm({
       setDeptError(result.error.issues[0]?.message || 'Please enter department name.');
       return;
     }
+    const isDuplicate = departmentFields.some(
+      (d) => d.name.trim().toLowerCase() === result.data.name.trim().toLowerCase(),
+    );
+    if (isDuplicate) {
+      setDeptError('A department with this name already exists.');
+      return;
+    }
     appendDepartment(result.data);
     setDeptForm(EMPTY_DEPT);
     setIsAddingDept(false);
@@ -147,6 +168,14 @@ export function EditClientForm({
     const result = clientDepartmentSchema.safeParse(deptForm);
     if (!result.success) {
       setDeptError(result.error.issues[0]?.message || 'Please enter department name.');
+      return;
+    }
+    const isDuplicate = departmentFields.some(
+      (d, i) =>
+        i !== index && d.name.trim().toLowerCase() === result.data.name.trim().toLowerCase(),
+    );
+    if (isDuplicate) {
+      setDeptError('A department with this name already exists.');
       return;
     }
     updateDepartment(index, result.data);
@@ -247,6 +276,7 @@ export function EditClientForm({
             type="button"
             variant="secondary"
             pill
+            startIcon={<Plus size={16} aria-hidden />}
             onClick={() => {
               setIsAddingContact(true);
               setEditingContactIndex(null);
@@ -254,7 +284,7 @@ export function EditClientForm({
               setContactError('');
             }}
           >
-            <PlusIcon aria-hidden /> Add Contact
+            Add Contact
           </BaseButton>
         }
       >
@@ -439,6 +469,7 @@ export function EditClientForm({
             type="button"
             variant="secondary"
             pill
+            startIcon={<Plus size={16} aria-hidden />}
             onClick={() => {
               setIsAddingDept(true);
               setEditingDeptIndex(null);
@@ -446,7 +477,7 @@ export function EditClientForm({
               setDeptError('');
             }}
           >
-            <PlusIcon aria-hidden /> Add Department
+            Add Department
           </BaseButton>
         }
       >

@@ -2,52 +2,20 @@
 
 import { useState, type FormEvent } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Plus } from 'lucide-react';
-import Link from 'next/link';
+import { Plus, Search } from 'lucide-react';
 
-import {
-  BaseButton,
-  BaseDialog,
-  BaseInput,
-  BaseSelect,
-  BaseTable,
-  type BaseColumn,
-} from '@/components/base';
-import { SearchIcon, TrendDownIcon, TrendUpIcon } from '@/components/icons';
-import { ROUTES } from '@/config/routes';
+import { BaseButton, BaseDialog, BaseInput, BaseSelect } from '@/components/base';
 import { CLIENT_FORM_STATUS_OPTIONS, CLIENT_STATUSES } from '@/constants/clients';
 import { clientsApi } from '@/features/admin-clients';
-import { formatBatteryScore } from '@/lib/clients';
 import { queryKeys } from '@/lib/query-client';
-import type { ClientDepartment, ClientStatus, DepartmentListItemDto } from '@/types';
-import { cn } from '@/lib/utils';
+import type { ClientDepartment, ClientStatus, CreateDepartmentPayload } from '@/types';
+
+import { ClientDepartmentsTable } from './ClientDepartmentsTable';
 
 export interface ClientDepartmentsTabProps {
   clientId: string;
   departments?: ClientDepartment[];
   className?: string;
-}
-
-function DeltaBadge({ change }: { change?: number | null }) {
-  if (change === undefined || change === null) {
-    return <span className="text-neutral-grey-3">—</span>;
-  }
-  const isPositive = change >= 0;
-  return (
-    <span
-      className={cn(
-        'body-14-bold inline-flex items-center gap-1',
-        isPositive ? 'text-secondary-green-4' : 'text-secondary-red-4',
-      )}
-    >
-      {isPositive ? (
-        <TrendUpIcon size={16} aria-hidden="true" />
-      ) : (
-        <TrendDownIcon size={16} aria-hidden="true" />
-      )}
-      <span>{Math.round(Math.abs(change) * 10) / 10}%</span>
-    </span>
-  );
 }
 
 export function ClientDepartmentsTab({
@@ -68,7 +36,7 @@ export function ClientDepartmentsTab({
   const [newDeptStatus, setNewDeptStatus] = useState<ClientStatus>(CLIENT_STATUSES.ACTIVE);
   const [errorMsg, setErrorMsg] = useState('');
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isFetching } = useQuery({
     queryKey: queryKeys.adminClients.departments(
       clientId,
       page,
@@ -91,7 +59,7 @@ export function ClientDepartmentsTab({
   });
 
   const createMutation = useMutation({
-    mutationFn: (payload: { name: string; status: string }) =>
+    mutationFn: (payload: CreateDepartmentPayload) =>
       clientsApi.createDepartment(clientId, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -112,77 +80,24 @@ export function ClientDepartmentsTab({
 
   const handleCreateDepartment = (e: FormEvent) => {
     e.preventDefault();
-    if (!newDeptName.trim()) {
+    const trimmed = newDeptName.trim();
+    if (!trimmed) {
       setErrorMsg('Please enter a department name.');
+      return;
+    }
+    const isDuplicate = (data?.items ?? []).some(
+      (d) => d.name.trim().toLowerCase() === trimmed.toLowerCase(),
+    );
+    if (isDuplicate) {
+      setErrorMsg('A department with this name already exists.');
       return;
     }
     setErrorMsg('');
     createMutation.mutate({
-      name: newDeptName.trim(),
+      name: trimmed,
       status: newDeptStatus,
     });
   };
-
-  const columns: BaseColumn<DepartmentListItemDto | ClientDepartment>[] = [
-    {
-      key: 'name',
-      title: 'Department',
-      sorter: 'name',
-      render: (_, row) => <span className="body-14-bold text-neutral-grey-1">{row.name}</span>,
-    },
-    {
-      key: 'participantCount',
-      title: 'Participants',
-      sorter: 'participantCount',
-      render: (_, row) => (
-        <span className="body-14-medium text-neutral-grey-2">{row.participantCount ?? 0}</span>
-      ),
-    },
-    {
-      key: 'score',
-      title: 'Score',
-      sorter: 'score',
-      render: (_, row) => {
-        const scoreVal = 'score' in row ? row.score : row.batteryScore;
-        return (
-          <span className="body-14-bold text-brand-green-2">
-            {scoreVal !== undefined && scoreVal !== null ? formatBatteryScore(scoreVal) : '—'}
-          </span>
-        );
-      },
-    },
-    {
-      key: 'vsPrevious',
-      title: 'vs. June',
-      sorter: 'vsPreviousChange',
-      render: (_, row) => {
-        const vsPrev = 'vsPreviousChange' in row ? row.vsPreviousChange : null;
-        return <DeltaBadge change={vsPrev} />;
-      },
-    },
-    {
-      key: 'vsFirstCheck',
-      title: 'vs. First Check',
-      sorter: 'vsFirstCheckChange',
-      render: (_, row) => {
-        const vsFirst = 'vsFirstCheckChange' in row ? row.vsFirstCheckChange : null;
-        return <DeltaBadge change={vsFirst} />;
-      },
-    },
-    {
-      key: 'actions',
-      title: '',
-      align: 'right',
-      render: (_, row) => (
-        <Link
-          href={ROUTES.admin.departmentDetail(clientId, row.id)}
-          className="body-14-bold text-brand-green-2 transition-colors hover:underline"
-        >
-          View
-        </Link>
-      ),
-    },
-  ];
 
   const tableData = data?.items ?? [];
 
@@ -199,7 +114,7 @@ export function ClientDepartmentsTab({
               setSearchTerm(e.target.value);
               setPage(1);
             }}
-            prefix={<SearchIcon size={18} className="text-neutral-grey-3" />}
+            prefix={<Search size={18} className="text-neutral-grey-3" aria-hidden />}
           />
         </div>
 
@@ -218,11 +133,12 @@ export function ClientDepartmentsTab({
       </div>
 
       {/* Table */}
-      <BaseTable
-        columns={columns}
+      <ClientDepartmentsTable
+        clientId={clientId}
         data={tableData}
-        rowKey="id"
         meta={data?.meta}
+        page={page}
+        totalPages={data?.meta?.totalPages ?? 1}
         onPageChange={(p) => setPage(p)}
         sortField={sortBy}
         sortOrder={sortOrder}
@@ -234,9 +150,7 @@ export function ClientDepartmentsTab({
             setSortOrder('asc');
           }
         }}
-        loading={isLoading}
-        emptyTitle="No departments found"
-        emptyDescription="This client does not have any departments yet."
+        loading={isLoading || isFetching}
       />
 
       {/* Add Department Modal */}
@@ -267,18 +181,16 @@ export function ClientDepartmentsTab({
 
             <BaseSelect
               label="Status"
-              placeholder="Select status"
               size="mediumPlus"
               value={newDeptStatus}
-              onChange={setNewDeptStatus}
               options={CLIENT_FORM_STATUS_OPTIONS}
+              onChange={(val) => setNewDeptStatus(val as ClientStatus)}
             />
 
-            <div className="mt-4 flex items-center justify-end gap-2">
+            <div className="mt-4 flex justify-end gap-3">
               <BaseButton
-                type="button"
                 variant="secondary"
-                pill
+                size="mediumPlus"
                 onClick={() => {
                   setIsAddModalOpen(false);
                   setErrorMsg('');
@@ -286,8 +198,13 @@ export function ClientDepartmentsTab({
               >
                 Cancel
               </BaseButton>
-              <BaseButton type="submit" variant="primary" pill loading={createMutation.isPending}>
-                Create Department
+              <BaseButton
+                type="submit"
+                variant="primary"
+                size="mediumPlus"
+                loading={createMutation.isPending}
+              >
+                Save
               </BaseButton>
             </div>
           </form>

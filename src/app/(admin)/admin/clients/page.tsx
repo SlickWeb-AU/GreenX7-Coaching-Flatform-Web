@@ -1,12 +1,11 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { Plus } from 'lucide-react';
+import { Factory, Plus, Search, SlidersHorizontal } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 
 import { BaseButton, BaseHeader, BaseInput, BaseLoading, BaseSelect } from '@/components/base';
-import { FilterMonthIcon, FilterSlidersIcon, SearchIcon } from '@/components/icons';
 import { ROUTES } from '@/config/routes';
 
 import { ClientsTable } from '@/components/clients';
@@ -16,7 +15,13 @@ import { buildClientsQuery } from '@/lib/clients';
 import { queryKeys } from '@/lib/query-client';
 import { mergeSearchParams } from '@/lib/search-params';
 import type { ClientsSortField } from '@/types';
-import { ALL_FILTER_VALUE, CLIENT_STATUS_OPTIONS, SORT_FIELD_TO_API } from '@/constants/clients';
+import {
+  ALL_FILTER_VALUE,
+  CLIENT_SORT_FIELDS,
+  CLIENT_STATUS_OPTIONS,
+  SORT_FIELD_TO_API,
+  SORT_ORDERS,
+} from '@/constants/clients';
 
 function useDebounced(value: string, delay = 400): string {
   const [debounced, setDebounced] = useState(value);
@@ -36,8 +41,8 @@ function ClientsContent() {
   const search = useDebounced(searchInput.trim());
   const industry = searchParams.get('industry') ?? ALL_FILTER_VALUE;
   const status = searchParams.get('status') ?? ALL_FILTER_VALUE;
-  const sortField = (searchParams.get('sort') as ClientsSortField) || 'name';
-  const sortAsc = searchParams.get('order') !== 'desc';
+  const sortField = (searchParams.get('sort') as ClientsSortField) || CLIENT_SORT_FIELDS.NAME;
+  const sortAsc = searchParams.get('order') !== SORT_ORDERS.DESC;
   const page = Number(searchParams.get('page')) > 0 ? Number(searchParams.get('page')) : 1;
 
   // Latest URL snapshot for debounced writes (avoids stale closures wiping
@@ -72,7 +77,7 @@ function ClientsContent() {
     industry,
     status,
     sortBy: SORT_FIELD_TO_API[sortField],
-    sortOrder: sortAsc ? 'asc' : 'desc',
+    sortOrder: sortAsc ? SORT_ORDERS.ASC : SORT_ORDERS.DESC,
   });
 
   const { data, isLoading, isFetching } = useQuery({
@@ -110,15 +115,11 @@ function ClientsContent() {
     </BaseButton>
   );
 
-  if ((isLoading || isFetching) && rows.length === 0) {
-    return <BaseLoading message="Loading clients..." fullScreen />;
-  }
-
   const toggleSort = (field: ClientsSortField) => {
     const nextAsc = sortField === field ? !sortAsc : true;
     setParams({
-      sort: field === 'name' ? null : field,
-      order: nextAsc ? null : 'desc',
+      sort: field === CLIENT_SORT_FIELDS.NAME ? null : field,
+      order: nextAsc ? null : SORT_ORDERS.DESC,
       page: null,
     });
   };
@@ -133,13 +134,13 @@ function ClientsContent() {
             variant="secondary"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            prefix={<SearchIcon aria-hidden />}
+            prefix={<Search size={18} className="text-neutral-grey-3" aria-hidden />}
           />
         </div>
         <div className="flex flex-wrap items-center gap-2 md:ml-auto">
           <div className="w-full sm:w-[180px]">
             <BaseSelect
-              startIcon={<FilterMonthIcon aria-hidden />}
+              startIcon={<Factory size={16} aria-hidden />}
               placeholder="Select industry"
               value={industry}
               options={industryOptions}
@@ -150,7 +151,7 @@ function ClientsContent() {
           </div>
           <div className="w-full sm:w-[160px]">
             <BaseSelect
-              startIcon={<FilterSlidersIcon aria-hidden />}
+              startIcon={<SlidersHorizontal size={16} aria-hidden />}
               placeholder="Select status"
               value={status}
               options={CLIENT_STATUS_OPTIONS}
@@ -162,6 +163,7 @@ function ClientsContent() {
       <div className="pt-4">
         <ClientsTable
           rows={rows}
+          loading={isLoading || isFetching}
           meta={data?.meta}
           sortField={sortField}
           sortAsc={sortAsc}

@@ -1,16 +1,12 @@
 'use client';
 
+import { Eye, EyeOff } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, Suspense, type FormEvent } from 'react';
 
 import { BaseButton, BaseInput, BaseLoading } from '@/components/base';
-import {
-  DecorativeWaveBottomRight,
-  DecorativeWaveTopRight,
-  EyeClosedIcon,
-  EyeOpenIcon,
-} from '@/components/icons';
+import { DecorativeWaveBottomRight, DecorativeWaveTopRight } from '@/components/icons';
 import { reportApi } from '@/features/report-login';
 import { reportSessionKey } from '@/lib/report-auth';
 
@@ -119,7 +115,11 @@ function ReportLoginContent() {
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                     className="flex cursor-pointer select-none items-center justify-center text-neutral-grey-2 transition-opacity hover:opacity-80"
                   >
-                    {showPassword ? <EyeClosedIcon /> : <EyeOpenIcon />}
+                    {showPassword ? (
+                      <EyeOff size={20} aria-hidden />
+                    ) : (
+                      <Eye size={20} aria-hidden />
+                    )}
                   </button>
                 }
               />

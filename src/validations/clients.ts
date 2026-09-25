@@ -1,6 +1,10 @@
 import { z } from 'zod';
 
-import { CLIENT_CHECK_IN_DAY_MAX, CLIENT_STATUSES } from '@/constants/clients';
+import {
+  CLIENT_CHECK_IN_DAY_MAX,
+  CLIENT_STATUSES,
+  DEFAULT_CLIENT_TIMEZONE,
+} from '@/constants/clients';
 
 export const clientContactSchema = z.object({
   firstName: z.string().trim().min(1, 'Please fill in the contact first name.'),
@@ -40,7 +44,7 @@ export const clientFormSchema = z
       (val) => (val === '' || val === null || val === undefined ? undefined : Number(val)),
       z.number().min(1).max(CLIENT_CHECK_IN_DAY_MAX).optional(),
     ),
-    timezone: z.string().default('Australia/Sydney'),
+    timezone: z.string().default(DEFAULT_CLIENT_TIMEZONE),
     autoSendReport: z.boolean().default(true),
   })
   .refine(
@@ -53,6 +57,26 @@ export const clientFormSchema = z
     {
       message: 'Start day must be before end day.',
       path: ['checkInStartDay'],
+    },
+  )
+  .refine(
+    (data) => {
+      const emails = data.contacts.map((c) => c.email.trim().toLowerCase());
+      return new Set(emails).size === emails.length;
+    },
+    {
+      message: 'Duplicate contact email addresses are not allowed.',
+      path: ['contacts'],
+    },
+  )
+  .refine(
+    (data) => {
+      const names = data.departments.map((d) => d.name.trim().toLowerCase());
+      return new Set(names).size === names.length;
+    },
+    {
+      message: 'Duplicate department names are not allowed.',
+      path: ['departments'],
     },
   );
 

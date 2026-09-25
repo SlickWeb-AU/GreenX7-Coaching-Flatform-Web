@@ -10,6 +10,7 @@ import { BaseBreadcrumb, BaseButton, BaseHeader, BaseLoading } from '@/component
 import { ROUTES } from '@/config/routes';
 
 import { EditClientForm } from '@/components/clients';
+import { DEFAULT_CLIENT_TIMEZONE } from '@/constants/clients';
 import { clientsApi } from '@/features/admin-clients';
 import { settingsApi } from '@/features/admin-settings';
 import { queryKeys } from '@/lib/query-client';
@@ -51,7 +52,7 @@ export default function EditClientPage() {
       })),
       checkInStartDay: data.checkInStartDay,
       checkInEndDay: data.checkInEndDay,
-      timezone: data.timezone ?? 'Australia/Sydney',
+      timezone: data.timezone ?? DEFAULT_CLIENT_TIMEZONE,
       autoSendReport: data.autoSendReport,
     };
   }, [data]);

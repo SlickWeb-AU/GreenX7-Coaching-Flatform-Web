@@ -8,8 +8,10 @@ import type {
   ClientDetail,
   ClientListItem,
   CreateClientPayload,
+  CreateDepartmentPayload,
   DepartmentDashboardDto,
   DepartmentListItemDto,
+  DepartmentListQuery,
   DepartmentShareLinksDto,
   UpdateClientPayload,
 } from '@/types';
@@ -24,11 +26,11 @@ export const clientsApi = {
     id: string,
     params: { year: number; month: number; trendMonths?: number; industryId?: string },
   ) => get<ClientDashboardDto>(`/clients/${id}/dashboard`, { params }),
-  getDepartments: (id: string, params: Record<string, unknown> | string) =>
+  getDepartments: (id: string, params: DepartmentListQuery | string) =>
     typeof params === 'string'
       ? getPaginated<DepartmentListItemDto>(`/clients/${id}/departments?${params}`)
       : getPaginated<DepartmentListItemDto>(`/clients/${id}/departments`, { params }),
-  getCheckIns: (id: string, params: Record<string, unknown> | string) =>
+  getCheckIns: (id: string, params: DepartmentListQuery | string) =>
     typeof params === 'string'
       ? getPaginated<CheckInHistoryItemDto>(`/clients/${id}/check-ins?${params}`)
       : getPaginated<CheckInHistoryItemDto>(`/clients/${id}/check-ins`, { params }),
@@ -42,6 +44,6 @@ export const clientsApi = {
     }),
   getDepartmentShareLinks: (id: string, deptId: string) =>
     get<DepartmentShareLinksDto>(`/clients/${id}/departments/${deptId}/share-links`),
-  createDepartment: (id: string, payload: { name: string; status: string }) =>
+  createDepartment: (id: string, payload: CreateDepartmentPayload) =>
     post<DepartmentListItemDto>(`/clients/${id}/departments`, payload),
 };

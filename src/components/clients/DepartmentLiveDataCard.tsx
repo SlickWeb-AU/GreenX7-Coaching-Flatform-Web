@@ -3,6 +3,7 @@
 import { ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 
+import { BaseTag } from '@/components/base';
 import { cn } from '@/lib/utils';
 
 export interface DepartmentLiveDataCardProps {
@@ -12,40 +13,51 @@ export interface DepartmentLiveDataCardProps {
 }
 
 export function DepartmentLiveDataCard({
-  participantCount = 91,
+  participantCount = 0,
   dashboardHref = '#',
   className,
 }: DepartmentLiveDataCardProps) {
   return (
     <div
       className={cn(
-        'flex flex-col items-center justify-between gap-3 rounded-2xl border-2 border-secondary-green-2 bg-white p-5 text-center shadow-none',
+        'flex flex-col items-center justify-between rounded-2xl border-4 border-brand-green-4 bg-white p-3 text-center shadow-none',
         className,
       )}
     >
-      {/* Top: Live data badge */}
-      <div className="caption-12-bold inline-flex items-center gap-1.5 rounded-full bg-secondary-green-2 px-3 py-0.5 text-secondary-green-4">
-        <span className="h-2 w-2 rounded-full bg-secondary-green-4" aria-hidden="true" />
-        <span>LIVE DATA</span>
-      </div>
-
-      {/* Middle: Participant count */}
-      <div className="my-auto flex flex-col items-center justify-center">
-        <div className="body-14-medium text-neutral-grey-1">
-          <span className="heading-24-bold text-neutral-grey-1">{participantCount}</span>{' '}
-          participants
+      {/* Top cluster: Live data badge + Participant count */}
+      <div className="flex flex-col items-center">
+        <div className="mb-[14px]">
+          <BaseTag variant="green" className="gap-2 px-2.5 py-1 text-secondary-green-4">
+            <span
+              className="relative flex h-2 w-2 shrink-0 items-center justify-center"
+              aria-hidden="true"
+            >
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-green-3 opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-green-3 shadow-live-dot" />
+            </span>
+            <span>LIVE DATA</span>
+          </BaseTag>
         </div>
-        <span className="body-12-medium text-neutral-grey-3">received</span>
+
+        <div className="body-14-bold flex flex-col items-center justify-center text-center text-neutral-grey-1">
+          <span>{participantCount} participants</span>
+          <span>received</span>
+        </div>
       </div>
 
-      {/* Bottom: Open dashboard link */}
-      <Link
-        href={dashboardHref}
-        className="body-14-bold inline-flex items-center gap-1 text-brand-green-2 transition-colors hover:underline"
-      >
-        <span>Open dashboard</span>
-        <ExternalLink size={16} aria-hidden="true" />
-      </Link>
+      {/* Bottom cluster: Divider & Open dashboard link */}
+      <div className="flex w-full flex-col items-center">
+        <div className="w-full border-t border-neutral-grey-6" />
+        <div className="mt-3">
+          <Link
+            href={dashboardHref}
+            className="body-14-bold inline-flex items-center gap-1 text-brand-green-2 transition-colors hover:underline"
+          >
+            <span>Open dashboard</span>
+            <ExternalLink size={15} aria-hidden="true" />
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }

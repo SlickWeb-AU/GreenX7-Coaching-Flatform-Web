@@ -1,17 +1,12 @@
 'use client';
 
+import { ArrowLeft, Info, Lock } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, type FormEvent } from 'react';
 
 import { BaseButton, BaseInput, BaseOtp } from '@/components/base';
-import {
-  ArrowBackIcon,
-  DecorativeWaveBottomRight,
-  DecorativeWaveTopRight,
-  InformationIcon,
-  LockedPadlockIcon,
-} from '@/components/icons';
+import { DecorativeWaveBottomRight, DecorativeWaveTopRight } from '@/components/icons';
 import {
   LOGIN_STEPS,
   type LoginStep,
@@ -142,7 +137,7 @@ export default function LoginPage() {
           {step === LOGIN_STEPS.EMAIL && (
             <>
               <div className="mb-6 flex items-center gap-2">
-                <LockedPadlockIcon color="#005943" />
+                <Lock size={18} className="text-brand-green-2" aria-hidden />
                 <span className="body-14-bold text-brand-green-2">Secure administrator access</span>
               </div>
               <h1 className="heading-28-bold text-neutral-grey-1">Sign in to GreenX7</h1>
@@ -170,7 +165,7 @@ export default function LoginPage() {
                   Continue
                 </BaseButton>
                 <div className="mt-3 flex items-center gap-2">
-                  <InformationIcon size={15} className="shrink-0" />
+                  <Info size={15} className="shrink-0 text-neutral-grey-3" aria-hidden />
                   <span className="body-12-medium text-neutral-grey-3">
                     Access is limited to approved GreenX7 administrators.
                   </span>
@@ -190,7 +185,7 @@ export default function LoginPage() {
                 }}
                 className="body-14-bold mb-4 inline-flex cursor-pointer items-center gap-2 text-brand-green-2 transition-opacity hover:opacity-80"
               >
-                <ArrowBackIcon size={20} className="h-5 w-5" />
+                <ArrowLeft size={20} className="h-5 w-5" aria-hidden />
                 <span>Use a different email</span>
               </button>
               <h1 className="heading-28-bold mb-4 text-neutral-grey-1">Check your email</h1>

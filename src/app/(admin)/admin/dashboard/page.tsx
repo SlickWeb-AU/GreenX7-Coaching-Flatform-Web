@@ -1,12 +1,13 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { Download } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { Suspense, useMemo } from 'react';
+import { Suspense, useEffect, useMemo } from 'react';
+import { toast } from 'sonner';
 
 import { BaseButton, BaseHeader, BaseLoading, BaseSelectInside } from '@/components/base';
-import { ExportIcon } from '@/components/icons';
-import { get } from '@/lib/axios';
+import { calculateAverageBatteryScore, cn } from '@/lib/utils';
 
 import {
   BatteryScoreBanner,
@@ -14,17 +15,17 @@ import {
   PlatformPerformanceBar,
   WellbeingGrid,
 } from '@/components/dashboard';
+import { dashboardApi } from '@/features/admin-dashboard';
 import { settingsApi } from '@/features/admin-settings';
 import { buildDashboardQuery } from '@/lib/dashboard';
-import { queryKeys } from '@/lib/query-client';
-import type { AdminDashboardDto } from '@/types';
 import {
   ALL_FILTER_VALUE,
-  DASHBOARD_MONTH_OPTIONS,
-  DASHBOARD_YEAR_OPTIONS,
   FIXED_WELLBEING_AREAS,
   FIXED_ZONES,
+  MONTH_OPTIONS,
+  YEAR_OPTIONS,
 } from '@/constants';
+import { queryKeys } from '@/lib/query-client';
 
 function DashboardContent() {
   const router = useRouter();
@@ -60,39 +61,47 @@ function DashboardContent() {
   }, [industry, industryOptions]);
 
   const query = buildDashboardQuery({ month, year, industry });
-  const { data, isLoading, isFetching } = useQuery({
+  const { data, isLoading, isFetching, error } = useQuery({
     queryKey: queryKeys.adminDashboard.metrics(month, year, industry),
-    queryFn: async () => {
-      try {
-        return await get<AdminDashboardDto>(`/dashboard?${query}`);
-      } catch {
-        return null;
-      }
-    },
+    queryFn: () => dashboardApi.getDashboard(query),
+    placeholderData: keepPreviousData,
     retry: false,
   });
 
-  const overview = useMemo(
-    () => ({
-      averageBatteryScore: data?.averageBatteryScore ?? data?.overview?.averageBatteryScore ?? 0,
+  useEffect(() => {
+    if (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to load dashboard');
+    }
+  }, [error]);
+
+  const overview = useMemo(() => {
+    let avgBatteryScore = data?.averageBatteryScore ?? data?.overview?.averageBatteryScore ?? null;
+
+    if (avgBatteryScore === null && data?.wellbeingAreas && data.wellbeingAreas.length > 0) {
+      avgBatteryScore = calculateAverageBatteryScore(data.wellbeingAreas.map((a) => a.score));
+    }
+
+    return {
+      averageBatteryScore: avgBatteryScore,
       change:
-        data?.vsPrevious?.changePercent ?? data?.vsPrevious?.change ?? data?.overview?.change ?? 0,
-      clientCount: data?.clientCount ?? data?.overview?.clientCount ?? 0,
-      participantCount: data?.participantCount ?? data?.overview?.participantCount ?? 0,
-      departmentCount: data?.departmentCount ?? data?.overview?.departmentCount ?? 0,
-      industryCount: data?.industryCount ?? data?.overview?.industryCount ?? 0,
-    }),
-    [data],
-  );
+        data?.vsPrevious?.changePercent ??
+        data?.vsPrevious?.change ??
+        data?.overview?.change ??
+        null,
+      clientCount: data?.clientCount ?? data?.overview?.clientCount ?? null,
+      participantCount: data?.participantCount ?? data?.overview?.participantCount ?? null,
+      departmentCount: data?.departmentCount ?? data?.overview?.departmentCount ?? null,
+      industryCount: data?.industryCount ?? data?.overview?.industryCount ?? null,
+    };
+  }, [data]);
 
   const wellbeingAreas = useMemo(() => {
-    if (!data?.wellbeingAreas || data.wellbeingAreas.length === 0) return [];
     const apiAreaMap = new Map(
-      data.wellbeingAreas.map((item) => [
+      (data?.wellbeingAreas ?? []).map((item) => [
         item.area.toUpperCase(),
         {
-          score: item.score ?? 0,
-          change: item.vsPrevious?.changePercent ?? item.vsPrevious?.change ?? item.change ?? 0,
+          score: item.score ?? null,
+          change: item.vsPrevious?.changePercent ?? item.vsPrevious?.change ?? item.change ?? null,
           vsPrevious: item.vsPrevious,
           vsFirstCheck: item.vsFirstCheck,
         },
@@ -103,8 +112,8 @@ function DashboardContent() {
       return {
         area: def.area,
         label: def.label,
-        score: match?.score ?? 0,
-        change: match?.change ?? 0,
+        score: match?.score ?? null,
+        change: match?.change ?? null,
         vsPrevious: match?.vsPrevious,
         vsFirstCheck: match?.vsFirstCheck,
       };
@@ -112,13 +121,12 @@ function DashboardContent() {
   }, [data?.wellbeingAreas]);
 
   const zoneDistribution = useMemo(() => {
-    if (!data?.zoneDistribution || data.zoneDistribution.length === 0) return [];
     const apiZoneMap = new Map(
-      data.zoneDistribution.map((z) => [
+      (data?.zoneDistribution ?? []).map((z) => [
         z.key.toUpperCase(),
         {
-          count: z.count ?? 0,
-          percentage: z.percentage ?? 0,
+          count: z.count ?? null,
+          percentage: z.percentage ?? null,
           min: z.min,
           max: z.max,
         },
@@ -129,17 +137,20 @@ function DashboardContent() {
       return {
         key: def.key,
         label: def.label,
-        count: match?.count ?? 0,
-        percentage: match?.percentage ?? 0,
+        count: match?.count ?? null,
+        percentage: match?.percentage ?? null,
         min: match?.min,
         max: match?.max,
       };
     });
   }, [data?.zoneDistribution]);
 
-  const historicalTrend = data?.historicalTrend ?? [];
+  const historicalTrend = useMemo(
+    () => (data?.historicalTrend ?? []).filter((point) => point.year === year),
+    [data?.historicalTrend, year],
+  );
 
-  if ((isLoading || isFetching) && !data) {
+  if (isLoading && !data) {
     return <BaseLoading message="Loading dashboard..." fullScreen />;
   }
 
@@ -153,14 +164,14 @@ function DashboardContent() {
               label="Month"
               placeholder="Select month"
               value={String(month)}
-              options={DASHBOARD_MONTH_OPTIONS}
+              options={MONTH_OPTIONS}
               onChange={(v) => setParam('month', v)}
             />
             <BaseSelectInside
               label="Year"
               placeholder="Select year"
               value={String(year)}
-              options={DASHBOARD_YEAR_OPTIONS}
+              options={YEAR_OPTIONS}
               onChange={(v) => setParam('year', v)}
             />
             <BaseSelectInside
@@ -173,7 +184,7 @@ function DashboardContent() {
             <BaseButton
               variant="secondary"
               pill
-              startIcon={<ExportIcon aria-hidden />}
+              startIcon={<Download size={16} aria-hidden />}
               onClick={() => window.print()}
             >
               Export PDF
@@ -181,21 +192,24 @@ function DashboardContent() {
           </>
         }
       />
-      <div className="mb-8">
-        <BatteryScoreBanner
-          overview={overview}
-          industryName={selectedIndustryLabel}
-          industryCount={overview.industryCount}
-        />
-      </div>
-      <div className="mb-4">
-        <WellbeingGrid areas={wellbeingAreas} title="Average by Battery Area" />
-      </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2">
-        <div className="mb-4 lg:mb-0 lg:mr-4">
-          <PlatformPerformanceBar distribution={zoneDistribution} />
+      <div
+        className={cn(
+          'relative transition-opacity duration-200',
+          isFetching && 'pointer-events-none opacity-60',
+        )}
+      >
+        <div className="mb-8">
+          <BatteryScoreBanner
+            overview={overview}
+            industryName={selectedIndustryLabel}
+            industryCount={overview.industryCount}
+          />
         </div>
-        <div>
+        <div className="mb-4">
+          <WellbeingGrid areas={wellbeingAreas} title="Average by Battery Area" />
+        </div>
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <PlatformPerformanceBar distribution={zoneDistribution} />
           <HistoricalTrendChart data={historicalTrend} title="Platform Historical Trend" />
         </div>
       </div>

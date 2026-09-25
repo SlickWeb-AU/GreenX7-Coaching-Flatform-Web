@@ -2,13 +2,12 @@
 
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Tv } from 'lucide-react';
-import { useParams } from 'next/navigation';
+import { Download, SlidersHorizontal, Tv } from 'lucide-react';
+import { useParams, useRouter } from 'next/navigation';
 
 import { BaseButton, BaseLoading } from '@/components/base';
 import {
   CloudIcon,
-  ExportIcon,
   FriendshipsIcon,
   FunIcon,
   HeartIcon,
@@ -16,8 +15,11 @@ import {
   NutritionIcon,
   PurposeIcon,
   RelationshipsIcon,
-  SlidersIcon,
 } from '@/components/icons';
+import { ROUTES } from '@/config/routes';
+import { MONTH_NAMES } from '@/constants';
+import { CLIENT_STATUSES, CLIENT_TABS } from '@/constants/clients';
+import { CHART_COLORS } from '@/constants/tokens';
 import { clientsApi } from '@/features/admin-clients';
 import { queryKeys } from '@/lib/query-client';
 import {
@@ -35,21 +37,6 @@ import {
 } from '@/components/clients';
 import { HistoricalTrendChart } from '@/components/dashboard';
 import type { AreaScoreDto } from '@/types';
-
-const MONTH_NAMES = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-];
 
 const ICON_BY_AREA: Record<string, typeof HeartIcon> = {
   PHYSICAL: HeartIcon,
@@ -69,25 +56,6 @@ const ICON_BY_AREA: Record<string, typeof HeartIcon> = {
   PURPOSE: PurposeIcon,
   Purpose: PurposeIcon,
 };
-
-const STRENGTHS_ITEMS: InsightItem[] = [
-  { key: 'friendships', label: 'Friendships', score: 73, icon: FriendshipsIcon },
-  { key: 'relationships', label: 'Relationships', score: 71, icon: RelationshipsIcon },
-];
-
-const FOCUS_ITEMS: InsightItem[] = [
-  { key: 'physical', label: 'Physical', score: 61, icon: HeartIcon },
-  { key: 'sleep', label: 'Sleep', score: 64, icon: CloudIcon },
-];
-
-const DEFAULT_TREND_DATA = [
-  { year: 2026, month: 1, score: 55, label: 'Jan' },
-  { year: 2026, month: 2, score: 58, label: 'Feb' },
-  { year: 2026, month: 3, score: 60, label: 'Mar' },
-  { year: 2026, month: 4, score: 68, label: 'Apr' },
-  { year: 2026, month: 5, score: 66, label: 'May' },
-  { year: 2026, month: 6, score: 73, label: 'Jun' },
-];
 
 function mapWellbeingAreas(areas?: AreaScoreDto[]): WellbeingItemData[] | undefined {
   if (!areas || areas.length === 0) return undefined;
@@ -110,12 +78,14 @@ function mapInsightItems(items?: AreaScoreDto[], fallback: InsightItem[] = []): 
 }
 
 export default function DepartmentDetailPage() {
+  const router = useRouter();
   const params = useParams<{ clientId: string; deptId: string }>();
   const clientId = params.clientId;
   const deptId = params.deptId;
 
-  const [selectedMonth, setSelectedMonth] = useState('7'); // July
-  const [selectedYear, setSelectedYear] = useState('2026');
+  const now = new Date();
+  const [selectedMonth, setSelectedMonth] = useState(String(now.getMonth() + 1));
+  const [selectedYear, setSelectedYear] = useState(String(now.getFullYear()));
 
   // Consume client from layout context
   const { client, isLoading: isClientLoading } = useClient();
@@ -139,10 +109,10 @@ export default function DepartmentDetailPage() {
 
   const department = client?.departments?.find((d) => d.id === deptId) || {
     id: deptId,
-    name: deptDashboard?.departmentName || 'Construction',
-    status: 'Active',
-    participantCount: deptDashboard?.participantCount ?? 91,
-    batteryScore: deptDashboard?.batteryScore ?? 68,
+    name: deptDashboard?.departmentName ?? 'Department',
+    status: CLIENT_STATUSES.ACTIVE,
+    participantCount: deptDashboard?.participantCount ?? 0,
+    batteryScore: deptDashboard?.batteryScore ?? null,
   };
 
   const departmentName = deptDashboard?.departmentName || department.name;
@@ -157,9 +127,9 @@ export default function DepartmentDetailPage() {
           variant="secondary"
           size="medium"
           pill
-          startIcon={<SlidersIcon size={16} />}
+          startIcon={<SlidersHorizontal size={16} aria-hidden />}
           onClick={() => {
-            // Manage department action
+            router.push(`${ROUTES.admin.clientDetail(clientId)}?tab=${CLIENT_TABS.DEPARTMENTS}`);
           }}
         >
           Manage Department
@@ -169,7 +139,7 @@ export default function DepartmentDetailPage() {
           variant="secondary"
           size="medium"
           pill
-          startIcon={<ExportIcon size={16} />}
+          startIcon={<Download size={16} aria-hidden />}
           onClick={() => {
             // PDF export
           }}
@@ -211,12 +181,11 @@ export default function DepartmentDetailPage() {
   const prevMonthIdx = (monthIdx - 1 + 12) % 12;
   const previousMonthName = MONTH_NAMES[prevMonthIdx];
 
-  const effectiveScore = deptDashboard?.batteryScore ?? department.batteryScore ?? 68;
-  const effectiveZone = deptDashboard?.zone?.name ?? 'Function Zone';
-  const effectiveParticipants =
-    deptDashboard?.participantCount ?? department.participantCount ?? 91;
-  const effectiveStrengths = mapInsightItems(deptDashboard?.strengths, STRENGTHS_ITEMS);
-  const effectiveFocus = mapInsightItems(deptDashboard?.focus, FOCUS_ITEMS);
+  const effectiveScore = deptDashboard?.batteryScore ?? department.batteryScore ?? 0;
+  const effectiveZone = deptDashboard?.zone?.name ?? '';
+  const effectiveParticipants = deptDashboard?.participantCount ?? department.participantCount ?? 0;
+  const effectiveStrengths = mapInsightItems(deptDashboard?.strengths);
+  const effectiveFocus = mapInsightItems(deptDashboard?.focus);
   const effectiveWellbeing = mapWellbeingAreas(deptDashboard?.wellbeingAreas);
   const effectiveTrend =
     deptDashboard?.historicalTrend && deptDashboard.historicalTrend.length > 0
@@ -226,36 +195,33 @@ export default function DepartmentDetailPage() {
           score: t.score ?? 0,
           label: t.label,
         }))
-      : DEFAULT_TREND_DATA;
+      : [];
 
   const openUntilLabel = deptDashboard?.openUntil
     ? `Open until ${new Date(deptDashboard.openUntil).toLocaleDateString('en-GB', { day: 'numeric', month: 'long' })}`
-    : 'Open until 20 July';
+    : undefined;
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Top 4 Metric Cards */}
       <div className="grid grid-cols-1 items-stretch gap-4 md:grid-cols-2 lg:grid-cols-12">
-        {/* Card 1: Battery Score */}
         <div className="lg:col-span-5">
           <ClientBatteryCard
             title="Current Battery Score"
             badgeText={openUntilLabel}
             score={effectiveScore}
-            changeVsLastMonth={deptDashboard?.vsPrevious?.change ?? -1}
+            periodLabel={`${MONTH_NAMES[monthIdx]} ${selectedYear}`}
+            changeVsLastMonth={deptDashboard?.vsPrevious?.change ?? 0}
             lastMonthLabel={previousMonthName}
-            changeVsFirstCheck={deptDashboard?.vsFirstCheck?.change ?? 3}
-            firstCheckLabel="first check"
+            changeVsFirstCheck={deptDashboard?.vsFirstCheck?.change ?? 0}
+            firstCheckLabel={deptDashboard?.firstCheck?.label}
             className="h-full"
           />
         </div>
 
-        {/* Card 2: Current Zone */}
         <div className="lg:col-span-2">
           <ClientCurrentZoneCard zoneName={effectiveZone} className="h-full" />
         </div>
 
-        {/* Card 3: Live Data & Participants */}
         <div className="lg:col-span-2">
           <DepartmentLiveDataCard
             participantCount={effectiveParticipants}
@@ -264,7 +230,6 @@ export default function DepartmentDetailPage() {
           />
         </div>
 
-        {/* Card 4: Month & Year Filter */}
         <div className="lg:col-span-3">
           <ClientPeriodFilter
             selectedMonth={selectedMonth}
@@ -276,9 +241,7 @@ export default function DepartmentDetailPage() {
         </div>
       </div>
 
-      {/* Deep-Dive Insights Grid */}
       <div className="grid grid-cols-1 items-stretch gap-4 lg:grid-cols-12">
-        {/* Left: Wellbeing areas */}
         <div className="lg:col-span-8">
           <ClientWellbeingCard
             items={effectiveWellbeing}
@@ -287,30 +250,28 @@ export default function DepartmentDetailPage() {
           />
         </div>
 
-        {/* Right: Our Strengths & Our Focus */}
         <div className="flex flex-col gap-4 lg:col-span-4">
           <DepartmentInsightListCard
             title="Our Strengths"
-            titleColorClass="text-brand-green-2"
+            titleColorClass="text-secondary-green-4"
             items={effectiveStrengths}
             className="flex-1"
           />
           <DepartmentInsightListCard
             title="Our Focus"
-            titleColorClass="text-secondary-orange-1"
+            titleColorClass="text-secondary-red-4"
             items={effectiveFocus}
             className="flex-1"
           />
         </div>
       </div>
 
-      {/* Historical Trend Chart */}
       <div className="w-full">
         <HistoricalTrendChart
           title="Historical trend"
           data={effectiveTrend}
-          lineColor="#DF863B"
-          dotColor="#DF863B"
+          lineColor={CHART_COLORS.trendLine}
+          dotColor={CHART_COLORS.trendLine}
           className="w-full"
         />
       </div>

@@ -10,7 +10,7 @@ export interface ClientCurrentZoneCardProps {
 }
 
 export function ClientCurrentZoneCard({
-  zoneName = 'Function Zone',
+  zoneName = '',
   title = 'Current zone',
   className,
 }: ClientCurrentZoneCardProps) {

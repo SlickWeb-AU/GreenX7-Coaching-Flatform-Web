@@ -1,9 +1,8 @@
 'use client';
 
 import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
-import { Check } from 'lucide-react';
+import { Check, ChevronDown } from 'lucide-react';
 
-import { ChevronDownIcon } from '@/components/icons';
 import { cn } from '@/lib/utils';
 
 export type BaseSelectSize = 'small' | 'medium' | 'mediumPlus';
@@ -171,8 +170,12 @@ export function BaseSelect<T extends string = string>({
             </span>
           </div>
           <span className="ml-3 shrink-0">
-            <ChevronDownIcon
-              className={cn('transition-transform duration-200', isOpen && 'rotate-180')}
+            <ChevronDown
+              size={16}
+              className={cn(
+                'text-neutral-grey-3 transition-transform duration-200',
+                isOpen && 'rotate-180',
+              )}
               aria-hidden
             />
           </span>
