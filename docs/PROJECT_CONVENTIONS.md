@@ -1,118 +1,182 @@
 # GreenX7 Project Conventions
 
-Architecture and development rules for all developers and AI agents. Styling and design-system rules live in `UI_CONVENTIONS.md`.
+Architecture, state management, and development guidelines for all developers and AI agents. Styling and UI design-system rules live in `UI_CONVENTIONS.md`.
 
 ---
 
-## 1. Code Style
+## 1. Code Style & TypeScript Standards
 
-- **Self-documenting**: precise domain names; TypeScript types are the source of truth. If the code is clear, write no comment.
-- **Comment the "why" only**: non-obvious business rules, tradeoffs, browser/library workarounds. If code is hard to read, rename or extract a function instead.
-- **English only**: every comment (JSDoc, inline, `TODO`/`FIXME`) must be in English.
-- **Forbidden**: ASCII dividers/banners, label comments (`{/* Header Row */}`), commented-out code (Git keeps history).
-- **No `React.FC` / `FC`**: Never type components with `React.FC` or `FC`. Use standard typed props directly on function parameters (`export function Component({ prop }: ComponentProps)` or `export const Component = ({ prop }: ComponentProps) => ...`). If children are needed, explicitly define `children?: ReactNode` in the props interface.
-- **Named React imports only**: Never use `React.*` namespace prefixes in component, hook, or utility code (e.g. ❌ `React.useState`, `React.useEffect`, `React.useCallback`, `React.useMemo`, `React.FormEvent`). Always import hooks and types directly from `'react'` (e.g. ✅ `import { useState, useEffect, useCallback, type FormEvent } from 'react';`).
-- **No unnecessary `<Suspense>` on pages**: Do not wrap page contents in `<Suspense>` unless explicitly required for streaming architecture. Keep `page.tsx` direct and clean.
-- **Flow & Step Constants**: Never hardcode string literals for multi-step flows or page states inline (e.g. ❌ `'email' | 'otp'`). Always define them as constants in `src/constants/{domain}.ts` (e.g. ✅ `export const LOGIN_STEPS = { EMAIL: 'email', OTP: 'otp' } as const;`) and derive the type (`export type LoginStep = (typeof LOGIN_STEPS)[keyof typeof LOGIN_STEPS];`).
-- **No `any` / `@ts-ignore`**: use `unknown` with narrowing. Give generics explicit type parameters (`useFetch<T>()`, `ApiResponse<T = unknown>`). In `catch (err: unknown)`, use `axios.isAxiosError<ApiErrorResponse>(err)`.
+- **Self-documenting**: Use precise domain names; TypeScript types are the source of truth. If the code is clear, write no comment.
+- **Comment the "why" only**: Non-obvious business rules, tradeoffs, or browser/library workarounds. If code is hard to read, rename variables or extract helper functions instead.
+- **English only**: Every comment (JSDoc, inline, `TODO`/`FIXME`) must be written in English.
+- **Forbidden**: ASCII dividers/banners, label comments (e.g. `{/* Header Row */}`), commented-out dead code (Git keeps history).
+- **No `React.FC` / `FC`**: Never type components with `React.FC` or `FC`. Use standard typed props directly on function parameters:
+  ```tsx
+  export function Component({ title, children }: ComponentProps) { ... }
+  export const Component = ({ title, children }: ComponentProps) => { ... };
+  ```
+  If children are needed, explicitly define `children?: ReactNode` in the props interface.
+- **Named React imports only**: Never use `React.*` namespace prefixes (e.g. ❌ `React.useState`, `React.useEffect`, `React.useCallback`, `React.useMemo`, `React.FormEvent`). Always import hooks and types directly from `'react'`:
+  ```tsx
+  import { useState, useEffect, useCallback, type ReactNode, type FormEvent } from 'react';
+  ```
+- **Next.js `<Suspense>` on pages with `useSearchParams()`**:
+  - In Next.js App Router, any client component reading `useSearchParams()` MUST be wrapped in a `<Suspense>` boundary to prevent build-time/runtime SSR de-optimization.
+  - Pattern: Keep `page.tsx` as a clean wrapper with `<Suspense fallback={<BaseLoading fullScreen />}>` around the inner content component (e.g. `<ClientsContent />`).
+  - Do NOT wrap arbitrary non-search-param components in `<Suspense>` without an architectural need.
+- **Flow & Step Constants**:
+  - Never hardcode string literals for multi-step flows, statuses, or page states inline (e.g. ❌ `'email' | 'otp'`).
+  - Always define them as constants with `as const` in `src/constants/{domain}.ts` and derive the type:
+  ```tsx
+  export const LOGIN_STEPS = {
+    EMAIL: 'email',
+    OTP: 'otp',
+  } as const;
 
-```tsx
-// ❌ Forbidden: React.FC / FC / React.* namespace calls
-export const Card: React.FC<CardProps> = ({ title }) => {
-  React.useEffect(() => { ... }, []);
-  return <div>{title}</div>;
-};
-
-// ✅ Allowed: Standard typed props & direct hook imports
-import { useEffect, useState } from 'react';
-
-export const Card = ({ title }: CardProps) => { ... };
-export function Card({ title }: CardProps) { ... }
-
-// ✅ Workaround for Safari flexbox clipping with dynamic height
-// ✅ Ignore stale responses when filter params change rapidly
-```
+  export type LoginStep = (typeof LOGIN_STEPS)[keyof typeof LOGIN_STEPS];
+  ```
+- **Strict Typing (No `any` / `@ts-ignore`)**:
+  - Use `unknown` with narrowing or type guards.
+  - Generics must have explicit type parameters (`get<T>()`, `ApiSuccessResponse<T>`).
+  - In `catch (err: unknown)`, use `toApiError(err)` or `err instanceof ApiError` (or `axios.isAxiosError(err)` if handling raw Axios).
 
 ---
 
-## 2. Feature Structure
+## 2. Directory & Layer Architecture
 
 ```
 src/
-├── type/{feature}.ts                  # entities, DTOs, filters, enums, flow-step types
-├── constants/{domain}.ts              # business constants, timers, routes, mock/presentation data
-├── services/api/{feature}.service.ts  # `{feature}Api`: Axios + ApiResponse envelope
-├── hooks/use{Feature}.ts              # feature orchestration on top of useFetch / useMutation
-├── component/{feature}/               # {Feature}Card / Table / FilterBar / Modal + index.ts barrel
-└── app/{route}/page.tsx               # thin orchestration only (layout.tsx optional)
+├── app/                 # Next.js App Router (pages, layouts, route handlers)
+│   ├── (admin)/         # Admin route group (dashboard, clients, settings)
+│   ├── (auth)/          # Authentication route group (login, verify)
+│   ├── api/             # BFF & Auth API route handlers
+│   │   ├── auth/        # /api/auth/login, /api/auth/refresh, /api/auth/logout
+│   │   └── bff/         # /api/bff/[...path] proxy to NestJS backend
+│   ├── report/          # Public/client report pages
+│   ├── forbidden/       # 403 Forbidden page
+│   ├── globals.css      # Tailwind base layers, typography utilities, scrollbar
+│   └── layout.tsx       # Root layout with server session fetching
+├── components/          # UI Presentation Components
+│   ├── base/            # Design-system atomic base components (BaseButton, BaseInput, BaseTable, BaseDialog, etc.)
+│   ├── icons/           # SVG icons & Lucide icon wrappers
+│   ├── layout/          # Layout components (AdminLayout, Sidebar, Navbar, Breadcrumbs)
+│   ├── providers/       # AppProviders, AuthProvider, QueryProvider, ConfirmProvider
+│   ├── clients/         # Clients domain components (table, forms, cards, tabs)
+│   ├── dashboard/       # Dashboard domain components (charts, score banners, grids)
+│   └── settings/        # Settings domain components (admins table, forms)
+├── config/              # Central configuration
+│   ├── navigation.ts    # Sidebar menu items & role-based route matching
+│   ├── permissions.ts   # RBAC permissions & permission helper functions
+│   └── routes.ts        # Typed route path constants (ROUTES.admin.clients, etc.)
+├── constants/           # Business & UI constants, design tokens
+│   ├── auth.ts          # Auth flow steps, token keys
+│   ├── clients.ts       # Status options, timezones, check-in limits, sort mappings
+│   ├── dashboard.ts     # Month options, fixed zones, trend options
+│   ├── tokens.ts        # Dashboard color palettes, zone colors, pill tone styles
+│   └── ui.ts            # Base component size & variant class dictionaries
+├── features/            # Pure Business & API Service Layer
+│   ├── admin-auth/      # useAdminOtp hook
+│   ├── admin-clients/   # clientsApi service
+│   ├── admin-dashboard/ # dashboardApi service
+│   ├── admin-settings/  # settingsApi service
+│   ├── auth/            # authApi service
+│   └── report-login/    # reportApi service
+├── lib/                 # Core utilities, helpers & HTTP client
+│   ├── api-error.ts     # ApiError class & error parser
+│   ├── axios.ts         # Axios BFF client with refresh-token mutex queue & typed helpers (get, post, patch, del)
+│   ├── backend.ts       # Server-side direct backend client
+│   ├── clients.ts       # Query builders & client data formatters
+│   ├── cookies.ts       # Secure cookie parser & setter for tokens
+│   ├── dashboard.ts     # Dashboard query builders
+│   ├── jwt.ts           # JWT decode & verification helpers
+│   ├── otp.ts           # OTP timer & email masking formatters
+│   ├── query-client.ts  # TanStack QueryClient factory & query keys
+│   ├── search-params.ts # URL search param patch & merge utilities
+│   └── utils.ts         # cn (clsx + tailwind-merge) & common string helpers
+├── stores/              # Pure Client Global UI State (Zustand)
+│   └── ui.store.ts      # Sidebar collapse, mobile menu open state
+├── types/               # ALL TypeScript Definitions, DTOs & API Contracts
+│   ├── api.ts           # ApiSuccessResponse, ApiErrorResponse, PaginationMeta, PaginatedResult
+│   ├── auth.ts          # AuthUser, UserRole, UserStatus, AuthTokens, AccessTokenPayload
+│   ├── clients.ts       # ClientListItem, ClientDetail, CreateClientPayload, DepartmentDto
+│   ├── dashboard.ts     # ClientDashboardDto, DepartmentDashboardDto, BatteryScoreDto
+│   ├── settings.ts      # AdminUserDto, IndustryDto
+│   ├── ui.ts            # BaseSize, BaseVariant, BaseButtonStyleOptions
+│   └── index.ts
+└── validations/         # Zod validation schemas
+    ├── clients.ts       # Client form & department schemas
+    ├── settings.ts      # Industry name & invite admin schemas
+    └── index.ts
 ```
 
-Create only the layers a feature actually needs.
-
-### Imports
+### Imports & Path Aliases
 
 Always use path aliases. Never use deep relative paths (`../../../`).
 
-| Alias              | Example                                                |
-| :----------------- | :----------------------------------------------------- |
-| `@/components/...` | `import { BaseButton } from '@/components/base';`      |
-| `@/context/...`    | `import { useAuth } from '@/context/AuthContext';`     |
-| `@/services/api`   | `import { clientApi, authApi } from '@/services/api';` |
-| `@/services/axios` | `import api from '@/services/axios';`                  |
-| `@/hooks`          | `import { useFetch, useMutation } from '@/hooks';`     |
-| `@/type/...`       | `import { IClient, ApiResponse } from '@/type';`       |
-| `@/utils/...`      | `import { tokenStorage } from '@/utils/tokenStorage';` |
-| `@/constants`      | `import { COLORS, TYPOGRAPHY } from '@/constants';`    |
+| Alias                   | Example                                                                 |
+| :---------------------- | :---------------------------------------------------------------------- |
+| `@/components/base`     | `import { BaseButton, BaseInput, BaseTable } from '@/components/base';` |
+| `@/components/{domain}` | `import { ClientsTable } from '@/components/clients';`                  |
+| `@/features/{domain}`   | `import { clientsApi } from '@/features/admin-clients';`                |
+| `@/validations`         | `import { clientFormSchema } from '@/validations';`                     |
+| `@/types`               | `import type { ClientListItem, PaginationMeta } from '@/types';`        |
+| `@/constants`           | `import { CLIENT_STATUS_OPTIONS } from '@/constants/clients';`          |
+| `@/config/routes`       | `import { ROUTES } from '@/config/routes';`                             |
+| `@/lib/{util}`          | `import { buildClientsQuery } from '@/lib/clients';`                    |
+| `@/stores/{store}`      | `import { useUiStore } from '@/stores/ui.store';`                       |
 
-### Layer & Export Rules
+### Layer Responsibilities & Export Rules
 
-- **Export from the correct directory**:
-  - **Types (`@/type`)**: All interfaces, types, DTOs, enums, and domain types (e.g. `ClientsSortField`, `ApiResponse`, `IClient`) MUST be defined in and exported from `src/type/`. Do NOT define or export domain/business types from component files or component barrel files.
-  - **Constants (`@/constants`)**: All constants, options, configurations, routes, and static maps MUST be defined in and exported from `src/constants/`.
-  - **Exception (Types from Constants)**: Types directly derived from constants (e.g. `export type AllFilterValue = typeof ALL_FILTER_VALUE;`, `export type BaseButtonSize = keyof typeof BASE_BUTTON_SIZES;`, or `export type { LoginStep };` in constant files) are permitted to be exported from `src/constants/` and re-exported through `@/constants`.
+- **`src/features/`**:
+  - Contains ONLY API service objects (`clientsApi`, `settingsApi`, `authApi`, `dashboardApi`, `reportApi`) and domain query/mutation orchestration hooks.
+  - MUST NOT contain UI presentation components, Zod schemas, or domain types.
+- **`src/components/`**:
+  - Contains presentation UI components grouped by feature/domain.
+  - Component files contain only the props interface and the component function.
+- **`src/validations/`**:
+  - All Zod schemas and validation helper functions live here and are re-exported via `src/validations/index.ts`.
+- **`src/types/`**:
+  - All interfaces, DTOs, enums, payloads, and domain types live here and are re-exported via `src/types/index.ts`.
+- **`src/constants/`**:
+  - All business constants, option lists, status definitions, and design tokens live here.
+- **`src/lib/`**:
+  - HTTP clients (`axios.ts`), search params mergers, formatters, and reusable helper functions live here.
 - **Barrel `index.ts` files**:
-  - MUST strictly use `export * from './...'` (wildcard export only).
-  - Do NOT use named exports (`export { Component } from './...'`) or named type exports (`export type { ... } from './...'`) in `index.ts` files.
-- **Services**: name objects with the `*Api` suffix. `@/services/api/index.ts` only re-exports (`export * from './...'`). No monolithic facade classes. Services call the live backend only; mock/presentation data goes in `@/constants`.
-- **Thin `page.tsx`**: it only wires hooks, state, and components. No business constants, magic numbers (`OTP_EXPIRY_SECONDS`), or domain types/enums (`LoginStep`).
-  - Constants, timers, flow-step mappings, routes → `src/constants/{domain}.ts` (re-exported by `src/constants/index.ts`).
-  - Interfaces, DTOs, payloads, flow-step types → `src/type/{domain}.ts` (re-exported by `src/type/index.ts`).
-- **Component file shape (`*.tsx`)**: a component file contains only the props interface and the function component (plus its default export). Everything else lives in its home layer:
-  - Column configs, option lists, static maps → `src/constants/{domain}.ts`.
-  - Entities, DTOs, row types → `src/type/{domain}.ts`.
-  - Format/map helpers → `utils/` next to the component (or `@/utils` if shared).
-  - Data fetching and orchestration → `@/hooks` and `@/services/api`.
-- **Boundaries**: base components never re-export feature types or constants. Avoid circular dependencies.
-- **UI composition** (native HTML, Base components, no MUI `Box`/`Typography`/`sx`): see `UI_CONVENTIONS.md`.
+  - Use `export * from './...'` (wildcard re-exports).
+- **Thin `page.tsx`**:
+  - Only wires hooks, state, routing, and domain components. No raw Axios calls or hardcoded schemas.
 
 ---
 
 ## 3. State Management
 
-Classify each piece of state into the first tier that fits:
+Classify each piece of state into the appropriate tier:
 
-| Tier                  | Use when                                                               | Mechanism                                               | Rules                                                          |
-| :-------------------- | :--------------------------------------------------------------------- | :------------------------------------------------------ | :------------------------------------------------------------- |
-| **1. URL**            | Search, filters, tabs, pagination must survive reload and be shareable | `useSearchParams`, `useRouter`, `usePathname`           | Use `router.replace` while filtering to keep history clean.    |
-| **2. Server / async** | Data comes from or goes to the API                                     | `useFetch` (GET), `useMutation` (POST/PUT/PATCH/DELETE) | Provide `loading`, `fetching`, `error`, `refetch`.             |
-| **3. Global**         | App-wide: auth session, top-level dashboard filters                    | React Context (`@/context/*`)                           | Never put page- or form-specific state here. No toast context. |
-| **4. Local**          | Modal/drawer visibility, draft inputs, hover/selection                 | `useState`, `useReducer`                                | Scope as tightly as possible.                                  |
+| Tier                         | Use When                                                                        | Mechanism                                                             | Rules                                                                                                                    |
+| :--------------------------- | :------------------------------------------------------------------------------ | :-------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------- |
+| **1. URL State**             | Search, filters, tabs, sorting, pagination (must survive reload & be shareable) | `useSearchParams`, `useRouter`, `usePathname`, `mergeSearchParams`    | Use `router.replace` with debounced input to keep browser history clean. Wrap component in `<Suspense>`.                 |
+| **2. Server / Async State**  | Data fetched from or mutated to the backend                                     | `@tanstack/react-query` (`useQuery`, `useMutation`, `useQueryClient`) | Centralized query keys (`queryKeys` in `@/lib/query-client`), default `staleTime: 60s`, automatic background refetching. |
+| **3. Global UI State**       | Pure client UI state across pages (sidebar collapsed, mobile drawer)            | `zustand` (`src/stores/ui.store.ts`)                                  | Do NOT put server data in Zustand. Only client UI state.                                                                 |
+| **4. App Auth & RBAC**       | User session, permissions, role checking                                        | `AuthProvider` / `useAuth()` (`React Context`)                        | Populated from server-rendered layout session. Provides `can()`, `canAny()`, `hasRole()`.                                |
+| **5. Local Component State** | Modal/dialog visibility, draft form inputs, dropdown open state                 | `useState`, `useReducer`, `useRef`                                    | Keep as local and tightly scoped as possible.                                                                            |
 
 ---
 
-## 4. API & Data Fetching
+## 4. API, BFF & Data Fetching
+
+### Backend-for-Frontend (BFF) Architecture
+
+1. **Client requests** hit Next.js BFF at `/api/bff/[...path]` or `/api/auth/*` (same origin, no CORS, no preflight).
+2. **Access & Refresh tokens** are stored in secure, `httpOnly` cookies managed by Next.js route handlers. JavaScript in the browser cannot and should not access tokens directly.
+3. **Automatic 401 Refresh Queue**:
+   - `src/lib/axios.ts` implements a mutex queue for token refresh.
+   - If multiple parallel requests receive a `401 Unauthorized`, only the first request triggers `/api/auth/refresh`. Subsequent requests queue and retry once refresh succeeds.
+   - If refresh fails, `setSessionExpiredHandler` clears the React Query cache, resets `AuthContext`, and redirects to `/login`.
+
+### API Envelope Contracts (`src/types/api.ts`)
 
 ```typescript
-export interface ApiResponse<T = unknown> {
-  success: boolean;
-  statusCode: number;
-  message: string;
-  data: T;
-  timestamp: string;
-  path: string;
-}
-
-export interface ApiPaginationMeta {
+export interface PaginationMeta {
   page: number;
   pageSize: number;
   total: number;
@@ -121,96 +185,117 @@ export interface ApiPaginationMeta {
   hasPreviousPage: boolean;
 }
 
-export interface PaginatedApiResponse<T = unknown> extends ApiResponse<T[]> {
-  meta: ApiPaginationMeta;
+export interface ApiSuccessResponse<T> {
+  success: true;
+  statusCode: number;
+  message: string;
+  data: T;
+  meta?: PaginationMeta;
+  timestamp: string;
+  path: string;
+}
+
+export interface PaginatedResult<T> {
+  items: T[];
+  meta: PaginationMeta;
 }
 ```
 
-`useFetch` unwraps `ApiResponse.data`; `usePaginatedFetch` unwraps paginated `data` + `meta`:
+### Typed HTTP Helpers (`src/lib/axios.ts`)
+
+Use the unwrapped helper functions directly in API feature services:
 
 ```typescript
-// Read: refetches automatically when dependencies change
-const { data, loading, fetching, error, refetch } = useFetch<IndustryDto[]>(
-  () => settingsApi.getIndustries(true),
-  [status],
-);
+import { get, getPaginated, post, patch, del } from '@/lib/axios';
 
-// Paginated read: data is T[], meta is separate
-const {
-  data: rows,
-  meta,
-  loading,
-  fetching,
-  error,
-  refetch,
-} = usePaginatedFetch<ClientListItemDto>(() => clientApi.list({ status, page }), [status, page]);
-
-// Write
-const createMutation = useMutation<IClient, CreateClientDto>(
-  (payload) => clientApi.create(payload),
-  {
-    onSuccess: (newClient) => {
-      /* refresh list, close modal, redirect */
-    },
-    onError: (message) => {
-      /* set inline error */
-    },
-  },
-);
-await createMutation.mutate(formData);
+export const clientsApi = {
+  listPaginated: (query: string) => getPaginated<ClientListItem>(`/clients?${query}`),
+  getById: (id: string) => get<ClientDetail>(`/clients/${id}`),
+  create: (payload: CreateClientPayload) => post<ClientDetail>('/clients', payload),
+  update: (id: string, payload: UpdateClientPayload) =>
+    patch<ClientDetail>(`/clients/${id}`, payload),
+  delete: (id: string) => del<void>(`/clients/${id}`),
+};
 ```
 
-- `loading`: initial load only → render Skeletons.
-- `fetching`: background refetch → keep the existing layout (no layout shift).
+### TanStack Query Usage Pattern
+
+```tsx
+// Query: fetching list or detail data
+const { data, isLoading, isFetching, error } = useQuery({
+  queryKey: ['admin-clients', query],
+  queryFn: () => clientsApi.listPaginated(query),
+  retry: false,
+});
+
+// Mutation: creating, updating, or deleting data
+const queryClient = useQueryClient();
+const createMutation = useMutation({
+  mutationFn: (payload: CreateClientPayload) => clientsApi.create(payload),
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ['admin-clients'] });
+    toast.success('Client created successfully');
+    router.push(ROUTES.admin.clients);
+  },
+  onError: (err) => {
+    toast.error(err instanceof Error ? err.message : 'Failed to create client');
+  },
+});
+```
+
+- `isLoading`: initial load when no cache exists → render skeleton or `<BaseLoading fullScreen />`.
+- `isFetching`: background refetch → keep existing layout without jarring full-screen loaders.
 
 ---
 
-## 5. Forms
+## 5. Forms & Validations
 
-1. **State**: `values`, `errors` (`Record<keyof FormValues, string>`), `isSubmitting`.
-2. **`onChange`**: clear that field's error.
-3. **`onBlur`**: validate that field.
-4. **`onSubmit`**: `e.preventDefault()` → validate all fields → on errors, set `errors`, focus the first invalid field, stop → otherwise set `isSubmitting` and mutate.
-5. **Server errors**: map 400/422 field errors into `errors` (`error` + `helperText`); show general errors in an inline alert at the top of the form.
+- **Simple forms** (1–2 flat fields, e.g. rename industry modal): Local React state (`useState` for values and errors).
+- **Complex forms** (multi-section, nested arrays, check-in settings, client creation): `react-hook-form` + `zod` schema (`@hookform/resolvers/zod`).
+- **Validation Schemas**: All schemas reside in `src/validations/` and export inferred types (e.g. `type ClientFormValues = z.infer<typeof clientFormSchema>;`).
 
-Required: `<form noValidate>` (no native browser popups), and the submit `BaseButton` gets `disabled={isSubmitting}` and `loading={isSubmitting}`.
+### Form Rules:
 
----
-
-## 6. Inline Feedback (No Toasts)
-
-Floating toasts are prohibited. Every notification is contextual and inline:
-
-| Scenario                        | Handled by                     | UI                                                      |
-| :------------------------------ | :----------------------------- | :------------------------------------------------------ |
-| Network error / timeout         | API call catch                 | Inline warning with **Retry**                           |
-| Data fetch failure (500/404)    | `useFetch` `error`             | `<BaseErrorState message={error} onRetry={refetch} />`  |
-| Empty data (200, `[]`)          | `!data \|\| data.length === 0` | Empty state with message + CTA                          |
-| Form validation (client or 400) | Form validation                | Field `error` + `helperText` (`COLORS.secondary.red4`)  |
-| Session expired (401)           | Axios response interceptor     | Purge tokens, reset `AuthContext`, redirect to `/login` |
-| Runtime UI crash                | `error.tsx` / `ErrorBoundary`  | Fallback screen with **Reload**                         |
-
-Rendering details for these states: `UI_CONVENTIONS.md` §3.
+1. **Form element**: Always use `<form noValidate onSubmit={handleSubmit(onSubmit)}>`.
+2. **Field error clearing**: Clear field errors upon user input change.
+3. **Submit button**: Always bind `loading={isSubmitting || isPending}` and `disabled={isSubmitting || isPending}` on `BaseButton`.
+4. **Server validation errors**: Map 400/422 validation errors to corresponding form field `error` and `helperText`.
 
 ---
 
-## 7. Auth & Storage
+## 6. Feedback & Notifications
 
-- `localStorage` holds **tokens only**: `greenx7_access_token`, `greenx7_refresh_token`.
-- User profile (`currentUser`, `AuthUserDto`) and permissions live **only in memory** (`AuthContext`).
-- On logout or unrecoverable 401: purge all tokens and reset `AuthContext` to `null`.
+| Scenario                                       | Handled By                 | UI Component / Action                                   |
+| :--------------------------------------------- | :------------------------- | :------------------------------------------------------ |
+| **Mutation success / write alert**             | `useMutation` `onSuccess`  | `toast.success(...)` (`sonner`)                         |
+| **Mutation failure / write error**             | `useMutation` `onError`    | `toast.error(...)` (`sonner`)                           |
+| **Destructive / critical action confirmation** | `useConfirm()`             | `<ConfirmProvider>` dialog modal                        |
+| **Initial page load**                          | `isLoading && !data`       | `<BaseLoading message="..." fullScreen />`              |
+| **Table / list fetch failure**                 | Query `error`              | Inline error card with **Retry** button                 |
+| **Empty list (200 OK, `[]`)**                  | `data.length === 0`        | Dashed border empty container with CTA button           |
+| **Field validation error**                     | Client Zod / API 422       | Field `error` + `helperText` below input                |
+| **Session expired (401)**                      | Axios response interceptor | Auto refresh; if failed, reset auth & redirect `/login` |
 
 ---
 
-## 8. YAGNI & Surgical Changes
+## 7. Authentication, RBAC & Security
 
-- Write the minimum code that solves the immediate problem. No wrapper utility used in only one place. Prefer inline feedback over notification libraries.
-- Touch only the lines and files the task needs. No drive-by refactors or formatting changes that inflate diffs.
+- **Tokens in `httpOnly` Cookies**: Access and refresh tokens are stored securely in cookies.
+- **Server Session Hydration**: The root layout fetches the current authenticated user at request time and hydrates `AuthProvider` via `initialUser`, preventing UI flash.
+- **RBAC & Permissions**:
+  - Permissions are defined in `src/config/permissions.ts`.
+  - Use `useAuth()` in components to check access:
+    ```tsx
+    const { user, isAdmin, can, canAny, hasRole } = useAuth();
+    if (can(PERMISSIONS.CLIENT_CREATE)) { ... }
+    ```
+- **Route Guards**: Next.js middleware and layout-level guards protect admin and authenticated routes.
 
 ---
 
-## 9. Verification & Type Checking (No Build)
+## 8. Verification & Development Commands
 
-- **Forbidden during dev & verification**: Do NOT run `next build`, `npm run build`, or `yarn build` just to verify changes. Next.js build prerenders and exports 70+ static pages, causing high memory spikes and wasting time.
-- **Type check**: Run `yarn tsc --noEmit` (or `yarn type-check`) for lightweight type checking with low memory usage.
-- **Lint**: Run `yarn lint`.
+- **Type Check**: Run `npm run typecheck` (`tsc --noEmit`) for fast, low-memory type validation.
+- **Lint Check**: Run `npm run lint:check` (or `npm run lint` for auto-fixing).
+- **Unit Tests**: Run `npm test` (`vitest run`).
+- **Forbidden in Dev Verification**: Do NOT run `npm run build` just to verify code or type changes. Next.js build prerenders all static routes, consuming excessive time and memory. Always use `npm run typecheck` and `npm run lint:check`.

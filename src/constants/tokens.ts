@@ -7,6 +7,7 @@ export const DASHBOARD_COLORS = {
   secondary: {
     yellow1: '#EBD343',
     yellow2: '#FAF4D0',
+    yellow3: '#9E892E',
     green1: '#9ACC63',
     green2: '#E6F2D8',
     green4: '#087452',
@@ -14,6 +15,7 @@ export const DASHBOARD_COLORS = {
     orange2: '#FBE7D7',
     cyan1: '#5FC8C9',
     cyan2: '#D7F1F2',
+    cyan3: '#418382',
     violet1: '#AC8ED4',
     violet2: '#EBE4F5',
     rose1: '#EE8F9F',

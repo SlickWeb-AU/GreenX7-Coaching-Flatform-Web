@@ -1,65 +1,201 @@
 # GreenX7 UI & Design System Conventions
 
-Mandatory for all developers and AI agents building or modifying UI. Architecture, state, and API rules live in `PROJECT_CONVENTIONS.md`.
+Mandatory UI, design tokens, and component guidelines for all developers and AI agents building or modifying the frontend. Architecture, API, and state rules live in `PROJECT_CONVENTIONS.md`.
 
 ---
 
-## 1. Component Rules
+## 1. UI Tech Stack & Component Hierarchy
+
+### Core Tech Stack
+
+- **Styling**: Tailwind CSS v3 with CSS variables & customized tokens (`tailwind.config.ts`, `globals.css`).
+- **Icons**: Lucide React (`lucide-react`) and custom SVG icons in `@/components/icons`.
+- **Primitives**: Radix UI headless components (`@radix-ui/react-*`).
+- **Class Utilities**: `clsx` and `tailwind-merge` unified via `@/lib/utils` (`cn(...)`).
+- **Strict Rule**: **NO Material UI (MUI)**, **NO Emotion `styled()`**, **NO `sx` props**, **NO inline style objects** for layout.
+
+### Component Composition Rules
 
 Pick the first option that fits:
 
-1. **Layout & text → native HTML** (`div`, `p`, `span`, `h1`–`h6`, `section`, `header`, `button`) styled with Tailwind tokens + `clsx`.
-2. **Interactive / design-system controls → Base component** from `@/components/base`: `BaseButton`, `BaseInput`, `BaseSelect`, `BaseCard`, `BaseDialog`, `BaseTable`, `BaseTableRow`, `BaseSwitch`, `BaseTabs`, `BasePill`, `BasePagination`, `BaseOtp`, `BaseLabel`, `DeltaBadge`.
-3. **Specialized MUI primitive** (`Drawer`, `Menu`, `Tooltip`, `Slider`, `Skeleton`) → wrap once inside `@/components/base/*` with a module-level `styled()`. Never import it in feature code.
+1. **Layout & Text → Native Semantic HTML** (`div`, `p`, `span`, `h1`–`h6`, `section`, `header`, `button`) styled with Tailwind classes + typography utilities.
+2. **Interactive / Base Design-System Controls → Base Components** from `@/components/base`:
+   - `BaseButton`, `BaseIconButton`
+   - `BaseInput`
+   - `BaseSelect`, `BaseSelectInside`
+   - `BaseTable`, `BasePagination`
+   - `BaseCard`, `BaseDialog`, `BasePopover`
+   - `BaseTabs`, `BasePillTabs`, `BaseSwitch`, `BaseOtp`, `BaseTag`
+   - `BaseHeader`, `BaseBreadcrumb`, `BaseLink`, `BaseLoading`, `BaseDatePicker`
+3. **Complex Domain Components** → Build inside `@/components/{domain}/` (e.g. `@/components/clients/ClientsTable.tsx`, `@/components/dashboard/WellbeingScoreCard.tsx`) by composing Base components and Tailwind styling.
 
-### Component Declaration & Typing (All Code)
+### Component Declaration & Typing
 
 - ❌ **`React.FC` / `FC` is forbidden**: Never type components as `React.FC<Props>` or `FC<Props>`.
-- ❌ **`React.*` namespace calls are forbidden**: Do not use `React.useState`, `React.useEffect`, `React.useCallback`, `React.useMemo`, etc. Import hooks and types directly (`import { useState, useEffect, useCallback, type ReactNode, type FormEvent } from 'react'`).
-- ❌ **Unnecessary `<Suspense>` page wrappers are forbidden**: Do not wrap whole page contents in `<Suspense>` unless explicitly architected for streaming.
+- ❌ **`React.*` namespace imports are forbidden**: Do not use `React.useState`, `React.useEffect`, `React.useCallback`, `React.useMemo`, etc. Import directly from `'react'`.
 - ✅ **Standard typed arguments**: Type props directly on the function parameter:
-  - `export function Comp({ title }: CompProps) { ... }`
-  - `export const Comp = ({ title }: CompProps) => { ... };`
-- If children are accepted, explicitly define `children?: ReactNode` in the component props interface.
+  ```tsx
+  import { useState, type ReactNode } from 'react';
 
-### Feature code (`src/app/*`, `src/component/{feature}/*`)
+  export interface UserCardProps {
+    name: string;
+    avatarUrl?: string | null;
+    children?: ReactNode;
+    className?: string;
+  }
 
-- ❌ MUI `Box` / `Typography` / raw MUI components, `sx`, inline `style`, hand-built Skeletons, template-literal class strings.
-- ✅ Tailwind token classes for all spacing, layout, color, and typography.
-- ✅ `clsx` for conditional classes and for merging an external `className`.
+  export function UserCard({ name, avatarUrl, children, className }: UserCardProps) {
+    return (
+      <div className={cn('rounded-2xl border border-neutral-grey-7 bg-white p-4', className)}>
+        <h4 className="body-16-bold text-neutral-grey-1">{name}</h4>
+        {children}
+      </div>
+    );
+  }
+  ```
 
-### Base components (`src/component/base/*`)
+---
 
-- **Styling**: `styled(MuiComponent)` at module level for colors, borders, shadows, hover/active/focus, `.Mui-disabled`/`.Mui-error`. No `sx`, no fixed heights. Never override MUI internal classes in `globals.css`.
-- **Sizes**: via `size` prop from static dictionaries in `src/constants/base/*.ts` (e.g. `BaseButton`: `'xs' | 'small' | 'medium' | 'mediumPlus' | 'large'`, default `'medium'`; use `'xs'` for compact cases like pagination). Custom components and wrapped MUI primitives size via `size` prop — never hard-code `width`/`height`/`padding` in `styled()` when Tailwind can do it. Native HTML tags (`div`, `p`, `span`, `button`) size via Tailwind classes (`w-8`, `h-8`, `body-14-*`).
-- **Skeletons**: form controls accept `loading?: boolean` and render a size-matched Skeleton. `BaseButton`: `loading` = submit spinner, `skeleton` = initial page load.
-- **Tokens only**: full `TYPOGRAPHY.*` tokens (never a lone `fontSize`); direct `COLORS.*` access with no fallbacks (`COLORS.neutral?.grey2 || '#...'` is forbidden).
-- **`className`**: accept it and merge with `clsx` so callers can adjust layout (`w-full`, `mt-4`).
-- **Barrels**: `src/component/base/index.ts` exports only base components and their prop types.
+## 2. Design Tokens & Styling System
 
-### Form field spec
+### Typography Utility Classes (`src/app/globals.css`)
 
-- **`BaseLabel`** (wraps MUI `FormLabel`): `small` → `caption-12-bold`, `medium` → `body-14-bold`, `large` → `body-16-bold`. Asterisk and error use `COLORS.secondary.red4`.
-- **Placeholder**: `body-16-medium`, `COLORS.neutral.grey3`, `opacity: 1`.
-- **Field error**: `mt-2` below the field, `body-16-medium`, `COLORS.secondary.red4`; cleared on `onChange`.
-- **Input border**: `border-primary-main`.
-- **Select border**: `1px solid ${COLORS.neutral.grey5}` (`#CBD1CD`). Error: `COLORS.secondary.red4`.
-- **Border radius**: interactive controls (`BaseInput`, `BaseSelect`, `BaseButton` when `pill={false}`, sidebar nav items) use `8px` (`rounded-lg`). Modals use `24px` (`rounded-2xl`).
-- **Select labels & variant**: Without `variant` (default) → use the external `BaseLabel`. With `variant="filled"` → hide `BaseLabel` and use the inner `label` in `StyledSelect`.
-- **Select dropdown arrow**: `COLORS.neutral.grey3` (`#6A7A72`).
-- **Header controls gap**: Gap between Selects and Buttons in the Header is `8px` (`gap-2`).
+Always use the predefined typography utility classes instead of manual arbitrary font sizes:
 
-### Table spec
+| Group       | Utility Class        | Tailwind Font / Line-height | Weight        | Letter Spacing   |
+| :---------- | :------------------- | :-------------------------- | :------------ | :--------------- |
+| **Heading** | `heading-64-bold`    | `text-[64px]/[68px]`        | Bold (700)    | `tracking-tight` |
+|             | `heading-48-bold`    | `text-[48px]/[52px]`        | Bold (700)    | `tracking-tight` |
+|             | `heading-28-bold`    | `text-[28px]/[32px]`        | Bold (700)    | `tracking-tight` |
+|             | `heading-20-bold`    | `text-xl/[26px]`            | Bold (700)    | `tracking-tight` |
+| **Body**    | `body-32-bold`       | `text-[32px]/[38px]`        | Bold (700)    | `tracking-tight` |
+|             | `body-20-bold`       | `text-xl/[26px]`            | Bold (700)    | `tracking-tight` |
+|             | `body-18-bold`       | `text-lg/[24px]`            | Bold (700)    | `tracking-tight` |
+|             | `body-18-medium`     | `text-lg/[24px]`            | Medium (500)  | `tracking-tight` |
+|             | `body-16-bold`       | `text-base/[22px]`          | Bold (700)    | `tracking-tight` |
+|             | `body-16-medium`     | `text-base/[22px]`          | Medium (500)  | `tracking-tight` |
+|             | `body-14-bold`       | `text-sm/[20px]`            | Bold (700)    | `tracking-tight` |
+|             | `body-14-medium`     | `text-sm/[20px]`            | Medium (500)  | `tracking-tight` |
+|             | `body-14-regular`    | `text-sm/[20px]`            | Regular (400) | `tracking-tight` |
+|             | `body-12-bold`       | `text-xs/[18px]`            | Bold (700)    | `tracking-tight` |
+|             | `body-12-medium`     | `text-xs/[18px]`            | Medium (500)  | `tracking-tight` |
+| **Caption** | `caption-12-regular` | `text-xs/[18px]`            | Regular (400) | `tracking-tight` |
 
-- **Never hand-roll `<table>` in feature code** — use `BaseTable` from `@/components/base`. Define columns antd-style, then pass `data` + `meta` (`PaginationMeta` from `@/types/api`):
+- **Font family**: Satoshi (`font-satoshi` / `var(--font-satoshi)`).
+
+### Color Tokens (`tailwind.config.ts` & `src/constants/tokens.ts`)
+
+| Category             | Tailwind Class Prefix                                                  | Hex Values           | Usage                                                                |
+| :------------------- | :--------------------------------------------------------------------- | :------------------- | :------------------------------------------------------------------- |
+| **Brand Primary**    | `bg-brand-green-2`, `text-brand-green-2`, `border-brand-green-2`       | `#005943`            | Primary brand action, active sidebar item, primary button background |
+| **Neutral Grey**     | `text-neutral-grey-1`, `bg-neutral-grey-1`                             | `#12211C`            | Primary heading text, dark surfaces                                  |
+|                      | `text-neutral-grey-2`                                                  | `#53635C`            | Secondary body text, form field labels                               |
+|                      | `text-neutral-grey-3`                                                  | `#6A7A72`            | Muted descriptions, placeholder text, chevron icons                  |
+|                      | `border-neutral-grey-4`                                                | `#BFCFC5`            | Input hover border                                                   |
+|                      | `border-neutral-grey-5`                                                | `#CBD1CD`            | Default input & select borders                                       |
+|                      | `border-neutral-grey-6`                                                | `#DFE5E1`            | Divider lines                                                        |
+|                      | `bg-neutral-grey-7`, `border-neutral-grey-7`                           | `#EDF3EF`            | Card borders, skeleton placeholders, subtle hover                    |
+|                      | `bg-neutral-grey-8`                                                    | `#F6F8F5`            | Page background, secondary input background                          |
+|                      | `bg-white`, `text-white`                                               | `#FFFFFF`            | Solid white cards, primary button text                               |
+| **Secondary Red**    | `text-secondary-red-4`, `border-secondary-red-4`, `bg-secondary-red-2` | `#B43E47`, `#FBE3E7` | Form errors, destructive actions, survive zone badge                 |
+| **Secondary Green**  | `text-secondary-green-4`, `bg-secondary-green-2`                       | `#087452`, `#E6F2D8` | Active status badges, success indicators                             |
+| **Secondary Yellow** | `text-secondary-yellow-3`, `bg-secondary-yellow-2`                     | `#9E892E`, `#FAF4D0` | Function zone badge, warning indicator                               |
+
+### Wellbeing Zone Colors (`ZONE_COLORS` in `@/constants/tokens.ts`)
+
+- **Thrive Zone** (80–100%): `color: #005943`, `bg: #E6F2D8`
+- **Momentum Zone** (70–79%): `color: #087452`, `bg: #E6F2D8`
+- **Function Zone** (50–69%): `color: #53635C`, `bg: #FAF4D0`
+- **Survive Zone** (0–49%): `color: #B43E47`, `bg: #FBE3E7`
+
+---
+
+## 3. Base Component Specifications & Patterns
+
+### 1. `BaseButton` (`@/components/base`)
+
+```tsx
+<BaseButton
+  variant="primary" // 'primary' (brand green) | 'secondary' (white with border) | 'ghost'
+  size="medium" // 'small' (h-9 body-14-bold) | 'medium' (h-11 body-14-bold) | 'mediumPlus' (h-12 body-16-bold)
+  pill // boolean: rounded-full (true) vs rounded-lg 8px (false)
+  loading={isPending} // boolean: shows spin loader Loader2 and disables click
+  skeleton={isLoading} // boolean: renders size-matched pulse placeholder
+  startIcon={<PlusIcon />}
+  onClick={handleClick}
+>
+  Add Client
+</BaseButton>
+```
+
+### 2. `BaseInput` (`@/components/base`)
+
+```tsx
+<BaseInput
+  label="Business name"
+  placeholder="Enter business name"
+  size="medium" // 'small' (h-9) | 'medium' (h-10) | 'mediumPlus' (h-12)
+  variant="primary" // 'primary' (bg-white) | 'secondary' (bg-neutral-grey-8)
+  prefix={<SearchIcon aria-hidden />}
+  error={Boolean(errors.businessName)}
+  helperText={errors.businessName?.message}
+  loading={isLoading} // Pulse skeleton
+  {...register('businessName')}
+/>
+```
+
+- **Error state**: Red border `border-secondary-red-4`, error helper text `text-secondary-red-4` (`body-14-medium`).
+- **Focus state**: Green border `focus:border-brand-green-2` without ugly browser outlines.
+
+### 3. `BaseSelect` (`@/components/base`)
+
+```tsx
+<BaseSelect
+  label="Industry"
+  placeholder="Select industry"
+  value={selectedIndustry}
+  options={[
+    { value: 'all', label: 'All industries' },
+    { value: 'tech', label: 'Technology' },
+  ]}
+  onChange={(val) => setSelectedIndustry(val)}
+  size="medium"
+  startIcon={<FilterSlidersIcon />}
+  error={Boolean(error)}
+  helperText={error}
+/>
+```
+
+- **Smart Popover Positioning**: Auto-detects viewport clearance and renders dropdown either downward or upward to prevent off-screen clipping.
+
+### 4. `BaseTable` & `BasePagination` (`@/components/base`)
+
+Use `BaseTable` for all tabular data displays. Never hand-roll `<table>` elements in page views:
 
 ```tsx
 import { BaseTable, type BaseColumn } from '@/components/base';
 
 const columns: BaseColumn<ClientListItem>[] = [
-  { key: 'name', title: 'Client', sorter: 'businessName', render: (_, row) => (...) },
-  { key: 'industry', title: 'Industry', dataIndex: 'industry', sorter: 'industry' },
-  { key: 'departments', title: 'Departments', dataIndex: 'departmentCount', align: 'right' },
+  {
+    key: 'name',
+    title: 'Client Name',
+    sorter: 'businessName',
+    render: (_, row) => (
+      <span className="body-14-bold text-neutral-grey-1">{row.businessName}</span>
+    ),
+  },
+  {
+    key: 'industry',
+    title: 'Industry',
+    dataIndex: 'industryName',
+    sorter: 'industry',
+  },
+  {
+    key: 'departments',
+    title: 'Departments',
+    align: 'right',
+    render: (_, row) => <span>{row.departmentCount ?? 0}</span>,
+  },
 ];
 
 <BaseTable
@@ -67,151 +203,90 @@ const columns: BaseColumn<ClientListItem>[] = [
   data={rows}
   rowKey="id"
   meta={data?.meta}
+  page={page}
+  totalPages={data?.meta.totalPages}
   onPageChange={(p) => setParams({ page: p > 1 ? String(p) : null })}
-  sortField={sortKey}
+  sortField={sortField}
   sortOrder={sortAsc ? 'asc' : 'desc'}
-  onSortChange={handleSort}
+  onSortChange={handleSortChange}
   loading={isLoading}
   onRowClick={(row) => router.push(`/admin/clients/${row.id}`)}
 />;
 ```
 
-- **`BaseColumn<T>`**: `key` (unique), `title`, `dataIndex?: keyof T` (plain value cells), `render?(value, record, index)` (custom cells; required for object values — a bare object cell renders `—`), `sorter?: boolean | string` (`true` = sort by `key`, string = custom sort key), `align`, `width`, `className` / `headerClassName`.
-- **Sorting is controlled**: `sortField` + `sortOrder` + `onSortChange`. Sortable headers render a button with an `▲/▼/↕` indicator. Keep sort state in URL search params (`PROJECT_CONVENTIONS.md` §3 Tier 1).
-- **States**: `loading` renders skeleton rows with `aria-busy` on the table; empty `data` renders the shared empty card — override via `emptyTitle` / `emptyDescription` / `emptyAction`.
-- **Row click**: `onRowClick(record, index)` adds pointer cursor + hover. `rowKey` accepts `keyof T` or `(record, index) => string`.
-- **Footer pagination**: shown when `meta` + `onPageChange` are provided (hide with `showFooter={false}`), sitting 24px (`gap-6`) below the table. Left shows `Showing X–Y of Z` (from `meta.total` / `meta.pageSize`); right shows Prev/Next icon buttons flanking numbered page buttons — large totals window as `1 … 4 5 6 … 20` (all pages when `totalPages <= 7`). Every button is `BaseButton` `size="small"` at 32×32 (`h-8 w-8 px-0`); the active page uses `variant="primary"`.
-- **`BasePagination`** is reused inside the `BaseTable` footer and can be used standalone: `<BasePagination meta={meta} onPageChange={setPage} />` (also accepts manual `page` / `totalPages` without `meta`; hide the range with `showTotal={false}`).
+- **Footer & Pagination**: When `meta` and `onPageChange` are supplied, `BaseTable` automatically renders `BasePagination` (`Showing 1–10 of 120` on the left, Previous/Next + windowed numbered buttons on the right).
+- **Sorting**: Pass `sortField`, `sortOrder` (`'asc'` | `'desc'`), and `onSortChange`. Column headers render interactive sort indicators.
 
-### Example
+### 5. `BaseDialog` (`@/components/base`)
 
 ```tsx
-import clsx from 'clsx';
-import { BaseButton, BaseInput } from '@/components/base';
-
-<div
-  className={clsx(
-    'flex flex-col gap-2 rounded-2xl border p-5 transition-all',
-    isHighlighted
-      ? 'border-primary-main bg-primary-lighter'
-      : 'border-border-default bg-background-card',
-    className,
-  )}
->
-  <h3 className="body-18-bold text-text-primary">Card Title</h3>
-  <p className="body-14-regular text-text-muted">Description</p>
-  <BaseInput
-    label="Work Email"
-    size="medium"
-    loading={isLoading}
-    className="w-full"
-    error={Boolean(error)}
-    helperText={error}
-  />
-  <BaseButton loading={isSubmitting} skeleton={isLoading}>
-    Save Changes
-  </BaseButton>
-</div>;
-```
-
----
-
-## 2. Design Tokens
-
-### Typography
-
-Tailwind class `{group}-{size}-{weight}` maps to `TYPOGRAPHY.{group}{Size}{Weight}` (e.g. `body-14-medium` → `TYPOGRAPHY.body14Medium`). Weights: bold 700, semibold 600, medium 500, regular 400.
-
-| Group      | Size / line height (px)    | Weights               | Letter spacing |
-| :--------- | :------------------------- | :-------------------- | :------------- |
-| `heading`  | 64/68, 48/52               | bold                  | -3%            |
-| `heading`  | 36/40, 32/36, 28/32, 24/28 | bold                  | -2%            |
-| `heading`  | 20/26                      | bold, semibold        | -2%            |
-| `body`     | 18/24, 16/22               | bold, medium, regular | -2%            |
-| `body`     | 14/20                      | bold, medium, regular | -1%            |
-| `body`     | 13/18                      | medium, regular       | -1%            |
-| `body`     | 12/18                      | bold, medium, regular | -1%            |
-| `caption`  | 12/18                      | bold, medium, regular | -1%            |
-| `caption`  | 10/14                      | bold, medium          | 0              |
-| `overline` | 11/16, 12/16               | bold (UPPERCASE)      | +5%            |
-
-### Colors
-
-TypeScript `COLORS.{group}.{camelName}` maps to Tailwind `{bg|text|border}-{group}-{kebab-name}` (`cardSubtle` → `bg-background-card-subtle`, `red4` → `text-secondary-red-4`). Hover variants: `hover:bg-primary-hover`, `hover:bg-background-hover`.
-
-| Group        | Tokens                                                                                                                     | Notes                                                      |
-| :----------- | :------------------------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------- |
-| `primary`    | main `#005943`, hover `#004835`, dark `#003326`, deep `#05513D`, light `#CFE4CA`, lighter `#E7F1E5`, subtle `#EAF0EA`      | `bg-brand-green-2` aliases `primary-main`                  |
-| `secondary`  | yellow1 `#EBD343`, red4 `#B43E47`                                                                                          | red4 = error                                               |
-| `accent`     | yellow `#F5D547`, green `#63D556`                                                                                          |                                                            |
-| `neutral`    | grey1 `#12211C`, grey2 `#53635C`, grey3 `#6A7A72`, grey4 `#BFCFC5`, grey5 `#CBD1CD`, grey7 `#EDF3EF`, whiteSolid `#FFFFFF` | grey3 = placeholder, grey4 = border, grey5 = select border |
-| `text`       | primary `#111827`, secondary `#374151`, muted `#6B7280`, light `#9CA3AF`, darkMuted `#5C6E66`, white `#FFFFFF`             | Tailwind: `text-text-*`                                    |
-| `background` | page `#F4F7F2`, card `#FFFFFF`, cardSubtle `#F8FAF8`, tableHead `#EAF0EA`, hover `#F9FAF9`, disabled `#F3F4F6`             |                                                            |
-| `border`     | default `#E6EBE6`, input `#D1D5DB`, line `#E2E8E2`, lineSoft `#EFF3EF`, light `#F0F4F0`, divider `#F0F3F0`                 |                                                            |
-| `status`     | up `#0A7D5C`, down `#D6464F`, warn `#F5D547`                                                                               |                                                            |
-
----
-
-## 3. UI States
-
-Every data-driven view (Card, Table, List, Form) handles all five states. Behavior rules: `PROJECT_CONVENTIONS.md` §6.
-
-| State          | Trigger                   | Rendering                                                                                                      |
-| :------------- | :------------------------ | :------------------------------------------------------------------------------------------------------------- |
-| **Loading**    | Initial fetch (`loading`) | `loading` prop on Base form controls and `BaseTable` (auto size-matched Skeletons); `skeleton` on `BaseButton` |
-| **Error**      | `error` from `useFetch`   | Error card with **Retry** (`refetch`)                                                                          |
-| **Empty**      | 200 with no items         | Dashed container with message + CTA                                                                            |
-| **Content**    | Data present              | `BaseCard`, `BaseTable`, or grid                                                                               |
-| **Submitting** | Mutation in flight        | `loading={isSubmitting}` on `BaseButton` (spinner, blocks double click)                                        |
-
-**Page-level loading/error**: keep the page `BaseHeader` visible in every branch — render `<BaseLoading fullScreen={false} />` or `<BaseErrorState onRetry={refetch} />` below the header instead of returning them full-screen. Guard with `!data` (`(loading || fetching) && !data`, `error && !data`) so background refetches keep the existing layout.
-
-```tsx
-// Error: shared card from @/components/base (never hand-roll this markup)
-if (error) {
-  return <BaseErrorState message={error} onRetry={refetch} />;
-}
-
-if (!data || data.length === 0) {
-  return (
-    <div className="border-border-default flex flex-col items-center justify-center rounded-2xl border border-dashed px-4 py-12 text-center">
-      <p className="body-16-bold text-text-primary mb-1">No items found</p>
-      <p className="body-14-regular text-text-muted mb-4 max-w-sm">
-        Get started by creating a new entry or adjusting your filters.
-      </p>
-      <BaseButton size="small" onClick={handleCreate}>
-        Add New Item
+<BaseDialog title="Create new department" onClose={() => setIsOpen(false)} className="max-w-lg">
+  <form onSubmit={handleSubmit} noValidate>
+    <BaseInput label="Department name" {...register('name')} />
+    <div className="mt-6 flex justify-end gap-3">
+      <BaseButton variant="secondary" onClick={() => setIsOpen(false)}>
+        Cancel
+      </BaseButton>
+      <BaseButton type="submit" loading={isSubmitting}>
+        Save
       </BaseButton>
     </div>
-  );
-}
+  </form>
+</BaseDialog>
+```
+
+- **Specs**: Semi-transparent dark backdrop with animation (`bg-black/50 animate-in fade-in-0`), `rounded-2xl`, responsive padding, ESC key listener, and top-right close icon button.
+
+---
+
+## 4. UI States & Handling
+
+Every data-driven page or section must handle all 5 primary states:
+
+| State                      | Condition                         | Rendering Pattern                                                                                 |
+| :------------------------- | :-------------------------------- | :------------------------------------------------------------------------------------------------ |
+| **1. Loading (Initial)**   | `isLoading && !data`              | `<BaseLoading message="Loading..." fullScreen />` for pages, or skeleton rows in `BaseTable`      |
+| **2. Background Fetching** | `isFetching && data`              | Keep existing UI rendered without full-screen overlays (no jarring layout shift)                  |
+| **3. Error**               | `error && !data`                  | Error card with message and **Retry** button (`<BaseButton onClick={refetch}>Retry</BaseButton>`) |
+| **4. Empty**               | `!isLoading && rows.length === 0` | Dashed border container with descriptive text + CTA action button                                 |
+| **5. Content**             | Normal data available             | Render interactive `BaseTable`, `BaseCard` grid, or forms                                         |
+
+---
+
+## 5. Feature Page Anatomy & Layout
+
+Standard admin pages follow a uniform 4-zone top-to-bottom structure:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ 1. Header: BaseHeader with title, breadcrumbs & action CTA   │
+│    (e.g. "Clients" + Pill "Add client" button)              │
+├─────────────────────────────────────────────────────────────┤
+│ 2. Toolbar Card: White rounded-2xl container                │
+│    - Left: BaseInput search with SearchIcon                 │
+│    - Right: BaseSelect filters (Industry, Status, Date)     │
+├─────────────────────────────────────────────────────────────┤
+│ 3. Main Content:                                            │
+│    - BaseTable (with skeleton loaders or empty state)       │
+│    - Or BaseCard responsive grid                            │
+├─────────────────────────────────────────────────────────────┤
+│ 4. Table Footer / Pagination:                               │
+│    - "Showing 1–10 of 48" + Windowed page buttons (1 … 4 5) │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 4. Feature Page Anatomy
+## 6. Responsive & Accessibility Standards
 
-Every feature page has four zones, top to bottom:
-
-1. **Header**: breadcrumbs / title on the left, primary CTA on the right.
-2. **Filter toolbar**: search input, status dropdown, date range, clear-filters action.
-3. **Main content**: `BaseTable` or `BaseCard` grid, handling all five UI states.
-4. **Footer**: result count ("Showing 1–10 of 120") and `BasePagination`.
-
----
-
-## 5. Overlays
-
-| Overlay    | Component            | Use for                                                                           | Specs                                                                                                 |
-| :--------- | :------------------- | :-------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------- |
-| **Modal**  | `BaseDialog`         | Short forms (1–5 fields), confirmations, destructive actions                      | 4px backdrop blur, 24px radius, dismiss on ESC / backdrop click. Destructive: `COLORS.secondary.red4` |
-| **Drawer** | Wrapped MUI `Drawer` | Entity inspection, multi-step forms without leaving the page, mobile filter panel | `anchor="right"`, width `w-full max-w-md` or `max-w-xl`, persistent close button in header            |
-
----
-
-## 6. Responsive
-
-- **Breakpoints**: Tailwind defaults `sm` 640, `md` 768, `lg` 1024, `xl` 1280.
-- **Touch targets**: at least 44×44px on mobile for buttons, inputs, and tabs.
-- **Tables**: below `md`, replace with stacked `BaseCard` views.
-- **Toolbars**: `flex-row` on desktop, `flex-col w-full` on mobile.
+- **Breakpoints**: Standard Tailwind breakpoints:
+  - `sm`: 640px
+  - `md`: 768px
+  - `lg`: 1024px
+  - `xl`: 1280px
+- **Touch Targets**: All clickable buttons and interactive triggers must have a minimum target area of 36×36px (desktop) and 44×44px (mobile).
+- **ARIA Attributes**:
+  - Inputs: `aria-invalid={error}`, `aria-required={required}`.
+  - Buttons: `aria-label` for icon-only buttons (`BaseIconButton`).
+  - Dropdowns & Dialogs: `role="dialog"`, `aria-modal="true"`, `role="combobox"`, `aria-expanded`.
+  - Spinners / Skeletons: `aria-hidden="true"` or `aria-busy="true"`.
