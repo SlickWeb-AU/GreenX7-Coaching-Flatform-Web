@@ -6,6 +6,13 @@ import { Check } from 'lucide-react';
 import { ChevronDownIcon } from '@/components/icons';
 import { cn } from '@/lib/utils';
 
+export type BaseSelectInsideVariant = 'primary' | 'secondary';
+
+const variantClasses: Record<BaseSelectInsideVariant, string> = {
+  primary: 'border-neutral-grey-5 bg-white hover:border-neutral-grey-4 focus:border-brand-green-2',
+  secondary: 'border-white bg-neutral-grey-8 hover:bg-neutral-grey-7 focus:bg-neutral-grey-7',
+};
+
 export interface SelectOption<T extends string = string> {
   value: T;
   label: string;
@@ -17,16 +24,20 @@ export function BaseSelectInside<T extends string>({
   options,
   onChange,
   placeholder,
+  variant = 'primary',
   disabled = false,
   className,
+  containerClassName,
 }: {
   label: string;
   value: T;
   options: SelectOption<T>[];
   onChange: (value: T) => void;
   placeholder?: string;
+  variant?: BaseSelectInsideVariant;
   disabled?: boolean;
   className?: string;
+  containerClassName?: string;
 }) {
   const generatedId = useId();
   const listboxId = `${generatedId}-listbox`;
@@ -34,9 +45,21 @@ export function BaseSelectInside<T extends string>({
   const containerRef = useRef<HTMLDivElement>(null);
 
   const selectedOption = options.find((opt) => opt.value === value);
+  const resolvedPlaceholder =
+    placeholder ?? (label ? `Select ${label.toLowerCase()}` : 'Select an option');
+
+  const [openUpward, setOpenUpward] = useState(false);
 
   useEffect(() => {
     if (!isOpen) return;
+
+    if (containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const spaceAbove = rect.top;
+      const estimatedHeight = Math.min(320, options.length * 40 + 8);
+      setOpenUpward(spaceBelow < estimatedHeight && spaceAbove > spaceBelow);
+    }
 
     const handleClickOutside = (e: MouseEvent | TouchEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
@@ -59,10 +82,10 @@ export function BaseSelectInside<T extends string>({
       document.removeEventListener('touchstart', handleClickOutside);
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isOpen]);
+  }, [isOpen, options.length]);
 
   return (
-    <div ref={containerRef} className="relative inline-block">
+    <div ref={containerRef} className={cn('relative inline-block', containerClassName)}>
       <button
         type="button"
         role="combobox"
@@ -72,17 +95,18 @@ export function BaseSelectInside<T extends string>({
         disabled={disabled}
         onClick={() => !disabled && setIsOpen((prev) => !prev)}
         className={cn(
-          'inline-flex min-h-[44px] w-auto min-w-[166px] flex-col items-stretch gap-[2px] rounded-lg border border-neutral-grey-5 bg-white px-3 py-1.5 text-left shadow-none transition-colors',
-          'hover:border-neutral-grey-4 focus:border-brand-green-2',
+          'inline-flex min-h-11 w-auto min-w-[166px] flex-col items-stretch gap-0.5 rounded-lg border px-3 py-1 text-left shadow-none transition-colors',
+          variantClasses[variant],
+          isOpen && (variant === 'primary' ? 'border-brand-green-2' : 'bg-neutral-grey-7'),
           'outline-none focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0',
           disabled && 'cursor-not-allowed opacity-50',
           className,
         )}
       >
-        <span className="body-12-medium select-none leading-none text-neutral-grey-3">{label}</span>
+        <span className="body-14-medium select-none leading-none text-neutral-grey-3">{label}</span>
         <span className="flex items-center justify-between gap-3">
           <span className="body-16-bold min-w-0 truncate text-neutral-grey-1">
-            {selectedOption?.label ?? placeholder ?? value}
+            {selectedOption?.label ?? (value ? value : resolvedPlaceholder)}
           </span>
           <ChevronDownIcon
             className={cn('shrink-0 transition-transform duration-200', isOpen && 'rotate-180')}
@@ -95,7 +119,10 @@ export function BaseSelectInside<T extends string>({
         <div
           id={listboxId}
           role="listbox"
-          className="absolute left-0 top-full z-50 mt-1.5 max-h-80 w-max min-w-full animate-fade-in overflow-y-auto rounded-xl border border-neutral-grey-5 bg-white p-1 text-neutral-grey-1 shadow-lg shadow-black/5"
+          className={cn(
+            'absolute left-0 z-50 max-h-80 w-max min-w-full animate-fade-in overflow-y-auto rounded-xl border border-neutral-grey-5 bg-white p-1 text-neutral-grey-1 shadow-lg shadow-black/5',
+            openUpward ? 'bottom-full mb-1.5' : 'top-full mt-1.5',
+          )}
         >
           {options.map((opt) => {
             const isSelected = opt.value === value;

@@ -29,6 +29,11 @@ export const metadata: Metadata = {
     template: '%s | GreenX7',
   },
   description: 'Nền tảng thực phẩm sạch GreenX7',
+  icons: {
+    icon: '/images/favicon.png',
+    shortcut: '/images/favicon.png',
+    apple: '/images/favicon.png',
+  },
   // Use APP_URL (not NEXT_PUBLIC_) because metadata only runs on the server.
   // NEXT_PUBLIC_ values are baked into the bundle at build time, so the Docker
   // image would stick to one domain and could not be reused for staging/production.

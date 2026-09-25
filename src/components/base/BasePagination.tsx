@@ -6,7 +6,7 @@ import type { PaginationMeta } from '@/types/api';
 
 import { BaseButton } from './BaseButton';
 import { BaseIconButton } from './BaseIconButton';
-import { buildPageItems } from './pagination-helpers';
+import { buildPageItems } from './utils/pagination';
 
 export interface BasePaginationProps {
   meta?: PaginationMeta | null;
@@ -25,7 +25,7 @@ export function BasePagination({
   showTotal = true,
   className,
 }: BasePaginationProps) {
-  const page = meta?.page ?? pageProp ?? 1;
+  const page = pageProp ?? meta?.page ?? 1;
   const totalPages = Math.max(meta?.totalPages ?? totalPagesProp ?? 1, 1);
   const total = meta?.total ?? null;
   const pageSize = meta?.pageSize ?? null;
@@ -35,8 +35,8 @@ export function BasePagination({
   const end =
     total === null || pageSize === null || total === 0 ? null : Math.min(page * pageSize, total);
 
-  const hasPreviousPage = meta ? meta.hasPreviousPage : page > 1;
-  const hasNextPage = meta ? meta.hasNextPage : page < totalPages;
+  const hasPreviousPage = meta?.hasPreviousPage ?? page > 1;
+  const hasNextPage = meta?.hasNextPage ?? page < totalPages;
 
   return (
     <div className={cn('flex items-center justify-between gap-3', className)}>
@@ -45,6 +45,8 @@ export function BasePagination({
           <p>
             Showing {start}–{end} of {total}
           </p>
+        ) : showTotal && total === 0 ? (
+          <p>Showing 0 of 0</p>
         ) : null}
       </div>
       <div className="flex items-center gap-2">
@@ -52,8 +54,8 @@ export function BasePagination({
           size={32}
           disabled={!hasPreviousPage}
           aria-label="Previous page"
-          icon={<ArrowBackIcon size={16} color="#53635C" aria-hidden />}
-          onClick={() => onPageChange(page - 1)}
+          icon={<ArrowBackIcon size={16} color="currentColor" aria-hidden />}
+          onClick={() => hasPreviousPage && onPageChange(page - 1)}
         />
         {buildPageItems(page, totalPages).map((item, index) =>
           item === '…' ? (
@@ -69,7 +71,6 @@ export function BasePagination({
               key={item}
               size="small"
               variant={item === page ? 'primary' : 'secondary'}
-              pill
               className="h-8 w-8 px-0"
               aria-label={`Page ${item}`}
               aria-current={item === page ? 'page' : undefined}
@@ -83,8 +84,8 @@ export function BasePagination({
           size={32}
           disabled={!hasNextPage}
           aria-label="Next page"
-          icon={<ArrowForwardIcon size={16} color="#53635C" aria-hidden />}
-          onClick={() => onPageChange(page + 1)}
+          icon={<ArrowForwardIcon size={16} color="currentColor" aria-hidden />}
+          onClick={() => hasNextPage && onPageChange(page + 1)}
         />
       </div>
     </div>

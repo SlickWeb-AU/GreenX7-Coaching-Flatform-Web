@@ -1,8 +1,11 @@
 'use client';
 
 import { useEffect, type ReactNode } from 'react';
+import { X } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
+
+import { BaseIconButton } from './BaseIconButton';
 
 export interface BaseDialogProps {
   title: string;
@@ -36,14 +39,13 @@ export function BaseDialog({ title, onClose, children, className }: BaseDialogPr
       >
         <div className="mb-4 flex items-center justify-between">
           <h2 className="heading-20-bold text-neutral-grey-1">{title}</h2>
-          <button
-            type="button"
-            onClick={onClose}
+          <BaseIconButton
+            size={28}
+            icon={<X size={18} aria-hidden="true" />}
             aria-label="Close"
-            className="text-xl text-neutral-grey-3"
-          >
-            ×
-          </button>
+            onClick={onClose}
+            className="text-neutral-grey-3 hover:text-neutral-grey-1"
+          />
         </div>
         {children}
       </div>

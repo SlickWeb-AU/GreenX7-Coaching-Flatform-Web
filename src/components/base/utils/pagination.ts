@@ -1,4 +1,4 @@
-export type PageItem = number | '…';
+import type { PageItem } from '@/types/ui';
 
 export function buildPageItems(page: number, totalPages: number): PageItem[] {
   const last = Math.max(totalPages, 1);
