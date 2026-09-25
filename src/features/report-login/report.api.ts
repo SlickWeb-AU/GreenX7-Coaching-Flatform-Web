@@ -1,13 +1,9 @@
 'use client';
 
-import { get } from '@/lib/axios';
-
-export interface ReportClient {
-  id: string;
-  name?: string;
-  reportPassword?: string | null;
-}
+import { post } from '@/lib/axios';
+import type { ReportViewDto } from '@/types/reports';
 
 export const reportApi = {
-  getClient: (clientId: string) => get<ReportClient>(`/clients/${clientId}`),
+  viewReport: (token: string, password: string) =>
+    post<ReportViewDto>(`/reports/${token}/view`, { password }),
 };

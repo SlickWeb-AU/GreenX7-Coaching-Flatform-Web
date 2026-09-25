@@ -19,6 +19,7 @@ import {
   SlidersIcon,
 } from '@/components/icons';
 import { clientsApi } from '@/features/admin-clients';
+import { queryKeys } from '@/lib/query-client';
 import {
   ClientBatteryCard,
   ClientCurrentZoneCard,
@@ -121,7 +122,12 @@ export default function DepartmentDetailPage() {
 
   // Fetch department full dashboard (GET /clients/{id}/departments/{childId}/dashboard)
   const { data: deptDashboard, isLoading: isDeptDashboardLoading } = useQuery({
-    queryKey: ['admin-dept-dashboard', clientId, deptId, selectedYear, selectedMonth],
+    queryKey: queryKeys.adminClients.departmentDashboard(
+      clientId,
+      deptId,
+      selectedYear,
+      selectedMonth,
+    ),
     queryFn: () =>
       clientsApi.getDepartmentDashboard(clientId, deptId, {
         year: Number(selectedYear),
@@ -186,6 +192,8 @@ export default function DepartmentDetailPage() {
         </BaseButton>
 
         <ShareBatteryCheckPopover
+          clientId={clientId}
+          departmentId={deptId}
           departmentName={departmentName}
           shareUrl={deptDashboard?.shareUrl}
           liveUrl={deptDashboard?.liveUrl}

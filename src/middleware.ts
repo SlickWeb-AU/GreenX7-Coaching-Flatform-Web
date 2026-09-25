@@ -103,9 +103,7 @@ export async function middleware(request: NextRequest) {
   }
 
   const isAuthenticated = payload !== null;
-  const role: UserRole = isAuthenticated
-    ? USER_ROLES.ADMINISTRATOR
-    : USER_ROLES.GUEST;
+  const role: UserRole = payload?.role ?? USER_ROLES.GUEST;
 
   /** Wrap every response so the just-renewed cookies are never forgotten */
   const finalize = (response: NextResponse): NextResponse => {
@@ -143,7 +141,7 @@ export async function middleware(request: NextRequest) {
   // ---- 1. Guest-only routes ----
   if (GUEST_ONLY_ROUTES.some((route) => pathname.startsWith(route))) {
     if (isAuthenticated && role) {
-      const redirectUrl = DEFAULT_REDIRECT_BY_ROLE[role as UserRole] ?? ROUTES.admin.dashboard;
+      const redirectUrl = DEFAULT_REDIRECT_BY_ROLE[role] ?? ROUTES.admin.dashboard;
       return finalize(NextResponse.redirect(new URL(redirectUrl, request.url)));
     }
     return nextWithPathname();
@@ -159,7 +157,7 @@ export async function middleware(request: NextRequest) {
       return finalize(NextResponse.redirect(new URL(ROUTES.login, request.url)));
     }
 
-    if (!rule.roles.includes(role as any)) {
+    if (!rule.roles.includes(role)) {
       return finalize(NextResponse.redirect(new URL('/forbidden', request.url)));
     }
   }

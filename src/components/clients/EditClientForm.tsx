@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Pencil, Trash2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 
 import {
@@ -81,7 +81,6 @@ export function EditClientForm({
     register,
     control,
     handleSubmit,
-    reset,
     formState: { errors },
   } = useForm<ClientFormValues>({
     resolver: zodResolver(clientFormSchema),
@@ -107,10 +106,6 @@ export function EditClientForm({
     control,
     name: 'departments',
   });
-
-  useEffect(() => {
-    reset(initial);
-  }, [initial, reset]);
 
   const handleAddContact = () => {
     const result = clientContactSchema.safeParse(contactForm);

@@ -223,7 +223,7 @@ export const clientsApi = {
 ```tsx
 // Query: fetching list or detail data
 const { data, isLoading, isFetching, error } = useQuery({
-  queryKey: ['admin-clients', query],
+  queryKey: queryKeys.adminClients.list(query),
   queryFn: () => clientsApi.listPaginated(query),
   retry: false,
 });
@@ -233,7 +233,7 @@ const queryClient = useQueryClient();
 const createMutation = useMutation({
   mutationFn: (payload: CreateClientPayload) => clientsApi.create(payload),
   onSuccess: () => {
-    queryClient.invalidateQueries({ queryKey: ['admin-clients'] });
+    queryClient.invalidateQueries({ queryKey: queryKeys.adminClients.all });
     toast.success('Client created successfully');
     router.push(ROUTES.admin.clients);
   },

@@ -16,18 +16,19 @@ import { EditIcon, PlusIcon, TrashIcon, UserPlusIcon } from '@/components/icons'
 import { useConfirm } from '@/components/providers';
 import { AdminsTable } from '@/components/settings';
 import { settingsApi } from '@/features/admin-settings';
+import { queryKeys } from '@/lib/query-client';
 import { validateIndustryName, validateInvite } from '@/validations';
 
 export default function SettingsPage() {
   const queryClient = useQueryClient();
   const { showConfirm } = useConfirm();
   const industriesQuery = useQuery({
-    queryKey: ['admin-industries'],
+    queryKey: queryKeys.industries.all,
     queryFn: settingsApi.getIndustries,
     retry: false,
   });
   const adminsQuery = useQuery({
-    queryKey: ['admin-admins'],
+    queryKey: queryKeys.admins.all,
     queryFn: settingsApi.getAdmins,
     retry: false,
   });
@@ -42,11 +43,11 @@ export default function SettingsPage() {
   const [inviteSuccess, setInviteSuccess] = useState(false);
 
   const invalidateIndustries = () => {
-    queryClient.invalidateQueries({ queryKey: ['admin-industries'] });
+    queryClient.invalidateQueries({ queryKey: queryKeys.industries.all });
   };
 
   const invalidateAdmins = () => {
-    queryClient.invalidateQueries({ queryKey: ['admin-admins'] });
+    queryClient.invalidateQueries({ queryKey: queryKeys.admins.all });
   };
 
   const createIndustry = useMutation({

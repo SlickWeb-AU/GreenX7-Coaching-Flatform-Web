@@ -13,6 +13,7 @@ import { ClientsTable } from '@/components/clients';
 import { clientsApi } from '@/features/admin-clients';
 import { settingsApi } from '@/features/admin-settings';
 import { buildClientsQuery } from '@/lib/clients';
+import { queryKeys } from '@/lib/query-client';
 import { mergeSearchParams } from '@/lib/search-params';
 import type { ClientsSortField } from '@/types';
 import { ALL_FILTER_VALUE, CLIENT_STATUS_OPTIONS, SORT_FIELD_TO_API } from '@/constants/clients';
@@ -75,13 +76,13 @@ function ClientsContent() {
   });
 
   const { data, isLoading, isFetching } = useQuery({
-    queryKey: ['admin-clients', query],
+    queryKey: queryKeys.adminClients.list(query),
     queryFn: () => clientsApi.listPaginated(query),
     retry: false,
   });
 
   const industriesQuery = useQuery({
-    queryKey: ['admin-industries'],
+    queryKey: queryKeys.industries.all,
     queryFn: settingsApi.getIndustries,
     retry: false,
   });

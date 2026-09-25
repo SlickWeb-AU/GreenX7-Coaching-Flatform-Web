@@ -46,12 +46,12 @@ export const clientFormSchema = z
   .refine(
     (data) => {
       if (data.checkInStartDay !== undefined && data.checkInEndDay !== undefined) {
-        return data.checkInStartDay <= data.checkInEndDay;
+        return data.checkInStartDay < data.checkInEndDay;
       }
       return true;
     },
     {
-      message: 'Start day must be on or before end day.',
+      message: 'Start day must be before end day.',
       path: ['checkInStartDay'],
     },
   );

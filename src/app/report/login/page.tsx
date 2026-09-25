@@ -1,6 +1,5 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, Suspense, type FormEvent } from 'react';
@@ -12,9 +11,8 @@ import {
   EyeClosedIcon,
   EyeOpenIcon,
 } from '@/components/icons';
-import { REPORT_FALLBACK_PASSWORD } from '@/constants/auth';
 import { reportApi } from '@/features/report-login';
-import { isReportPasswordValid, reportSessionKey } from '@/lib/report-auth';
+import { reportSessionKey } from '@/lib/report-auth';
 
 export default function ReportLoginPage() {
   return (
@@ -27,33 +25,38 @@ export default function ReportLoginPage() {
 function ReportLoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const clientId = searchParams.get('clientId') || searchParams.get('client') || 'mirvac';
-
-  const { data: client } = useQuery({
-    queryKey: ['report-client', clientId],
-    queryFn: () => reportApi.getClient(clientId),
-    retry: false,
-  });
+  const token = searchParams.get('token') || searchParams.get('clientId') || '';
 
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!password.trim()) {
       setError('Please enter the report password.');
       return;
     }
+    if (!token) {
+      setError('Invalid or missing report link token.');
+      return;
+    }
+
     setLoading(true);
-    const expected = client?.reportPassword || REPORT_FALLBACK_PASSWORD;
-    if (isReportPasswordValid(password, expected)) {
-      sessionStorage.setItem(reportSessionKey(clientId), 'true');
-      router.push(`/report/view?clientId=${encodeURIComponent(clientId)}`);
-    } else {
+    setError('');
+
+    try {
+      const reportData = await reportApi.viewReport(token, password.trim());
+      sessionStorage.setItem(reportSessionKey(token), JSON.stringify(reportData));
+      router.push(`/report/view?token=${encodeURIComponent(token)}`);
+    } catch (err: unknown) {
       setLoading(false);
-      setError('The password is incorrect. Please check and try again.');
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'The password is incorrect. Please check and try again.',
+      );
     }
   };
 

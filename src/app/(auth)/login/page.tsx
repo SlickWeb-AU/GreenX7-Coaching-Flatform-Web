@@ -41,9 +41,7 @@ export default function LoginPage() {
     (requestCode.error instanceof Error ? requestCode.error.message : '') ||
     (verifyCode.error instanceof Error ? verifyCode.error.message : '');
 
-  const canResendOnError = verifyCode.error?.errorCode === 'INVALID_CREDENTIALS';
-
-  const isResendDisabled = loading || (resendCooldown > 0 && !canResendOnError);
+  const isResendDisabled = loading || resendCooldown > 0;
 
   const clearErrors = () => {
     setLocalError('');
@@ -78,8 +76,9 @@ export default function LoginPage() {
     }
     clearErrors();
     try {
-      await requestCode.mutateAsync(email.trim());
-      setTimeLeft(OTP_EXPIRY_SECONDS);
+      const res = await requestCode.mutateAsync(email.trim());
+      const expiry = res?.expiresIn ?? OTP_EXPIRY_SECONDS;
+      setTimeLeft(expiry);
       setResendCooldown(RESEND_COOLDOWN_SECONDS);
       setStep(LOGIN_STEPS.OTP);
     } catch {
@@ -230,8 +229,10 @@ export default function LoginPage() {
                     clearErrors();
                     setOtp(['', '', '', '', '', '']);
                     try {
-                      await requestCode.mutateAsync(email.trim());
-                      setTimeLeft(OTP_EXPIRY_SECONDS);
+                      const res = await requestCode.mutateAsync(email.trim());
+                      const expiry =
+                        (res as { expiresIn?: number })?.expiresIn ?? OTP_EXPIRY_SECONDS;
+                      setTimeLeft(expiry);
                       setResendCooldown(RESEND_COOLDOWN_SECONDS);
                     } catch {
                       // error surfaces via mutation state
@@ -239,7 +240,7 @@ export default function LoginPage() {
                   }}
                 >
                   Resend Code
-                  {resendCooldown > 0 && !canResendOnError ? ` (${resendCooldown}s)` : ''}
+                  {resendCooldown > 0 ? ` (${resendCooldown}s)` : ''}
                 </BaseButton>
               </form>
             </>

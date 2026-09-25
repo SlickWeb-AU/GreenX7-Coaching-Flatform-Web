@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 import { clientsApi } from '@/features/admin-clients';
+import { queryKeys } from '@/lib/query-client';
 import type { AreaScoreDto } from '@/types';
 import { HistoricalTrendChart } from '@/components/dashboard';
 
@@ -63,7 +64,7 @@ export function ClientDashboardTab({
   const [selectedYear, setSelectedYear] = useState('2026');
 
   const { data } = useQuery({
-    queryKey: ['admin-client-dashboard', clientId, selectedYear, selectedMonth],
+    queryKey: queryKeys.adminClients.dashboard(clientId, selectedYear, selectedMonth),
     queryFn: () =>
       clientsApi.getDashboard(clientId, {
         year: Number(selectedYear),

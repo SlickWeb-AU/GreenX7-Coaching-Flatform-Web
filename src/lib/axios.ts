@@ -74,8 +74,9 @@ http.interceptors.response.use(
       status === 401 &&
       config &&
       !config._retried &&
-      // Không refresh cho chính các endpoint auth (tránh vòng lặp vô tận)
-      !config.url?.includes('/auth/login') &&
+      // Do not refresh for auth endpoints themselves (prevents infinite loop)
+      !config.url?.includes('/auth/request-code') &&
+      !config.url?.includes('/auth/verify-code') &&
       !config.url?.includes('/auth/refresh');
 
     if (shouldRefresh) {

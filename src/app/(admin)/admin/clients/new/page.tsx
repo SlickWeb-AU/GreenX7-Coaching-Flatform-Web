@@ -11,12 +11,13 @@ import { ROUTES } from '@/config/routes';
 import { CreateClientForm } from '@/components/clients';
 import { clientsApi } from '@/features/admin-clients';
 import { settingsApi } from '@/features/admin-settings';
+import { queryKeys } from '@/lib/query-client';
 
 export default function NewClientPage() {
   const router = useRouter();
 
   const industriesQuery = useQuery({
-    queryKey: ['admin-industries'],
+    queryKey: queryKeys.industries.all,
     queryFn: settingsApi.getIndustries,
     retry: false,
   });

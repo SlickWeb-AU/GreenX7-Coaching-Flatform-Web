@@ -3,6 +3,7 @@
 import { createContext, useContext, type ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { clientsApi } from '@/features/admin-clients';
+import { queryKeys } from '@/lib/query-client';
 import type { ClientDetail } from '@/types';
 
 interface ClientContextValue {
@@ -20,7 +21,7 @@ export function ClientProvider({ clientId, children }: { clientId: string; child
     isLoading,
     refetch,
   } = useQuery({
-    queryKey: ['admin-client', clientId],
+    queryKey: queryKeys.adminClients.detail(clientId),
     queryFn: () => clientsApi.getById(clientId),
     retry: false,
     enabled: Boolean(clientId),

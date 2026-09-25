@@ -18,6 +18,7 @@ import { ROUTES } from '@/config/routes';
 import { CLIENT_FORM_STATUS_OPTIONS, CLIENT_STATUSES } from '@/constants/clients';
 import { clientsApi } from '@/features/admin-clients';
 import { formatBatteryScore } from '@/lib/clients';
+import { queryKeys } from '@/lib/query-client';
 import type { ClientDepartment, ClientStatus, DepartmentListItemDto } from '@/types';
 import { cn } from '@/lib/utils';
 
@@ -68,7 +69,14 @@ export function ClientDepartmentsTab({
   const [errorMsg, setErrorMsg] = useState('');
 
   const { data, isLoading } = useQuery({
-    queryKey: ['admin-client-departments', clientId, page, pageSize, searchTerm, sortBy, sortOrder],
+    queryKey: queryKeys.adminClients.departments(
+      clientId,
+      page,
+      pageSize,
+      searchTerm,
+      sortBy,
+      sortOrder,
+    ),
     queryFn: () =>
       clientsApi.getDepartments(clientId, {
         page,
@@ -86,8 +94,12 @@ export function ClientDepartmentsTab({
     mutationFn: (payload: { name: string; status: string }) =>
       clientsApi.createDepartment(clientId, payload),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-client-departments', clientId] });
-      queryClient.invalidateQueries({ queryKey: ['admin-client', clientId] });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.adminClients.departments(clientId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.adminClients.detail(clientId),
+      });
       setIsAddModalOpen(false);
       setNewDeptName('');
       setNewDeptStatus(CLIENT_STATUSES.ACTIVE);

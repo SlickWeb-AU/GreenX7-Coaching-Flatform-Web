@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useParams, useRouter } from 'next/navigation';
+import { useMemo } from 'react';
 
 import { toast } from 'sonner';
 
@@ -11,6 +12,7 @@ import { ROUTES } from '@/config/routes';
 import { EditClientForm } from '@/components/clients';
 import { clientsApi } from '@/features/admin-clients';
 import { settingsApi } from '@/features/admin-settings';
+import { queryKeys } from '@/lib/query-client';
 import type { UpdateClientPayload } from '@/types';
 
 export default function EditClientPage() {
@@ -19,12 +21,12 @@ export default function EditClientPage() {
   const clientId = params.clientId;
 
   const { data, isLoading } = useQuery({
-    queryKey: ['admin-client', clientId],
+    queryKey: queryKeys.adminClients.detail(clientId),
     queryFn: () => clientsApi.getById(clientId),
     retry: false,
   });
   const industriesQuery = useQuery({
-    queryKey: ['admin-industries'],
+    queryKey: queryKeys.industries.all,
     queryFn: settingsApi.getIndustries,
     retry: false,
   });
@@ -32,6 +34,27 @@ export default function EditClientPage() {
   const industryOptions = (industriesQuery.data ?? [])
     .filter((industry) => industry.isActive || industry.id === currentIndustryId)
     .map((industry) => ({ value: industry.id, label: industry.name }));
+
+  const initialValues = useMemo(() => {
+    if (!data) return undefined;
+    return {
+      businessName: data.businessName,
+      industryId: typeof data.industry === 'string' ? data.industry : (data.industry?.id ?? ''),
+      companySize: data.companySize,
+      state: data.state,
+      status: data.status,
+      contacts: data.contacts ?? [],
+      departments: (data.departments ?? []).map((d) => ({
+        id: d.id,
+        name: d.name,
+        status: d.status,
+      })),
+      checkInStartDay: data.checkInStartDay,
+      checkInEndDay: data.checkInEndDay,
+      timezone: data.timezone ?? 'Australia/Sydney',
+      autoSendReport: data.autoSendReport,
+    };
+  }, [data]);
 
   const update = useMutation({
     mutationFn: (payload: UpdateClientPayload) => clientsApi.update(clientId, payload),
@@ -47,7 +70,7 @@ export default function EditClientPage() {
     return <BaseLoading message="Loading client..." fullScreen />;
   }
 
-  if (!data) return null;
+  if (!data || !initialValues) return null;
 
   return (
     <>
@@ -86,29 +109,25 @@ export default function EditClientPage() {
         }
       />
       <EditClientForm
+        key={clientId}
         formId="edit-client-form"
-        initial={{
-          businessName: data.businessName,
-          industryId: typeof data.industry === 'string' ? data.industry : (data.industry?.id ?? ''),
-          companySize: data.companySize,
-          state: data.state,
-          status: data.status,
-          contacts: data.contacts ?? [],
-          departments: (data.departments ?? []).map((d) => ({
-            id: d.id,
-            name: d.name,
-            status: d.status,
-          })),
-          checkInStartDay: data.checkInStartDay,
-          checkInEndDay: data.checkInEndDay,
-          timezone: data.timezone ?? 'Australia/Sydney',
-          autoSendReport: data.autoSendReport,
-        }}
+        initial={initialValues}
         industryOptions={industryOptions}
         showSubmitAction={false}
         onCancel={() => router.push(ROUTES.admin.clientDetail(clientId))}
         isSubmitting={update.isPending}
-        onSubmit={(values) => update.mutate(values)}
+        onSubmit={(values) => {
+          update.mutate({
+            businessName: values.businessName,
+            industryId: values.industryId,
+            companySize: values.companySize,
+            state: values.state,
+            status: values.status,
+            checkInStartDay: values.checkInStartDay,
+            checkInEndDay: values.checkInEndDay,
+            autoSendReport: values.autoSendReport,
+          });
+        }}
       />
     </>
   );

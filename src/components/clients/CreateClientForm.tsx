@@ -16,6 +16,7 @@ import {
 } from '@/components/base';
 import { PlusIcon } from '@/components/icons';
 import {
+  CLIENT_CHECK_IN_DAY_MAX,
   CLIENT_COMPANY_SIZE_OPTIONS,
   CLIENT_FORM_STATUS_OPTIONS,
   CLIENT_STATE_OPTIONS,
@@ -420,6 +421,7 @@ export function CreateClientForm({
                 <BaseDatePicker
                   label="Start day"
                   size="mediumPlus"
+                  maxDay={CLIENT_CHECK_IN_DAY_MAX}
                   format={formatDayOfMonth}
                   value={field.value}
                   onChange={field.onChange}
@@ -436,6 +438,7 @@ export function CreateClientForm({
                 <BaseDatePicker
                   label="End day"
                   size="mediumPlus"
+                  maxDay={CLIENT_CHECK_IN_DAY_MAX}
                   format={formatDayOfMonth}
                   value={field.value}
                   onChange={field.onChange}

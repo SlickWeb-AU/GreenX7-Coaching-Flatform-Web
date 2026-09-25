@@ -16,6 +16,7 @@ import {
 } from '@/components/dashboard';
 import { settingsApi } from '@/features/admin-settings';
 import { buildDashboardQuery } from '@/lib/dashboard';
+import { queryKeys } from '@/lib/query-client';
 import type { AdminDashboardDto } from '@/types';
 import {
   ALL_FILTER_VALUE,
@@ -40,7 +41,7 @@ function DashboardContent() {
   };
 
   const industriesQuery = useQuery({
-    queryKey: ['admin-industries'],
+    queryKey: queryKeys.industries.all,
     queryFn: settingsApi.getIndustries,
     retry: false,
   });
@@ -60,7 +61,7 @@ function DashboardContent() {
 
   const query = buildDashboardQuery({ month, year, industry });
   const { data, isLoading, isFetching } = useQuery({
-    queryKey: ['admin-dashboard', month, year, industry],
+    queryKey: queryKeys.adminDashboard.metrics(month, year, industry),
     queryFn: async () => {
       try {
         return await get<AdminDashboardDto>(`/dashboard?${query}`);

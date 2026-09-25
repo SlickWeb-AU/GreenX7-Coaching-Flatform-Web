@@ -10,6 +10,7 @@ import type {
   CreateClientPayload,
   DepartmentDashboardDto,
   DepartmentListItemDto,
+  DepartmentShareLinksDto,
   UpdateClientPayload,
 } from '@/types';
 
@@ -39,6 +40,8 @@ export const clientsApi = {
     get<DepartmentDashboardDto>(`/clients/${id}/departments/${deptId}/dashboard`, {
       params,
     }),
+  getDepartmentShareLinks: (id: string, deptId: string) =>
+    get<DepartmentShareLinksDto>(`/clients/${id}/departments/${deptId}/share-links`),
   createDepartment: (id: string, payload: { name: string; status: string }) =>
     post<DepartmentListItemDto>(`/clients/${id}/departments`, payload),
 };

@@ -84,11 +84,8 @@ export interface UpdateClientPayload {
   companySize: string;
   state: string;
   status: ClientStatus;
-  contacts?: ClientContact[];
-  departments?: { name: string; status: ClientStatus }[];
   checkInStartDay?: number;
   checkInEndDay?: number;
-  timezone?: string;
   autoSendReport: boolean;
 }
 
@@ -176,4 +173,11 @@ export interface DepartmentDashboardDto extends ClientDashboardDto {
   shareUrl: string;
   liveUrl: string;
   presentationUrl: string;
+}
+
+export interface DepartmentShareLinksDto {
+  batteryCheckUrl: string;
+  liveDashboardUrl: string;
+  presentationUrl: string;
+  qrCode?: string;
 }

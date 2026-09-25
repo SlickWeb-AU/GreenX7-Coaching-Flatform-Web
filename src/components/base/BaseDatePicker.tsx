@@ -33,6 +33,7 @@ export interface BaseDatePickerProps {
   className?: string;
   startIcon?: ReactNode;
   format?: (date: Date, day: number) => string;
+  maxDay?: number;
 }
 
 const WEEKDAYS = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
@@ -71,6 +72,7 @@ export function BaseDatePicker({
   className,
   startIcon,
   format = defaultFormat,
+  maxDay = 28,
 }: BaseDatePickerProps) {
   const generatedId = useId();
   const datePickerId = id ?? generatedId;
@@ -87,7 +89,8 @@ export function BaseDatePicker({
     if (currentValue instanceof Date) return currentValue;
     if (typeof currentValue === 'number') {
       const today = new Date();
-      return new Date(today.getFullYear(), today.getMonth(), currentValue);
+      const safeDay = Math.min(currentValue, maxDay ?? 28);
+      return new Date(today.getFullYear(), today.getMonth(), safeDay);
     }
     const d = new Date(String(currentValue));
     return isNaN(d.getTime()) ? null : d;
@@ -102,7 +105,8 @@ export function BaseDatePicker({
       setSelectedDate((prev) => {
         const y = prev ? prev.getFullYear() : new Date().getFullYear();
         const m = prev ? prev.getMonth() : new Date().getMonth();
-        return new Date(y, m, value);
+        const safeDay = Math.min(value, maxDay ?? 28);
+        return new Date(y, m, safeDay);
       });
     } else if (typeof value === 'string') {
       const num = Number(value);
@@ -110,14 +114,15 @@ export function BaseDatePicker({
         setSelectedDate((prev) => {
           const y = prev ? prev.getFullYear() : new Date().getFullYear();
           const m = prev ? prev.getMonth() : new Date().getMonth();
-          return new Date(y, m, num);
+          const safeDay = Math.min(num, maxDay ?? 28);
+          return new Date(y, m, safeDay);
         });
       } else {
         const d = new Date(value);
         setSelectedDate(isNaN(d.getTime()) ? null : d);
       }
     }
-  }, [value]);
+  }, [value, maxDay]);
 
   useEffect(() => {
     if (isOpen && selectedDate) {
@@ -186,7 +191,7 @@ export function BaseDatePicker({
   };
 
   const handleSelectDay = (day: number) => {
-    if (disabled) return;
+    if (disabled || (maxDay !== undefined && day > maxDay)) return;
     const d = new Date(currentYear, currentMonth, day);
     setSelectedDate(d);
     onChange?.(day, d);
@@ -301,25 +306,30 @@ export function BaseDatePicker({
               ))}
               {Array.from({ length: daysInMonth }, (_, index) => {
                 const day = index + 1;
+                const isExceeded = maxDay !== undefined && day > maxDay;
                 const isSelected =
+                  !isExceeded &&
                   selectedDate !== null &&
                   selectedDate.getFullYear() === currentYear &&
                   selectedDate.getMonth() === currentMonth &&
                   selectedDate.getDate() === day;
-                const isToday = isCurrentMonthToday && today.getDate() === day;
+                const isToday = !isExceeded && isCurrentMonthToday && today.getDate() === day;
 
                 return (
                   <button
                     key={day}
                     type="button"
+                    disabled={isExceeded}
                     onClick={() => handleSelectDay(day)}
                     className={cn(
                       'mx-auto flex h-8 w-8 items-center justify-center rounded-lg text-xs font-medium transition-colors',
-                      isSelected
-                        ? 'bg-brand-green-2 font-bold text-white shadow-sm'
-                        : isToday
-                          ? 'border border-brand-green-2 font-bold text-brand-green-2 hover:bg-neutral-grey-7'
-                          : 'text-neutral-grey-1 hover:bg-neutral-grey-7 hover:text-brand-green-2',
+                      isExceeded
+                        ? 'cursor-not-allowed text-neutral-grey-4 opacity-40 hover:bg-transparent hover:text-neutral-grey-4'
+                        : isSelected
+                          ? 'bg-brand-green-2 font-bold text-white shadow-sm'
+                          : isToday
+                            ? 'border border-brand-green-2 font-bold text-brand-green-2 hover:bg-neutral-grey-7'
+                            : 'text-neutral-grey-1 hover:bg-neutral-grey-7 hover:text-brand-green-2',
                     )}
                   >
                     {day}
