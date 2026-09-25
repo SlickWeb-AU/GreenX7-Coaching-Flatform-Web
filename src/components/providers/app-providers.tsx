@@ -3,9 +3,10 @@
 import type { ReactNode } from 'react';
 import { Toaster } from 'sonner';
 
-import { AuthProvider } from '@/features/auth/auth-provider';
+import { AuthProvider } from './auth-provider';
 import type { AuthUser } from '@/types/auth';
 
+import { ConfirmProvider } from './confirm-provider';
 import { QueryProvider } from './query-provider';
 
 export function AppProviders({
@@ -18,14 +19,13 @@ export function AppProviders({
   return (
     <QueryProvider>
       <AuthProvider initialUser={initialUser}>
-        {children}
-        <Toaster
-          position="top-right"
-          richColors
-          closeButton
-          toastOptions={{ duration: 4000 }}
-        />
+        <ConfirmProvider>
+          {children}
+          <Toaster position="top-right" richColors closeButton toastOptions={{ duration: 4000 }} />
+        </ConfirmProvider>
       </AuthProvider>
     </QueryProvider>
   );
 }
+
+export * from './confirm-provider';

@@ -4,7 +4,6 @@ import { cleanParams, formatCurrency, formatNumber, getInitials } from './utils'
 
 describe('formatCurrency', () => {
   it('định dạng theo chuẩn tiền Việt', () => {
-    // Intl dùng non-breaking space, nên so sánh phần số cho ổn định giữa các môi trường
     expect(formatCurrency(25000)).toMatch(/25\.000/);
   });
 

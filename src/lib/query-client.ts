@@ -37,26 +37,43 @@ export function getQueryClient(): QueryClient {
   return browserQueryClient;
 }
 
-/** Query key tập trung — tránh gõ tay chuỗi rời rạc rồi invalidate trượt */
+/** Centralized query keys — avoids typo errors and ensures accurate cache invalidation */
 export const queryKeys = {
   auth: {
+    all: ['auth'] as const,
     me: ['auth', 'me'] as const,
   },
-  users: {
-    all: ['users'] as const,
-    list: (params: unknown) => ['users', 'list', params] as const,
-    detail: (id: string) => ['users', 'detail', id] as const,
-    statistics: ['users', 'statistics'] as const,
+  industries: {
+    all: ['admin-industries'] as const,
   },
-  products: {
-    all: ['products'] as const,
-    list: (params: unknown) => ['products', 'list', params] as const,
-    adminList: (params: unknown) => ['products', 'admin-list', params] as const,
-    detail: (idOrSlug: string) => ['products', 'detail', idOrSlug] as const,
-    statistics: ['products', 'statistics'] as const,
+  admins: {
+    all: ['admin-admins'] as const,
   },
-  categories: {
-    all: ['categories'] as const,
-    list: ['categories', 'list'] as const,
+  adminClients: {
+    all: ['admin-clients'] as const,
+    list: (query?: string) =>
+      query !== undefined ? (['admin-clients', query] as const) : (['admin-clients'] as const),
+    detail: (id: string) => ['admin-client', id] as const,
+    dashboard: (id: string, year?: number | string, month?: number | string) =>
+      ['admin-client-dashboard', id, year, month] as const,
+    departments: (id: string, ...params: unknown[]) =>
+      ['admin-client-departments', id, ...params] as const,
+    departmentDashboard: (
+      clientId: string,
+      deptId: string,
+      year?: number | string,
+      month?: number | string,
+    ) => ['admin-dept-dashboard', clientId, deptId, year, month] as const,
+    departmentShareLinks: (clientId: string, deptId: string) =>
+      ['admin-dept-share-links', clientId, deptId] as const,
+  },
+  adminDashboard: {
+    all: ['admin-dashboard'] as const,
+    metrics: (month?: number | string, year?: number | string, industry?: string) =>
+      ['admin-dashboard', month, year, industry] as const,
+  },
+  reports: {
+    all: ['reports'] as const,
+    view: (token: string) => ['reports', 'view', token] as const,
   },
 } as const;

@@ -2,20 +2,24 @@ import { redirect } from 'next/navigation';
 
 import { AdminShell } from '@/components/layout/admin-shell';
 import { serverGet } from '@/lib/server-api';
-import type { AuthUser } from '@/types/auth';
+import { USER_ROLES, type AuthUser } from '@/types/auth';
 
 /**
- * LỚP BẢO VỆ THỨ HAI (middleware là lớp thứ nhất).
+ * Second defense layer (middleware is the first).
  *
- * Vì sao cần cả hai? Middleware tin vào chữ ký của access token. Nếu tài khoản vừa bị
- * hạ quyền hoặc bị khoá, token cũ vẫn còn hợp lệ về mặt chữ ký cho tới khi hết hạn.
- * Lần kiểm tra này hỏi thẳng BE nên phản ánh trạng thái THẬT tại thời điểm request.
+ * Why both? Middleware trusts the access-token signature. If an account was
+ * just demoted or locked, the old token stays signature-valid until expiry.
+ * This check asks the BE directly, so it reflects the true state at request time.
  */
-export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+import type { ReactNode } from 'react';
+
+export default async function AdminLayout({ children }: { children: ReactNode }) {
   const user = await serverGet<AuthUser>('/auth/me');
 
-  if (!user) redirect('/login?next=/admin');
-  if (user.role !== 'ADMIN') redirect('/forbidden');
+  if (!user) redirect('/login');
+  if (user.role !== USER_ROLES.ADMINISTRATOR) {
+    redirect('/forbidden');
+  }
 
   return <AdminShell>{children}</AdminShell>;
 }
