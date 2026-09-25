@@ -52,3 +52,7 @@ export const ZONE_COLORS = {
   Function: { label: 'Function Zone', range: '(50-69%)', color: '#53635C', bg: '#FAF4D0' },
   Survive: { label: 'Survive Zone', range: '(0-49%)', color: '#B43E47', bg: '#FBE3E7' },
 } as const;
+
+export const CHART_COLORS = {
+  trendLine: '#DF863B',
+} as const;

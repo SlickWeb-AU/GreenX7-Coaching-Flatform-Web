@@ -66,6 +66,12 @@ export const queryKeys = {
     ) => ['admin-dept-dashboard', clientId, deptId, year, month] as const,
     departmentShareLinks: (clientId: string, deptId: string) =>
       ['admin-dept-share-links', clientId, deptId] as const,
+    checkIns: (
+      clientId: string,
+      departmentId?: string,
+      page?: number | string,
+      pageSize?: number | string,
+    ) => ['admin-client-check-ins', clientId, departmentId, page, pageSize] as const,
   },
   adminDashboard: {
     all: ['admin-dashboard'] as const,
