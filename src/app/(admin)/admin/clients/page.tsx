@@ -3,29 +3,19 @@
 import { useQuery } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { Suspense, useEffect, useRef, useState } from 'react';
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 
-import {
-  BaseButton,
-  BaseErrorState,
-  BaseHeader,
-  BaseInput,
-  BaseLoading,
-  BaseSelect,
-} from '@/components/base';
+import { BaseButton, BaseHeader, BaseInput, BaseLoading, BaseSelect } from '@/components/base';
 import { FilterMonthIcon, FilterSlidersIcon, SearchIcon } from '@/components/icons';
 import { ROUTES } from '@/config/routes';
 
-import { ClientsTable } from '@/features/admin-clients/ClientsTable';
-import { ALL_FILTER_VALUE, buildClientsQuery } from '@/features/admin-clients/clients-display';
-import { clientsApi } from '@/features/admin-clients/clients.api';
-import { mergeSearchParams } from '@/features/admin-clients/search-params';
-import type { ClientsSortField } from '@/features/admin-clients/types';
-import {
-  CLIENT_INDUSTRY_OPTIONS,
-  CLIENT_STATUS_OPTIONS,
-  SORT_FIELD_TO_API,
-} from '@/constants/clients';
+import { ClientsTable } from '@/components/clients';
+import { clientsApi } from '@/features/admin-clients';
+import { settingsApi } from '@/features/admin-settings';
+import { buildClientsQuery } from '@/lib/clients';
+import { mergeSearchParams } from '@/lib/search-params';
+import type { ClientsSortField } from '@/types';
+import { ALL_FILTER_VALUE, CLIENT_STATUS_OPTIONS, SORT_FIELD_TO_API } from '@/constants/clients';
 
 function useDebounced(value: string, delay = 400): string {
   const [debounced, setDebounced] = useState(value);
@@ -60,16 +50,15 @@ function ClientsContent() {
     router.replace(next ? `${pathname}?${next}` : pathname);
   };
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const next = mergeSearchParams(paramsRef.current, { search: search || null, page: null });
-      if (next === null) return;
-      router.replace(next ? `${pathname}?${next}` : pathname);
-    }, 400);
-    return () => clearTimeout(timer);
-  }, [search, pathname, router]);
-
   const urlSearch = searchParams.get('search') ?? '';
+
+  useEffect(() => {
+    if (search === urlSearch) return;
+    const next = mergeSearchParams(paramsRef.current, { search: search || null, page: null });
+    if (next === null) return;
+    router.replace(next ? `${pathname}?${next}` : pathname);
+  }, [search, urlSearch, pathname, router]);
+
   const inputRef = useRef(searchInput);
   inputRef.current = searchInput;
   useEffect(() => {
@@ -85,17 +74,34 @@ function ClientsContent() {
     sortOrder: sortAsc ? 'asc' : 'desc',
   });
 
-  const { data, isLoading, isFetching, error, refetch } = useQuery({
+  const { data, isLoading, isFetching } = useQuery({
     queryKey: ['admin-clients', query],
     queryFn: () => clientsApi.listPaginated(query),
     retry: false,
   });
+
+  const industriesQuery = useQuery({
+    queryKey: ['admin-industries'],
+    queryFn: settingsApi.getIndustries,
+    retry: false,
+  });
+
+  const industryOptions = useMemo(
+    () => [
+      { value: ALL_FILTER_VALUE, label: 'All industries' },
+      ...(industriesQuery.data ?? [])
+        .filter((item) => item.isActive || item.id === industry)
+        .map((item) => ({ value: item.id, label: item.name })),
+    ],
+    [industriesQuery.data, industry],
+  );
 
   const rows = data?.items ?? [];
   const totalPages = data?.meta.totalPages ?? 1;
 
   const addBtn = (
     <BaseButton
+      pill
       startIcon={<Plus aria-hidden />}
       onClick={() => router.push(ROUTES.admin.clientNew)}
     >
@@ -104,25 +110,7 @@ function ClientsContent() {
   );
 
   if ((isLoading || isFetching) && rows.length === 0) {
-    return (
-      <>
-        <BaseHeader title="Clients" actions={addBtn} />
-        <BaseLoading message="Loading clients..." fullScreen={false} />
-      </>
-    );
-  }
-
-  if (error && rows.length === 0) {
-    return (
-      <>
-        <BaseHeader title="Clients" actions={addBtn} />
-        <BaseErrorState
-          title="Unable to load clients"
-          message={error instanceof Error ? error.message : 'Request failed'}
-          onRetry={() => refetch()}
-        />
-      </>
-    );
+    return <BaseLoading message="Loading clients..." fullScreen />;
   }
 
   const toggleSort = (field: ClientsSortField) => {
@@ -151,8 +139,9 @@ function ClientsContent() {
           <div className="w-full sm:w-[180px]">
             <BaseSelect
               startIcon={<FilterMonthIcon aria-hidden />}
+              placeholder="Select industry"
               value={industry}
-              options={CLIENT_INDUSTRY_OPTIONS}
+              options={industryOptions}
               onChange={(v) =>
                 setParams({ industry: v === ALL_FILTER_VALUE ? null : v, page: null })
               }
@@ -161,6 +150,7 @@ function ClientsContent() {
           <div className="w-full sm:w-[160px]">
             <BaseSelect
               startIcon={<FilterSlidersIcon aria-hidden />}
+              placeholder="Select status"
               value={status}
               options={CLIENT_STATUS_OPTIONS}
               onChange={(v) => setParams({ status: v === ALL_FILTER_VALUE ? null : v, page: null })}
@@ -186,7 +176,7 @@ function ClientsContent() {
 
 export default function ClientsPage() {
   return (
-    <Suspense fallback={<BaseLoading message="Loading clients..." fullScreen={false} />}>
+    <Suspense fallback={<BaseLoading message="Loading clients..." fullScreen />}>
       <ClientsContent />
     </Suspense>
   );

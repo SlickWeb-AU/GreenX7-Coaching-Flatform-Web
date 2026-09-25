@@ -12,8 +12,8 @@ import { AvatarPlaceholderIcon, LogoutIcon } from '@/components/icons';
 import { NavLink } from '@/components/layout/nav-link';
 import { ADMIN_NAVIGATION } from '@/config/navigation';
 import { ROUTES } from '@/config/routes';
-import { authApi } from '@/features/auth/api/auth.api';
-import { useAuth } from '@/features/auth/auth-provider';
+import { authApi } from '@/features/auth';
+import { useAuth } from '@/components/providers';
 import { useUiStore } from '@/stores/ui.store';
 
 interface SidebarBodyProps {
@@ -94,7 +94,7 @@ function SidebarContent({ onNavigate }: SidebarBodyProps) {
           variant="ghost"
           size="medium"
           fullWidth
-          className="justify-start"
+          className="justify-start gap-3"
           onClick={() => logout.mutate()}
           disabled={logout.isPending}
           startIcon={<LogoutIcon className="shrink-0" />}
@@ -112,7 +112,7 @@ export function AdminSidebar() {
   return (
     <>
       {/* Sidebar cố định — desktop */}
-      <aside className="border-r-0.5 fixed inset-y-0 left-0 z-30 hidden w-56 flex-col border-neutral-grey-5 bg-neutral-grey-7 lg:flex">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-56 flex-col border-r-0.5 border-neutral-grey-5 bg-neutral-grey-7 lg:flex">
         <SidebarContent />
       </aside>
 
@@ -125,7 +125,7 @@ export function AdminSidebar() {
             onClick={() => setMobileSidebarOpen(false)}
             aria-label="Đóng menu"
           />
-          <aside className="border-r-0.5 relative flex h-full w-56 animate-slide-up flex-col border-neutral-grey-5 bg-neutral-grey-7">
+          <aside className="relative flex h-full w-56 animate-slide-up flex-col border-r-0.5 border-neutral-grey-5 bg-neutral-grey-7">
             <div className="absolute right-3 top-4 z-10">
               <button
                 type="button"

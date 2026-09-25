@@ -42,7 +42,7 @@ export function NavLink({ item, collapsed, onNavigate, variant = 'sidebar' }: Na
       <BaseButton
         variant={isActive ? 'primary' : 'ghost'}
         fullWidth
-        className={cn('justify-start', collapsed && 'justify-center px-0')}
+        className={cn('body-14-medium justify-start', collapsed && 'justify-center px-0')}
         startIcon={<Icon size={20} className="shrink-0" aria-hidden />}
       >
         {!collapsed && <span className="truncate">{item.label}</span>}

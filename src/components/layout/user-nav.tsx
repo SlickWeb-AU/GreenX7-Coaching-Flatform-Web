@@ -7,10 +7,10 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
-import { BaseButton } from '@/components/base';
+import { BaseLink } from '@/components/base';
 import { ROUTES } from '@/config/routes';
-import { authApi } from '@/features/auth/api/auth.api';
-import { useAuth } from '@/features/auth/auth-provider';
+import { authApi } from '@/features/auth';
+import { useAuth } from '@/components/providers';
 import { getInitials } from '@/lib/utils';
 
 export function UserNav() {
@@ -61,9 +61,7 @@ export function UserNav() {
   if (!user) {
     return (
       <div className="flex items-center gap-2">
-        <BaseButton variant="ghost" size="small" asChild>
-          <Link href={ROUTES.login}>Đăng nhập</Link>
-        </BaseButton>
+        <BaseLink href={ROUTES.login}>Đăng nhập</BaseLink>
       </div>
     );
   }
@@ -90,7 +88,7 @@ export function UserNav() {
       {isOpen && (
         <div
           role="menu"
-          className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-neutral-grey-5 bg-white p-1 text-neutral-grey-1 shadow-lg shadow-black/5 animate-fade-in"
+          className="absolute right-0 top-full z-50 mt-2 w-56 animate-fade-in overflow-hidden rounded-xl border border-neutral-grey-5 bg-white p-1 text-neutral-grey-1 shadow-lg shadow-black/5"
         >
           <div className="px-3 py-2">
             <p className="truncate text-sm font-semibold text-neutral-grey-1">{user.fullName}</p>

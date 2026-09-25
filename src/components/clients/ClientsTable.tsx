@@ -3,11 +3,10 @@
 import { useRouter } from 'next/navigation';
 
 import { BaseTable, type BaseColumn } from '@/components/base';
-import { cn } from '@/lib/utils';
-import type { PaginationMeta } from '@/types/api';
-
-import { formatBatteryScore, getInitials, industryName } from './clients-display';
-import type { ClientListItem, ClientsSortField } from './types';
+import { CLIENT_STATUSES } from '@/constants/clients';
+import { cn, getInitials } from '@/lib/utils';
+import { formatBatteryScore, industryName } from '@/lib/clients';
+import type { ClientListItem, ClientsSortField, PaginationMeta } from '@/types';
 
 export interface ClientsTableProps {
   rows: ClientListItem[];
@@ -76,7 +75,7 @@ export function ClientsTable({
         <span
           className={cn(
             'inline-flex rounded-full px-2 py-0.5 text-xs font-bold',
-            row.status === 'ACTIVE'
+            row.status === CLIENT_STATUSES.ACTIVE
               ? 'bg-secondary-green-2 text-secondary-green-4'
               : 'bg-neutral-grey-7 text-neutral-grey-3',
           )}

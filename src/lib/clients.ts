@@ -1,14 +1,5 @@
-export const CLIENTS_PAGE_SIZE = 10;
-export const ALL_FILTER_VALUE = 'ALL';
-
-export interface ClientsQuery {
-  page: number;
-  search?: string;
-  industry?: string;
-  status?: string;
-  sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
-}
+import { ALL_FILTER_VALUE, CLIENTS_PAGE_SIZE } from '@/constants/clients';
+import type { ClientsQuery } from '@/types';
 
 export function buildClientsQuery(q: ClientsQuery): string {
   const params = new URLSearchParams({
@@ -21,15 +12,6 @@ export function buildClientsQuery(q: ClientsQuery): string {
   if (q.sortBy) params.set('sortBy', q.sortBy);
   if (q.sortOrder) params.set('sortOrder', q.sortOrder);
   return params.toString();
-}
-
-export function getInitials(name: string): string {
-  return name
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((w) => w.charAt(0).toUpperCase())
-    .join('');
 }
 
 export function industryName(industry: unknown): string {
