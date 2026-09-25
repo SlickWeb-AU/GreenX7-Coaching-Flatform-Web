@@ -19,9 +19,9 @@ import {
   RESEND_COOLDOWN_SECONDS,
 } from '@/constants';
 import { ROUTES } from '@/config/routes';
-import { formatOtpTimer, maskEmail } from '@/features/admin-auth/otp-helpers';
-import { useAdminOtp } from '@/features/admin-auth/useAdminOtp';
-import { useAuth } from '@/features/auth/auth-provider';
+import { useAdminOtp } from '@/features/admin-auth';
+import { formatOtpTimer, maskEmail } from '@/lib/otp';
+import { useAuth } from '@/components/providers';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -40,6 +40,10 @@ export default function LoginPage() {
     localError ||
     (requestCode.error instanceof Error ? requestCode.error.message : '') ||
     (verifyCode.error instanceof Error ? verifyCode.error.message : '');
+
+  const canResendOnError = verifyCode.error?.errorCode === 'INVALID_CREDENTIALS';
+
+  const isResendDisabled = loading || (resendCooldown > 0 && !canResendOnError);
 
   const clearErrors = () => {
     setLocalError('');
@@ -219,10 +223,10 @@ export default function LoginPage() {
                   variant="ghost"
                   size="mediumPlus"
                   fullWidth
-                  disabled={resendCooldown > 0 || loading}
+                  disabled={isResendDisabled}
                   className="mt-3"
                   onClick={async () => {
-                    if (resendCooldown > 0 || loading) return;
+                    if (isResendDisabled) return;
                     clearErrors();
                     setOtp(['', '', '', '', '', '']);
                     try {
@@ -235,6 +239,7 @@ export default function LoginPage() {
                   }}
                 >
                   Resend Code
+                  {resendCooldown > 0 && !canResendOnError ? ` (${resendCooldown}s)` : ''}
                 </BaseButton>
               </form>
             </>

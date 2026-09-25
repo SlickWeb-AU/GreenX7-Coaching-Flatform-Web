@@ -7,5 +7,6 @@ export type LoginStep = (typeof LOGIN_STEPS)[keyof typeof LOGIN_STEPS];
 
 export const OTP_EXPIRY_SECONDS = 300;
 export const RESEND_COOLDOWN_SECONDS = 60;
+export const REPORT_FALLBACK_PASSWORD = 'greenx7';
 
-export { USER_ROLES, type UserRole } from '@/types/auth';
+export { USER_ROLES, USER_STATUSES, type UserRole, type UserStatus } from '@/types/auth';

@@ -1,4 +1,4 @@
-export const REPORT_FALLBACK_PASSWORD = 'greenx7';
+import { REPORT_FALLBACK_PASSWORD } from '@/constants/auth';
 
 export function reportSessionKey(clientId: string): string {
   return `greenx7_report_auth_${clientId}`;

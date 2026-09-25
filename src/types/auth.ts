@@ -6,7 +6,14 @@ export const USER_ROLES = {
 } as const;
 
 export type UserRole = (typeof USER_ROLES)[keyof typeof USER_ROLES];
-export type UserStatus = 'ACTIVE' | 'INACTIVE' | 'BANNED';
+
+export const USER_STATUSES = {
+  ACTIVE: 'ACTIVE',
+  INACTIVE: 'INACTIVE',
+  BANNED: 'BANNED',
+} as const;
+
+export type UserStatus = (typeof USER_STATUSES)[keyof typeof USER_STATUSES];
 
 export interface AuthUser {
   id: string;

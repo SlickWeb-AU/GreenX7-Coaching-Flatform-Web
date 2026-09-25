@@ -1,5 +1,3 @@
-export { OTP_EXPIRY_SECONDS, RESEND_COOLDOWN_SECONDS } from '@/constants/auth';
-
 export function formatOtpTimer(seconds: number): string {
   const mins = Math.floor(seconds / 60);
   const secs = seconds % 60;

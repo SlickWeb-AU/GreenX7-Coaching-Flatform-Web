@@ -1,6 +1,4 @@
-import Link from 'next/link';
-
-import { BaseButton } from '@/components/base';
+import { BaseLink } from '@/components/base';
 import { ROUTES } from '@/config/routes';
 
 export default function NotFound() {
@@ -11,10 +9,7 @@ export default function NotFound() {
       <p className="max-w-md text-neutral-grey-3">
         The page you are looking for does not exist or has been moved.
       </p>
-      <BaseButton asChild>
-        <Link href={ROUTES.home}>Back to home</Link>
-      </BaseButton>
+      <BaseLink href={ROUTES.home}>Back to home</BaseLink>
     </main>
   );
 }
-

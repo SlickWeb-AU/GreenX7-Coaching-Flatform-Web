@@ -12,18 +12,9 @@ import {
   EyeClosedIcon,
   EyeOpenIcon,
 } from '@/components/icons';
-import {
-  REPORT_FALLBACK_PASSWORD,
-  isReportPasswordValid,
-  reportSessionKey,
-} from '@/features/report-login/report-auth';
-import { get } from '@/lib/axios';
-
-interface ReportClient {
-  id: string;
-  name?: string;
-  reportPassword?: string | null;
-}
+import { REPORT_FALLBACK_PASSWORD } from '@/constants/auth';
+import { reportApi } from '@/features/report-login';
+import { isReportPasswordValid, reportSessionKey } from '@/lib/report-auth';
 
 export default function ReportLoginPage() {
   return (
@@ -40,7 +31,7 @@ function ReportLoginContent() {
 
   const { data: client } = useQuery({
     queryKey: ['report-client', clientId],
-    queryFn: () => get<ReportClient>(`/clients/${clientId}`),
+    queryFn: () => reportApi.getClient(clientId),
     retry: false,
   });
 
@@ -139,4 +130,3 @@ function ReportLoginContent() {
     </div>
   );
 }
-

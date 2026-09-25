@@ -1,7 +1,6 @@
 import { ShieldOff } from 'lucide-react';
-import Link from 'next/link';
 
-import { BaseButton } from '@/components/base';
+import { BaseLink } from '@/components/base';
 import { ROUTES } from '@/config/routes';
 
 export const metadata = { title: 'Không có quyền truy cập' };
@@ -18,12 +17,8 @@ export default function ForbiddenPage() {
         liên hệ quản trị viên.
       </p>
       <div className="flex gap-2">
-        <BaseButton asChild variant="secondary" pill>
-          <Link href={ROUTES.home}>Về trang chủ</Link>
-        </BaseButton>
-        <BaseButton asChild variant="primary">
-          <Link href={ROUTES.admin.dashboard}>Về trang quản trị</Link>
-        </BaseButton>
+        <BaseLink href={ROUTES.home}>Về trang chủ</BaseLink>
+        <BaseLink href={ROUTES.admin.dashboard}>Về trang quản trị</BaseLink>
       </div>
     </main>
   );
