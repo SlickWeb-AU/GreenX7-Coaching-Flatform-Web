@@ -11,6 +11,7 @@ import { ROUTES } from '@/config/routes';
 import { CreateClientForm } from '@/components/clients';
 import { clientsApi } from '@/features/admin-clients';
 import { settingsApi } from '@/features/admin-settings';
+import { toApiError } from '@/lib/api-error';
 import { queryKeys } from '@/lib/query-client';
 
 export default function NewClientPage() {
@@ -33,8 +34,7 @@ export default function NewClientPage() {
       toast.success('Client created successfully');
       router.push(ROUTES.admin.clients);
     },
-    onError: (error: unknown) =>
-      toast.error(error instanceof Error ? error.message : 'Create client failed'),
+    onError: (error: unknown) => toast.error(toApiError(error).message),
   });
 
   return (

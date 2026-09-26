@@ -14,7 +14,7 @@ export function AdminHeader() {
         <button
           type="button"
           onClick={() => setMobileSidebarOpen(true)}
-          aria-label="Mở menu"
+          aria-label="Open menu"
           className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-neutral-grey-2 transition-colors hover:bg-neutral-grey-7 hover:text-neutral-grey-1"
         >
           <Menu className="h-5 w-5" />

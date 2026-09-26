@@ -12,6 +12,7 @@ import { ROUTES } from '@/config/routes';
 import { EditClientForm } from '@/components/clients';
 import { clientsApi } from '@/features/admin-clients';
 import { settingsApi } from '@/features/admin-settings';
+import { toApiError } from '@/lib/api-error';
 import { queryKeys } from '@/lib/query-client';
 import type { UpdateClientPayload } from '@/types';
 
@@ -65,8 +66,7 @@ export default function EditClientPage() {
       toast.success('Client updated successfully');
       router.push(ROUTES.admin.clientDetail(clientId));
     },
-    onError: (error: unknown) =>
-      toast.error(error instanceof Error ? error.message : 'Update client failed'),
+    onError: (error: unknown) => toast.error(toApiError(error).message),
   });
 
   if (isLoading) {

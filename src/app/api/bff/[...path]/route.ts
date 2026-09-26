@@ -65,7 +65,7 @@ async function proxy(request: NextRequest, params: Promise<{ path: string[] }>) 
       {
         success: false,
         statusCode: 503,
-        message: 'Không kết nối được tới máy chủ. Vui lòng thử lại.',
+        message: 'Failed to connect to server. Please try again.',
         errorCode: 'NETWORK_ERROR',
       },
       { status: 503 },

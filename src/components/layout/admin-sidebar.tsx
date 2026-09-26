@@ -12,6 +12,7 @@ import { NavLink } from '@/components/layout/nav-link';
 import { ADMIN_NAVIGATION } from '@/config/navigation';
 import { ROUTES } from '@/config/routes';
 import { authApi } from '@/features/auth';
+import { toApiError } from '@/lib/api-error';
 import { useAuth } from '@/components/providers';
 import { useUiStore } from '@/stores/ui.store';
 
@@ -33,7 +34,7 @@ function SidebarContent({ onNavigate }: SidebarBodyProps) {
       router.replace(ROUTES.login);
       router.refresh();
     },
-    onError: () => toast.error('Sign out failed, please try again'),
+    onError: (err) => toast.error(toApiError(err).message),
   });
 
   return (
@@ -121,7 +122,7 @@ export function AdminSidebar() {
 
   return (
     <>
-      {/* Sidebar cố định — desktop */}
+      {/* Fixed sidebar — desktop */}
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-56 flex-col border-r-0.5 border-neutral-grey-5 bg-neutral-grey-7 lg:flex">
         <SidebarContent />
       </aside>
@@ -133,7 +134,7 @@ export function AdminSidebar() {
             type="button"
             className="absolute inset-0 bg-black/50"
             onClick={() => setMobileSidebarOpen(false)}
-            aria-label="Đóng menu"
+            aria-label="Close menu"
           />
           <aside className="relative flex h-full w-56 animate-slide-up flex-col border-r-0.5 border-neutral-grey-5 bg-neutral-grey-7">
             <div className="absolute right-3 top-4 z-10">
@@ -141,7 +142,7 @@ export function AdminSidebar() {
                 type="button"
                 className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-neutral-grey-2 transition-colors hover:bg-neutral-grey-6"
                 onClick={() => setMobileSidebarOpen(false)}
-                aria-label="Đóng menu"
+                aria-label="Close menu"
               >
                 <X className="h-5 w-5" />
               </button>

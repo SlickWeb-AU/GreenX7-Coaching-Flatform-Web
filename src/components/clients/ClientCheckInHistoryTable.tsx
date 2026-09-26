@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { BaseTable, BaseTag, type BaseColumn, type BaseTagVariant } from '@/components/base';
 import { ROUTES } from '@/config/routes';
 import { clientsApi } from '@/features/admin-clients';
+import { toApiError } from '@/lib/api-error';
 import { formatBatteryScore } from '@/lib/clients';
 import { cn, formatDateTime } from '@/lib/utils';
 import type { CheckInHistoryItemDto, CheckinStatus, PaginationMeta, ReportStatus } from '@/types';
@@ -59,7 +60,7 @@ export function ClientCheckInHistoryTable({
       });
     },
     onError: (err) => {
-      toast.error(err instanceof Error ? err.message : 'Failed to send report');
+      toast.error(toApiError(err).message);
     },
     onSettled: () => {
       setSendingId(null);
