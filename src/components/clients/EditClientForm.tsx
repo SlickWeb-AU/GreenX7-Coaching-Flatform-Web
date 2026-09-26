@@ -2,15 +2,19 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
-import { useState } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 
 import {
   BaseButton,
   BaseCard,
+  BaseDatePicker,
+  BaseHelperText,
+  BaseIconButton,
   BaseInput,
   BaseSelect,
   BaseSwitch,
+  BaseTag,
+  formatDayOfMonth,
   type BaseSelectOption,
 } from '@/components/base';
 import {
@@ -21,31 +25,33 @@ import {
   MonthlyScheduleIcon,
 } from '@/components/icons';
 import {
-  CHECK_IN_DAY_SELECT_OPTIONS,
+  CLIENT_CHECK_IN_DAY_MAX,
   CLIENT_COMPANY_SIZE_OPTIONS,
   CLIENT_FORM_STATUS_OPTIONS,
   CLIENT_STATE_OPTIONS,
   CLIENT_STATUSES,
-  CLIENT_TIMEZONE_OPTIONS,
 } from '@/constants/clients';
+import {
+  contactDeleteKey,
+  contactSaveKey,
+  deptDeleteKey,
+  deptSaveKey,
+  useClientRowPersistence,
+  useEditableRows,
+} from '@/features/admin-clients';
 import { cn } from '@/lib/utils';
 
 import { ClientLogoUpload } from './ClientLogoUpload';
+import { DEFAULT_CONTACT_ROW, DEFAULT_DEPARTMENT_ROW } from './CreateClientForm';
 import {
-  clientContactSchema,
-  clientDepartmentSchema,
   clientFormSchema,
+  type ClientContactFormValue,
+  type ClientDepartmentFormValue,
   type ClientFormValues,
 } from '@/validations';
-import type { ClientContact, ClientStatus } from '@/types';
-
-const EMPTY_CONTACT: ClientContact = { firstName: '', lastName: '', email: '', role: '' };
-const EMPTY_DEPT: { name: string; status: ClientStatus } = {
-  name: '',
-  status: CLIENT_STATUSES.ACTIVE,
-};
 
 export interface EditClientFormProps {
+  clientId?: string;
   initial: ClientFormValues;
   onSubmit: (values: ClientFormValues) => void;
   onCancel?: () => void;
@@ -57,6 +63,7 @@ export interface EditClientFormProps {
 }
 
 export function EditClientForm({
+  clientId,
   initial,
   onSubmit,
   onCancel,
@@ -66,25 +73,33 @@ export function EditClientForm({
   showSubmitAction = false,
   submitLabel = 'Save changes',
 }: EditClientFormProps) {
-  const [editingContactIndex, setEditingContactIndex] = useState<number | null>(null);
-  const [isAddingContact, setIsAddingContact] = useState(false);
-  const [contactForm, setContactForm] = useState<ClientContact>(EMPTY_CONTACT);
-  const [contactError, setContactError] = useState('');
-
-  const [editingDeptIndex, setEditingDeptIndex] = useState<number | null>(null);
-  const [isAddingDept, setIsAddingDept] = useState(false);
-  const [deptForm, setDeptForm] = useState(EMPTY_DEPT);
-  const [deptError, setDeptError] = useState('');
+  const persist = useClientRowPersistence(clientId);
 
   const {
     register,
     control,
     handleSubmit,
+    trigger,
+    getValues,
+    setValue,
+    setError,
+    clearErrors,
     formState: { errors },
   } = useForm<ClientFormValues>({
     resolver: zodResolver(clientFormSchema),
     defaultValues: initial,
   });
+
+  const todayDay = new Date().getDate();
+  const currentStartDay = initial?.checkInStartDay;
+  const currentEndDay = initial?.checkInEndDay;
+  const isWindowOpen =
+    currentStartDay !== undefined &&
+    currentStartDay !== null &&
+    currentEndDay !== undefined &&
+    currentEndDay !== null &&
+    todayDay >= currentStartDay &&
+    todayDay <= currentEndDay;
 
   const {
     fields: contactFields,
@@ -106,82 +121,133 @@ export function EditClientForm({
     name: 'departments',
   });
 
-  const handleAddContact = () => {
-    const result = clientContactSchema.safeParse(contactForm);
-    if (!result.success) {
-      setContactError(result.error.issues[0]?.message || 'Please fill in contact details.');
-      return;
-    }
-    const isDuplicate = contactFields.some(
-      (c) => c.email.trim().toLowerCase() === result.data.email.trim().toLowerCase(),
+  const contactsEdit = useEditableRows<ClientContactFormValue>(contactFields.map((f) => f.id));
+  const departmentsEdit = useEditableRows<ClientDepartmentFormValue>(
+    departmentFields.map((f) => f.id),
+  );
+
+  // Contacts handlers
+  const handleSaveContact = async (index: number, id: string) => {
+    const isValid = await trigger(`contacts.${index}`);
+    if (!isValid) return;
+
+    const contacts = getValues('contacts');
+    const currentEmail = contacts[index]?.email?.trim().toLowerCase();
+    const isDuplicate = contacts.some(
+      (c, i) => i !== index && c.email?.trim().toLowerCase() === currentEmail,
     );
+
     if (isDuplicate) {
-      setContactError('A contact with this email address already exists.');
+      setError(`contacts.${index}.email`, {
+        type: 'manual',
+        message: 'A contact with this email address already exists.',
+      });
       return;
     }
-    appendContact(result.data);
-    setContactForm(EMPTY_CONTACT);
-    setIsAddingContact(false);
-    setContactError('');
+
+    clearErrors(`contacts.${index}`);
+    const saved = await persist.saveContact(contactSaveKey(id), getValues(`contacts.${index}`));
+    if (!saved) return;
+    updateContact(index, saved);
+    contactsEdit.markSaved(id);
   };
 
-  const handleSaveEditContact = (index: number) => {
-    const result = clientContactSchema.safeParse(contactForm);
-    if (!result.success) {
-      setContactError(result.error.issues[0]?.message || 'Please fill in contact details.');
-      return;
+  const handleCancelContact = (index: number, id: string) => {
+    const draft = contactsEdit.snapshots[id];
+
+    clearErrors(`contacts.${index}`);
+
+    if (draft) {
+      setValue(`contacts.${index}`, draft);
+      updateContact(index, draft);
+      contactsEdit.markSaved(id);
+    } else if (contactFields.length > 1) {
+      removeContact(index);
+      contactsEdit.drop(id);
+    } else {
+      setValue(`contacts.${index}`, { ...DEFAULT_CONTACT_ROW });
+      updateContact(index, { ...DEFAULT_CONTACT_ROW });
+      contactsEdit.markSaved(id);
     }
-    const isDuplicate = contactFields.some(
-      (c, i) =>
-        i !== index && c.email.trim().toLowerCase() === result.data.email.trim().toLowerCase(),
-    );
-    if (isDuplicate) {
-      setContactError('A contact with this email address already exists.');
-      return;
-    }
-    updateContact(index, result.data);
-    setEditingContactIndex(null);
-    setContactForm(EMPTY_CONTACT);
-    setContactError('');
   };
 
-  const handleAddDept = () => {
-    const result = clientDepartmentSchema.safeParse(deptForm);
-    if (!result.success) {
-      setDeptError(result.error.issues[0]?.message || 'Please enter department name.');
-      return;
-    }
-    const isDuplicate = departmentFields.some(
-      (d) => d.name.trim().toLowerCase() === result.data.name.trim().toLowerCase(),
-    );
-    if (isDuplicate) {
-      setDeptError('A department with this name already exists.');
-      return;
-    }
-    appendDepartment(result.data);
-    setDeptForm(EMPTY_DEPT);
-    setIsAddingDept(false);
-    setDeptError('');
+  const handleStartEditContact = (index: number, id: string) => {
+    contactsEdit.startEdit(id, { ...getValues(`contacts.${index}`) });
+    clearErrors(`contacts.${index}`);
   };
 
-  const handleSaveEditDept = (index: number) => {
-    const result = clientDepartmentSchema.safeParse(deptForm);
-    if (!result.success) {
-      setDeptError(result.error.issues[0]?.message || 'Please enter department name.');
-      return;
-    }
-    const isDuplicate = departmentFields.some(
-      (d, i) =>
-        i !== index && d.name.trim().toLowerCase() === result.data.name.trim().toLowerCase(),
+  const handleRemoveContact = async (index: number, id: string) => {
+    const ok = await persist.deleteContact(contactDeleteKey(id), getValues(`contacts.${index}`));
+    if (!ok) return;
+    removeContact(index);
+    contactsEdit.drop(id);
+    clearErrors(`contacts.${index}`);
+  };
+
+  const handleAddContactClick = () => {
+    appendContact({ ...DEFAULT_CONTACT_ROW });
+  };
+
+  // Departments handlers
+  const handleSaveDept = async (index: number, id: string) => {
+    const isValid = await trigger(`departments.${index}`);
+    if (!isValid) return;
+
+    const departments = getValues('departments');
+    const currentName = departments[index]?.name?.trim().toLowerCase();
+    const isDuplicate = departments.some(
+      (d, i) => i !== index && d.name?.trim().toLowerCase() === currentName,
     );
+
     if (isDuplicate) {
-      setDeptError('A department with this name already exists.');
+      setError(`departments.${index}.name`, {
+        type: 'manual',
+        message: 'A department with this name already exists.',
+      });
       return;
     }
-    updateDepartment(index, result.data);
-    setEditingDeptIndex(null);
-    setDeptForm(EMPTY_DEPT);
-    setDeptError('');
+
+    clearErrors(`departments.${index}`);
+    const saved = await persist.saveDepartment(deptSaveKey(id), getValues(`departments.${index}`));
+    if (!saved) return;
+    updateDepartment(index, saved);
+    departmentsEdit.markSaved(id);
+  };
+
+  const handleCancelDept = (index: number, id: string) => {
+    const draft = departmentsEdit.snapshots[id];
+
+    clearErrors(`departments.${index}`);
+
+    if (draft) {
+      setValue(`departments.${index}`, draft);
+      updateDepartment(index, draft);
+      departmentsEdit.markSaved(id);
+    } else if (departmentFields.length > 1) {
+      removeDepartment(index);
+      departmentsEdit.drop(id);
+    } else {
+      setValue(`departments.${index}`, { ...DEFAULT_DEPARTMENT_ROW });
+      updateDepartment(index, { ...DEFAULT_DEPARTMENT_ROW });
+      departmentsEdit.markSaved(id);
+    }
+  };
+
+  const handleStartEditDept = (index: number, id: string) => {
+    departmentsEdit.startEdit(id, { ...getValues(`departments.${index}`) });
+    clearErrors(`departments.${index}`);
+  };
+
+  const handleRemoveDept = async (index: number, id: string) => {
+    const ok = await persist.deleteDepartment(deptDeleteKey(id), getValues(`departments.${index}`));
+    if (!ok) return;
+    removeDepartment(index);
+    departmentsEdit.drop(id);
+    clearErrors(`departments.${index}`);
+  };
+
+  const handleAddDeptClick = () => {
+    appendDepartment({ ...DEFAULT_DEPARTMENT_ROW });
   };
 
   return (
@@ -277,178 +343,119 @@ export function EditClientForm({
             variant="secondary"
             pill
             startIcon={<Plus size={16} aria-hidden />}
-            onClick={() => {
-              setIsAddingContact(true);
-              setEditingContactIndex(null);
-              setContactForm(EMPTY_CONTACT);
-              setContactError('');
-            }}
+            onClick={handleAddContactClick}
           >
             Add Contact
           </BaseButton>
         }
       >
-        {(errors.contacts?.root?.message || contactError) && (
-          <p className="body-14-medium mb-3 text-secondary-red-4" role="alert">
-            {errors.contacts?.root?.message || contactError}
-          </p>
-        )}
+        <div className="flex flex-col gap-3">
+          {contactFields.map((field, index) => {
+            const isDraft = !contactsEdit.isSaved(field.id);
 
-        <div className="mb-2 hidden flex-1 grid-cols-4 gap-3 pr-[88px] lg:grid">
-          <span className="body-14-medium text-neutral-grey-2">First name</span>
-          <span className="body-14-medium text-neutral-grey-2">Last name</span>
-          <span className="body-14-medium text-neutral-grey-2">Email</span>
-          <span className="body-14-medium text-neutral-grey-2">Role</span>
-        </div>
-
-        {contactFields.map((field, index) => {
-          const isEditing = editingContactIndex === index;
-
-          if (isEditing) {
             return (
-              <div key={field.id} className="mb-3 flex flex-col gap-3 lg:flex-row lg:items-center">
-                <div className="grid min-w-0 flex-1 grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <div key={field.id} className="flex flex-col gap-3 xl:flex-row xl:items-start">
+                <div className="grid min-w-0 flex-1 grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
                   <BaseInput
+                    label={index === 0 ? 'First name' : undefined}
                     size="mediumPlus"
-                    value={contactForm.firstName}
-                    onChange={(e) => setContactForm({ ...contactForm, firstName: e.target.value })}
-                    placeholder="First name"
+                    variant="secondary"
+                    required
+                    readOnly={!isDraft}
+                    placeholder="Enter first name"
+                    error={Boolean(errors.contacts?.[index]?.firstName)}
+                    helperText={errors.contacts?.[index]?.firstName?.message}
+                    {...register(`contacts.${index}.firstName`)}
                   />
                   <BaseInput
+                    label={index === 0 ? 'Last name' : undefined}
                     size="mediumPlus"
-                    value={contactForm.lastName}
-                    onChange={(e) => setContactForm({ ...contactForm, lastName: e.target.value })}
-                    placeholder="Last name"
+                    variant="secondary"
+                    required
+                    readOnly={!isDraft}
+                    placeholder="Enter last name"
+                    error={Boolean(errors.contacts?.[index]?.lastName)}
+                    helperText={errors.contacts?.[index]?.lastName?.message}
+                    {...register(`contacts.${index}.lastName`)}
                   />
                   <BaseInput
-                    size="mediumPlus"
+                    label={index === 0 ? 'Email' : undefined}
                     type="email"
-                    value={contactForm.email}
-                    onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
-                    placeholder="Email"
+                    size="mediumPlus"
+                    variant="secondary"
+                    required
+                    readOnly={!isDraft}
+                    placeholder="Enter email address"
+                    error={Boolean(errors.contacts?.[index]?.email)}
+                    helperText={errors.contacts?.[index]?.email?.message}
+                    {...register(`contacts.${index}.email`)}
                   />
                   <BaseInput
+                    label={index === 0 ? 'Role' : undefined}
                     size="mediumPlus"
-                    value={contactForm.role}
-                    onChange={(e) => setContactForm({ ...contactForm, role: e.target.value })}
-                    placeholder="Role"
+                    variant="secondary"
+                    required
+                    readOnly={!isDraft}
+                    placeholder="Enter role"
+                    error={Boolean(errors.contacts?.[index]?.role)}
+                    helperText={errors.contacts?.[index]?.role?.message}
+                    {...register(`contacts.${index}.role`)}
                   />
                 </div>
-                <div className="flex shrink-0 items-center gap-2">
-                  <BaseButton type="button" pill onClick={() => handleSaveEditContact(index)}>
-                    Save
-                  </BaseButton>
-                  <BaseButton
-                    type="button"
-                    variant="secondary"
-                    pill
-                    onClick={() => {
-                      setEditingContactIndex(null);
-                      setContactError('');
-                    }}
-                  >
-                    Cancel
-                  </BaseButton>
+                <div
+                  className={cn(
+                    'flex h-12 w-[160px] shrink-0 items-center justify-evenly',
+                    index === 0 && 'xl:mt-[28px]',
+                  )}
+                >
+                  {!isDraft ? (
+                    <>
+                      <BaseIconButton
+                        aria-label="Edit contact"
+                        size={40}
+                        icon={<Pencil size={20} aria-hidden />}
+                        className="text-neutral-grey-3 hover:text-neutral-grey-1"
+                        onClick={() => handleStartEditContact(index, field.id)}
+                      />
+                      <BaseIconButton
+                        aria-label="Delete contact"
+                        size={40}
+                        icon={<Trash2 size={20} aria-hidden />}
+                        disabled={
+                          contactFields.length <= 1 ||
+                          persist.busyKey === contactDeleteKey(field.id)
+                        }
+                        className="text-neutral-grey-3 hover:text-secondary-red-4"
+                        onClick={() => handleRemoveContact(index, field.id)}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <BaseButton
+                        type="button"
+                        pill
+                        loading={persist.busyKey === contactSaveKey(field.id)}
+                        disabled={persist.busyKey === contactSaveKey(field.id)}
+                        onClick={() => handleSaveContact(index, field.id)}
+                      >
+                        Save
+                      </BaseButton>
+                      <BaseButton
+                        type="button"
+                        variant="secondary"
+                        pill
+                        disabled={persist.busyKey === contactSaveKey(field.id)}
+                        onClick={() => handleCancelContact(index, field.id)}
+                      >
+                        Cancel
+                      </BaseButton>
+                    </>
+                  )}
                 </div>
               </div>
             );
-          }
-
-          return (
-            <div key={field.id} className="mb-3 flex flex-col gap-3 lg:flex-row lg:items-center">
-              <div className="grid min-w-0 flex-1 grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                <div className="body-16-medium flex h-12 items-center truncate rounded-xl border border-neutral-grey-6/30 bg-neutral-grey-8 px-4 text-neutral-grey-1">
-                  {field.firstName}
-                </div>
-                <div className="body-16-medium flex h-12 items-center truncate rounded-xl border border-neutral-grey-6/30 bg-neutral-grey-8 px-4 text-neutral-grey-1">
-                  {field.lastName}
-                </div>
-                <div className="body-16-medium flex h-12 items-center truncate rounded-xl border border-neutral-grey-6/30 bg-neutral-grey-8 px-4 text-neutral-grey-1">
-                  {field.email}
-                </div>
-                <div className="body-16-medium flex h-12 items-center truncate rounded-xl border border-neutral-grey-6/30 bg-neutral-grey-8 px-4 text-neutral-grey-1">
-                  {field.role}
-                </div>
-              </div>
-              <div className="flex shrink-0 items-center gap-1 pl-1">
-                <button
-                  type="button"
-                  title="Edit contact"
-                  onClick={() => {
-                    setIsAddingContact(false);
-                    setEditingContactIndex(index);
-                    setContactForm({
-                      firstName: field.firstName,
-                      lastName: field.lastName,
-                      email: field.email,
-                      role: field.role,
-                    });
-                    setContactError('');
-                  }}
-                  className="flex h-10 w-10 items-center justify-center rounded-lg text-neutral-grey-3 transition-colors hover:bg-neutral-grey-8 hover:text-neutral-grey-1"
-                >
-                  <Pencil size={18} aria-hidden />
-                </button>
-                <button
-                  type="button"
-                  title="Delete contact"
-                  onClick={() => removeContact(index)}
-                  className="flex h-10 w-10 items-center justify-center rounded-lg text-neutral-grey-3 transition-colors hover:bg-secondary-red-1 hover:text-secondary-red-4"
-                >
-                  <Trash2 size={18} aria-hidden />
-                </button>
-              </div>
-            </div>
-          );
-        })}
-
-        {isAddingContact && (
-          <div className="mt-3 flex flex-col gap-3 lg:flex-row lg:items-center">
-            <div className="grid min-w-0 flex-1 grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              <BaseInput
-                size="mediumPlus"
-                value={contactForm.firstName}
-                onChange={(e) => setContactForm({ ...contactForm, firstName: e.target.value })}
-                placeholder="First name"
-              />
-              <BaseInput
-                size="mediumPlus"
-                value={contactForm.lastName}
-                onChange={(e) => setContactForm({ ...contactForm, lastName: e.target.value })}
-                placeholder="Last name"
-              />
-              <BaseInput
-                size="mediumPlus"
-                type="email"
-                value={contactForm.email}
-                onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
-                placeholder="Email"
-              />
-              <BaseInput
-                size="mediumPlus"
-                value={contactForm.role}
-                onChange={(e) => setContactForm({ ...contactForm, role: e.target.value })}
-                placeholder="Role"
-              />
-            </div>
-            <div className="flex shrink-0 items-center gap-2">
-              <BaseButton type="button" pill onClick={handleAddContact}>
-                Save
-              </BaseButton>
-              <BaseButton
-                type="button"
-                variant="secondary"
-                pill
-                onClick={() => {
-                  setIsAddingContact(false);
-                  setContactError('');
-                }}
-              >
-                Cancel
-              </BaseButton>
-            </div>
-          </div>
-        )}
+          })}
+        </div>
       </BaseCard>
 
       {/* 3. Branding */}
@@ -470,145 +477,122 @@ export function EditClientForm({
             variant="secondary"
             pill
             startIcon={<Plus size={16} aria-hidden />}
-            onClick={() => {
-              setIsAddingDept(true);
-              setEditingDeptIndex(null);
-              setDeptForm(EMPTY_DEPT);
-              setDeptError('');
-            }}
+            onClick={handleAddDeptClick}
           >
             Add Department
           </BaseButton>
         }
       >
-        {deptError && (
-          <p className="body-14-medium mb-3 text-secondary-red-4" role="alert">
-            {deptError}
-          </p>
-        )}
+        <div className="flex flex-col gap-3">
+          {departmentFields.map((field, index) => {
+            const isDraft = !departmentsEdit.isSaved(field.id);
+            const currentName = getValues(`departments.${index}.name`) || field.name;
+            const currentStatus =
+              (getValues(`departments.${index}.status`) || field.status)?.toUpperCase() ||
+              CLIENT_STATUSES.ACTIVE;
+            const deptErrorMessage = errors.departments?.[index]?.name?.message;
 
-        {departmentFields.map((field, index) => {
-          const isEditing = editingDeptIndex === index;
-
-          if (isEditing) {
             return (
-              <div key={field.id} className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center">
-                <div className="grid min-w-0 flex-1 grid-cols-1 gap-3 sm:grid-cols-2">
-                  <BaseInput
-                    size="mediumPlus"
-                    value={deptForm.name}
-                    onChange={(e) => setDeptForm({ ...deptForm, name: e.target.value })}
-                    placeholder="Department name"
-                  />
-                  <BaseSelect
-                    size="mediumPlus"
-                    placeholder="Select status"
-                    value={deptForm.status}
-                    options={CLIENT_FORM_STATUS_OPTIONS}
-                    onChange={(val) => setDeptForm({ ...deptForm, status: val })}
-                  />
-                </div>
-                <div className="flex shrink-0 items-center gap-2">
-                  <BaseButton type="button" pill onClick={() => handleSaveEditDept(index)}>
-                    Save
-                  </BaseButton>
-                  <BaseButton
-                    type="button"
-                    variant="secondary"
-                    pill
-                    onClick={() => {
-                      setEditingDeptIndex(null);
-                      setDeptError('');
-                    }}
-                  >
-                    Cancel
-                  </BaseButton>
-                  <button
-                    type="button"
-                    title="Remove department"
-                    onClick={() => {
-                      removeDepartment(index);
-                      setEditingDeptIndex(null);
-                    }}
-                    className="flex h-10 w-10 items-center justify-center rounded-lg text-neutral-grey-3 hover:text-secondary-red-4"
-                  >
-                    <Trash2 size={18} aria-hidden />
-                  </button>
+              <div key={field.id} className="flex flex-col gap-3 xl:flex-row xl:items-start">
+                {!isDraft ? (
+                  <div className="min-w-0 flex-1">
+                    <div
+                      className={cn(
+                        'flex h-12 min-w-0 flex-1 items-center gap-3 rounded-lg border border-neutral-grey-6 bg-white px-3',
+                        deptErrorMessage && 'border-secondary-red-4',
+                      )}
+                    >
+                      <span className="body-16-medium text-neutral-grey-1">{currentName}</span>
+                      <BaseTag
+                        variant={
+                          currentStatus === CLIENT_STATUSES.ACTIVE ? 'green' : 'green-neutral'
+                        }
+                      >
+                        {currentStatus === CLIENT_STATUSES.ACTIVE ? 'Active' : 'Inactive'}
+                      </BaseTag>
+                    </div>
+                    <BaseHelperText
+                      error={Boolean(deptErrorMessage)}
+                      helperText={deptErrorMessage}
+                    />
+                  </div>
+                ) : (
+                  <div className="grid min-w-0 flex-1 grid-cols-1 gap-2 md:grid-cols-2">
+                    <BaseInput
+                      size="mediumPlus"
+                      variant="secondary"
+                      required
+                      placeholder="Enter Department"
+                      error={Boolean(errors.departments?.[index]?.name)}
+                      helperText={errors.departments?.[index]?.name?.message}
+                      {...register(`departments.${index}.name`)}
+                    />
+                    <Controller
+                      name={`departments.${index}.status`}
+                      control={control}
+                      render={({ field: selectField }) => (
+                        <BaseSelect
+                          size="mediumPlus"
+                          variant="secondary"
+                          value={selectField.value}
+                          options={CLIENT_FORM_STATUS_OPTIONS}
+                          onChange={selectField.onChange}
+                          placeholder="Select status"
+                        />
+                      )}
+                    />
+                  </div>
+                )}
+                <div className="flex h-12 w-[160px] shrink-0 items-center justify-evenly">
+                  {!isDraft ? (
+                    <>
+                      <BaseIconButton
+                        aria-label="Edit department"
+                        size={40}
+                        icon={<Pencil size={20} aria-hidden />}
+                        className="text-neutral-grey-3 hover:text-neutral-grey-1"
+                        onClick={() => handleStartEditDept(index, field.id)}
+                      />
+                      <BaseIconButton
+                        aria-label="Delete department"
+                        size={40}
+                        icon={<Trash2 size={20} aria-hidden />}
+                        disabled={
+                          departmentFields.length <= 1 ||
+                          Boolean((field as { isCompanyWide?: boolean }).isCompanyWide) ||
+                          persist.busyKey === deptDeleteKey(field.id)
+                        }
+                        className="text-neutral-grey-3 hover:text-secondary-red-4"
+                        onClick={() => handleRemoveDept(index, field.id)}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <BaseButton
+                        type="button"
+                        pill
+                        loading={persist.busyKey === deptSaveKey(field.id)}
+                        disabled={persist.busyKey === deptSaveKey(field.id)}
+                        onClick={() => handleSaveDept(index, field.id)}
+                      >
+                        Save
+                      </BaseButton>
+                      <BaseButton
+                        type="button"
+                        variant="secondary"
+                        pill
+                        disabled={persist.busyKey === deptSaveKey(field.id)}
+                        onClick={() => handleCancelDept(index, field.id)}
+                      >
+                        Cancel
+                      </BaseButton>
+                    </>
+                  )}
                 </div>
               </div>
             );
-          }
-
-          return (
-            <div
-              key={field.id}
-              className="mb-2.5 flex items-center justify-between rounded-xl border border-neutral-grey-6 bg-white px-4 py-3.5 transition-colors hover:border-neutral-grey-5"
-            >
-              <div className="flex items-center gap-3">
-                <span className="body-14-bold text-neutral-grey-1">{field.name}</span>
-                <span
-                  className={cn(
-                    'body-12-bold inline-flex items-center rounded-full px-2.5 py-0.5',
-                    field.status?.toUpperCase() === CLIENT_STATUSES.ACTIVE
-                      ? 'bg-secondary-green-2 text-secondary-green-4'
-                      : 'border border-neutral-grey-6 bg-neutral-grey-8 text-neutral-grey-3',
-                  )}
-                >
-                  {field.status?.toUpperCase() === CLIENT_STATUSES.ACTIVE ? 'Active' : 'Inactive'}
-                </span>
-              </div>
-              <button
-                type="button"
-                title="Edit department"
-                onClick={() => {
-                  setIsAddingDept(false);
-                  setEditingDeptIndex(index);
-                  setDeptForm({ name: field.name, status: field.status || CLIENT_STATUSES.ACTIVE });
-                  setDeptError('');
-                }}
-                className="flex h-8 w-8 items-center justify-center rounded-lg text-neutral-grey-3 transition-colors hover:bg-neutral-grey-8 hover:text-neutral-grey-1"
-              >
-                <Pencil size={18} aria-hidden />
-              </button>
-            </div>
-          );
-        })}
-
-        {isAddingDept && (
-          <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center">
-            <div className="grid min-w-0 flex-1 grid-cols-1 gap-3 sm:grid-cols-2">
-              <BaseInput
-                size="mediumPlus"
-                value={deptForm.name}
-                onChange={(e) => setDeptForm({ ...deptForm, name: e.target.value })}
-                placeholder="Department name"
-              />
-              <BaseSelect
-                size="mediumPlus"
-                placeholder="Select status"
-                value={deptForm.status}
-                options={CLIENT_FORM_STATUS_OPTIONS}
-                onChange={(val) => setDeptForm({ ...deptForm, status: val })}
-              />
-            </div>
-            <div className="flex shrink-0 items-center gap-2">
-              <BaseButton type="button" pill onClick={handleAddDept}>
-                Save
-              </BaseButton>
-              <BaseButton
-                type="button"
-                variant="secondary"
-                pill
-                onClick={() => {
-                  setIsAddingDept(false);
-                  setDeptError('');
-                }}
-              >
-                Cancel
-              </BaseButton>
-            </div>
-          </div>
-        )}
+          })}
+        </div>
       </BaseCard>
 
       {/* 5. Monthly schedule */}
@@ -618,17 +602,26 @@ export function EditClientForm({
         prefixIcon={<MonthlyScheduleIcon label="Monthly schedule icon" />}
       >
         <div className="space-y-4">
+          {isWindowOpen && currentEndDay && (
+            <div className="body-14-medium rounded-lg border border-neutral-grey-5 bg-white p-3.5 text-brand-green-2">
+              The current check-in window is open until {formatDayOfMonth(currentEndDay)}. Schedule
+              changes will apply from the next period.
+            </div>
+          )}
+
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <Controller
               name="checkInStartDay"
               control={control}
               render={({ field }) => (
-                <BaseSelect
+                <BaseDatePicker
                   label="Start day"
                   size="mediumPlus"
-                  value={field.value !== undefined ? String(field.value) : ''}
-                  options={CHECK_IN_DAY_SELECT_OPTIONS}
-                  onChange={(val) => field.onChange(val ? Number(val) : undefined)}
+                  disabled={isWindowOpen}
+                  maxDay={CLIENT_CHECK_IN_DAY_MAX}
+                  format={formatDayOfMonth}
+                  value={field.value}
+                  onChange={field.onChange}
                   placeholder="Select date"
                   error={Boolean(errors.checkInStartDay)}
                   helperText={errors.checkInStartDay?.message}
@@ -639,12 +632,14 @@ export function EditClientForm({
               name="checkInEndDay"
               control={control}
               render={({ field }) => (
-                <BaseSelect
+                <BaseDatePicker
                   label="End day"
                   size="mediumPlus"
-                  value={field.value !== undefined ? String(field.value) : ''}
-                  options={CHECK_IN_DAY_SELECT_OPTIONS}
-                  onChange={(val) => field.onChange(val ? Number(val) : undefined)}
+                  disabled={isWindowOpen}
+                  maxDay={CLIENT_CHECK_IN_DAY_MAX}
+                  format={formatDayOfMonth}
+                  value={field.value}
+                  onChange={field.onChange}
                   placeholder="Select date"
                   error={Boolean(errors.checkInEndDay)}
                   helperText={errors.checkInEndDay?.message}
@@ -652,22 +647,7 @@ export function EditClientForm({
               )}
             />
           </div>
-          <Controller
-            name="timezone"
-            control={control}
-            render={({ field }) => (
-              <BaseSelect
-                label="Timezone"
-                size="mediumPlus"
-                value={field.value}
-                options={CLIENT_TIMEZONE_OPTIONS}
-                onChange={field.onChange}
-                placeholder="Select timezone"
-                error={Boolean(errors.timezone)}
-                helperText={errors.timezone?.message}
-              />
-            )}
-          />
+
           <Controller
             name="autoSendReport"
             control={control}
