@@ -7,6 +7,7 @@ import { Suspense, useEffect, useMemo } from 'react';
 import { toast } from 'sonner';
 
 import { BaseButton, BaseHeader, BaseLoading, BaseSelectInside } from '@/components/base';
+import { toApiError } from '@/lib/api-error';
 import { calculateAverageBatteryScore, cn } from '@/lib/utils';
 
 import {
@@ -70,7 +71,7 @@ function DashboardContent() {
 
   useEffect(() => {
     if (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to load dashboard');
+      toast.error(toApiError(error).message);
     }
   }, [error]);
 

@@ -10,6 +10,7 @@ import { BaseButton, BaseDialog, BaseHeader, BaseIconButton, BaseInput } from '@
 import { useConfirm } from '@/components/providers';
 import { AdminsTable } from '@/components/settings';
 import { settingsApi } from '@/features/admin-settings';
+import { toApiError } from '@/lib/api-error';
 import { queryKeys } from '@/lib/query-client';
 import { inviteSchema, industryNameSchema } from '@/validations';
 
@@ -52,7 +53,7 @@ export default function SettingsPage() {
       setEditingId(null);
       invalidateIndustries();
     },
-    onError: (e: unknown) => setFormError(e instanceof Error ? e.message : 'Save failed'),
+    onError: (e: unknown) => setFormError(toApiError(e).message),
   });
   const updateIndustry = useMutation({
     mutationFn: ({ id, name }: { id: string; name: string }) =>
@@ -64,7 +65,7 @@ export default function SettingsPage() {
       setEditingId(null);
       invalidateIndustries();
     },
-    onError: (e: unknown) => setFormError(e instanceof Error ? e.message : 'Save failed'),
+    onError: (e: unknown) => setFormError(toApiError(e).message),
   });
   const deleteIndustry = useMutation({
     mutationFn: settingsApi.deleteIndustry,
@@ -73,11 +74,7 @@ export default function SettingsPage() {
       invalidateIndustries();
     },
     onError: (e: unknown) => {
-      toast.error(
-        e instanceof Error
-          ? e.message
-          : 'Cannot delete this industry because it is currently assigned to one or more clients.',
-      );
+      toast.error(toApiError(e).message);
     },
   });
   const inviteAdmin = useMutation({
@@ -92,7 +89,7 @@ export default function SettingsPage() {
       }, 1500);
       invalidateAdmins();
     },
-    onError: (e: unknown) => setFormError(e instanceof Error ? e.message : 'Invite failed'),
+    onError: (e: unknown) => setFormError(toApiError(e).message),
   });
 
   const industries = industriesQuery.data ?? [];

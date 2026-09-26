@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { BaseLink } from '@/components/base';
 import { ROUTES } from '@/config/routes';
 import { authApi } from '@/features/auth';
+import { toApiError } from '@/lib/api-error';
 import { useAuth } from '@/components/providers';
 import { getInitials } from '@/lib/utils';
 
@@ -51,17 +52,17 @@ export function UserNav() {
     onSuccess: () => {
       setUser(null);
       queryClient.clear();
-      toast.success('Đã đăng xuất');
+      toast.success('Signed out successfully');
       router.replace(ROUTES.login);
       router.refresh();
     },
-    onError: () => toast.error('Đăng xuất thất bại, vui lòng thử lại'),
+    onError: (err) => toast.error(toApiError(err).message),
   });
 
   if (!user) {
     return (
       <div className="flex items-center gap-2">
-        <BaseLink href={ROUTES.login}>Đăng nhập</BaseLink>
+        <BaseLink href={ROUTES.login}>Sign in</BaseLink>
       </div>
     );
   }
@@ -74,7 +75,7 @@ export function UserNav() {
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
         className="flex items-center gap-2 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-brand-green-2 focus-visible:ring-offset-2"
-        aria-label="Menu tài khoản"
+        aria-label="User account menu"
         aria-expanded={isOpen}
       >
         <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-neutral-grey-7 text-xs font-bold text-neutral-grey-1">
@@ -101,7 +102,7 @@ export function UserNav() {
               role="menuitem"
             >
               <LayoutDashboard className="h-4 w-4 shrink-0 text-neutral-grey-3" />
-              <span>Trang quản trị</span>
+              <span>Admin panel</span>
             </Link>
           )}
 
@@ -116,7 +117,7 @@ export function UserNav() {
             role="menuitem"
           >
             <LogOut className="h-4 w-4 shrink-0 text-secondary-red-4" />
-            <span>Đăng xuất</span>
+            <span>Sign out</span>
           </button>
         </div>
       )}

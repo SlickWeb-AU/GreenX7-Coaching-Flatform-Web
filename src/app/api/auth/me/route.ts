@@ -11,7 +11,7 @@ export async function GET() {
 
   if (!accessToken) {
     return NextResponse.json(
-      { success: false, statusCode: 401, message: 'Chưa đăng nhập', errorCode: 'UNAUTHORIZED' },
+      { success: false, statusCode: 401, message: 'Unauthorized', errorCode: 'UNAUTHORIZED' },
       { status: 401 },
     );
   }

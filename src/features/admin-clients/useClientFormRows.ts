@@ -5,6 +5,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 import { clientsApi } from './clients.api';
+import { toApiError } from '@/lib/api-error';
 import { queryKeys } from '@/lib/query-client';
 import type { ClientContactFormValue, ClientDepartmentFormValue } from '@/validations';
 
@@ -59,19 +60,14 @@ export function useClientRowPersistence(clientId?: string) {
   const queryClient = useQueryClient();
   const [busyKey, setBusyKey] = useState<string | null>(null);
 
-  const run = async <R>(
-    key: string,
-    fn: () => Promise<R>,
-    ok: string,
-    fail: string,
-  ): Promise<R | null> => {
+  const run = async <R>(key: string, fn: () => Promise<R>, ok: string): Promise<R | null> => {
     setBusyKey(key);
     try {
       const res = await fn();
       toast.success(ok);
       return res;
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : fail);
+      toast.error(toApiError(err).message);
       return null;
     } finally {
       setBusyKey(null);
@@ -107,7 +103,6 @@ export function useClientRowPersistence(clientId?: string) {
           return { ...v, ...saved };
         },
         id ? 'Contact updated successfully' : 'Contact added successfully',
-        'Failed to save contact',
       );
     },
     deleteContact: (key: string, v: ClientContactFormValue) => {
@@ -121,7 +116,6 @@ export function useClientRowPersistence(clientId?: string) {
           return true;
         },
         'Contact deleted successfully',
-        'Failed to delete contact',
       ).then((r) => r === true);
     },
     saveDepartment: (key: string, v: ClientDepartmentFormValue) => {
@@ -138,7 +132,6 @@ export function useClientRowPersistence(clientId?: string) {
           return { ...v, ...saved, id: saved.id, isCompanyWide: saved.isCompanyWide };
         },
         id ? 'Department updated successfully' : 'Department added successfully',
-        'Failed to save department',
       );
     },
     deleteDepartment: (key: string, v: ClientDepartmentFormValue) => {
@@ -152,7 +145,6 @@ export function useClientRowPersistence(clientId?: string) {
           return true;
         },
         'Department deleted successfully',
-        'Failed to delete department',
       ).then((r) => r === true);
     },
   };

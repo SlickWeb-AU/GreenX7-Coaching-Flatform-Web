@@ -21,7 +21,7 @@ export async function POST() {
       {
         success: false,
         statusCode: 401,
-        message: 'Phiên đăng nhập đã kết thúc',
+        message: 'Session expired',
         errorCode: 'UNAUTHORIZED',
       },
       { status: 401 },
