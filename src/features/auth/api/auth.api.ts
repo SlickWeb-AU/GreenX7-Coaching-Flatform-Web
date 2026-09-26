@@ -15,13 +15,12 @@ async function authFetch<T>(path: string, body?: unknown): Promise<T> {
   });
 
   const payload = (await response.json()) as
-    | { success: true; data: T; message?: string }
-    | ApiErrorResponse;
+    { success: true; data: T; message?: string } | ApiErrorResponse;
 
   if (!response.ok || payload.success !== true) {
     const error = payload as ApiErrorResponse;
     throw new ApiError(
-      error.message ?? 'Yêu cầu thất bại',
+      error.message ?? 'Request failed',
       error.statusCode ?? response.status,
       error.errorCode ?? 'INTERNAL_ERROR',
       error.errors,

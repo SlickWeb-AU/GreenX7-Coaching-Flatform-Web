@@ -1,11 +1,10 @@
-export function validateInvite({ name, email }: { name: string; email: string }): string {
-  if (!name.trim() || !email.trim() || !email.includes('@')) {
-    return 'Please enter name and a valid email.';
-  }
-  return '';
-}
+import { z } from 'zod';
 
-export function validateIndustryName(name: string): string {
-  if (!name.trim()) return 'Please enter an industry name.';
-  return '';
-}
+export const industryNameSchema = z.string().trim().min(1, 'Please enter an industry name.');
+
+export const inviteSchema = z.object({
+  name: z.string().trim().min(1, 'Please enter name and a valid email.'),
+  email: z.string().trim().email('Please enter name and a valid email.'),
+});
+
+export type InviteValues = z.infer<typeof inviteSchema>;

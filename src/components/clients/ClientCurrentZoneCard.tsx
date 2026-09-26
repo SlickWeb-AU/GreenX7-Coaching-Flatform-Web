@@ -10,7 +10,7 @@ export interface ClientCurrentZoneCardProps {
 }
 
 export function ClientCurrentZoneCard({
-  zoneName = 'Function Zone',
+  zoneName = '',
   title = 'Current zone',
   className,
 }: ClientCurrentZoneCardProps) {
@@ -28,7 +28,7 @@ export function ClientCurrentZoneCard({
 
         <div className="absolute bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap">
           <span className="body-14-bold inline-block rounded-full border-2 border-[#EBD34399] bg-secondary-orange-1 px-5 py-1.5 text-[#5D5000]">
-            {zoneName}
+            {zoneName || '—'}
           </span>
         </div>
       </div>

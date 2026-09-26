@@ -1,29 +1,36 @@
 import { ALL_FILTER_VALUE } from './clients';
 
-export const DASHBOARD_MONTH_OPTIONS = [
-  { value: '1', label: 'January' },
-  { value: '2', label: 'February' },
-  { value: '3', label: 'March' },
-  { value: '4', label: 'April' },
-  { value: '5', label: 'May' },
-  { value: '6', label: 'June' },
-  { value: '7', label: 'July' },
-  { value: '8', label: 'August' },
-  { value: '9', label: 'September' },
-  { value: '10', label: 'October' },
-  { value: '11', label: 'November' },
-  { value: '12', label: 'December' },
-];
+export const MONTH_NAMES = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+] as const;
 
-export const getDashboardYearOptions = (count = 10) => {
-  const currentYear = new Date().getFullYear();
+export type MonthName = (typeof MONTH_NAMES)[number];
+
+export const MONTH_OPTIONS = MONTH_NAMES.map((name, index) => ({
+  value: String(index + 1),
+  label: name,
+}));
+
+export const getYearOptions = (count = 10, startYear?: number) => {
+  const currentYear = startYear ?? new Date().getFullYear();
   return Array.from({ length: count }, (_, i) => {
     const y = currentYear - i;
     return { value: String(y), label: String(y) };
   });
 };
 
-export const DASHBOARD_YEAR_OPTIONS = getDashboardYearOptions(10);
+export const YEAR_OPTIONS = getYearOptions(10);
 
 export const DASHBOARD_INDUSTRY_OPTIONS = [{ value: ALL_FILTER_VALUE, label: 'All Industries' }];
 

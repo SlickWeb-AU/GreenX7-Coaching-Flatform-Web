@@ -1,22 +1,11 @@
-import type { ComponentType, SVGProps } from 'react';
-
-import {
-  MenuClientsIcon,
-  MenuDashboardIcon,
-  MenuSettingsIcon,
-} from '@/components/icons';
+import { LayoutDashboard, Settings, Users, type LucideIcon } from 'lucide-react';
 import { PERMISSIONS, type Permission } from './permissions';
 import { ROUTES } from './routes';
-
-export interface NavItemIconProps extends SVGProps<SVGSVGElement> {
-  size?: number | string;
-  color?: string;
-}
 
 export interface NavItem {
   label: string;
   href: string;
-  icon: ComponentType<NavItemIconProps>;
+  icon: LucideIcon;
   /** Item chỉ hiện khi user có ĐỦ các permission này */
   permissions?: Permission[];
   /** true => chỉ active khi khớp chính xác */
@@ -35,20 +24,20 @@ export const ADMIN_NAVIGATION: NavGroup[] = [
       {
         label: 'Dashboard',
         href: ROUTES.admin.dashboard,
-        icon: MenuDashboardIcon,
+        icon: LayoutDashboard,
         permissions: [PERMISSIONS.DASHBOARD_VIEW],
         exact: true,
       },
       {
         label: 'Clients',
         href: ROUTES.admin.clients,
-        icon: MenuClientsIcon,
+        icon: Users,
         permissions: [PERMISSIONS.DASHBOARD_VIEW],
       },
       {
         label: 'Settings',
         href: ROUTES.admin.settings,
-        icon: MenuSettingsIcon,
+        icon: Settings,
         permissions: [PERMISSIONS.DASHBOARD_VIEW],
       },
     ],

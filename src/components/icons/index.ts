@@ -1,5 +1,4 @@
-export * from './BatteryIcon';
-export * from './BoltIcon';
+// Wellbeing Dimension Icons (GreenX7 Domain)
 export * from './HeartIcon';
 export * from './CloudIcon';
 export * from './NutritionIcon';
@@ -8,37 +7,21 @@ export * from './MindsetIcon';
 export * from './FriendshipsIcon';
 export * from './RelationshipsIcon';
 export * from './PurposeIcon';
-export * from './TrendUpIcon';
-export * from './TrendDownIcon';
-export * from './SearchIcon';
-export * from './IndustryIcon';
-export * from './SlidersIcon';
-export * from './ArrowBackIcon';
-export * from './ArrowForwardIcon';
-export * from './AvatarPlaceholderIcon';
-export * from './EyeOpenIcon';
-export * from './EyeClosedIcon';
-export * from './InformationIcon';
-export * from './LockedPadlockIcon';
-export * from './LogoutIcon';
-export * from './MenuClientsIcon';
-export * from './MenuDashboardIcon';
-export * from './MenuSettingsIcon';
-export * from './DecorativeWaveBottomRight';
-export * from './DecorativeWaveTopRight';
-export * from './ChevronDownIcon';
-export * from './SortIcon';
-export * from './ExportIcon';
-export * from './FilterMonthIcon';
-export * from './FilterSlidersIcon';
-export * from './PlusIcon';
-export * from './UserPlusIcon';
-export * from './TrashIcon';
-export * from './UploadIcon';
+export * from './BoltIcon';
+
+// Form Section Icons (Client Management)
 export * from './BrandingIcon';
 export * from './ClientDetailsIcon';
 export * from './ContactsIcon';
 export * from './DepartmentsIcon';
 export * from './MonthlyScheduleIcon';
+
+// Trend Icons
+export * from './TrendUpIcon';
+export * from './TrendDownIcon';
+
+// Custom Graphics & Illustrations
+export * from './BatteryIcon';
 export * from './CurrentZoneWaveIcon';
-export * from './EditIcon';
+export * from './DecorativeWaveBottomRight';
+export * from './DecorativeWaveTopRight';

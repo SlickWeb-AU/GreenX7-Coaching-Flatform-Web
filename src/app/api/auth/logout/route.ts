@@ -14,7 +14,7 @@ export async function POST() {
     await backendFetch('/auth/logout', { method: 'POST', accessToken, body: JSON.stringify({}) });
   }
 
-  const response = NextResponse.json({ success: true, message: 'Đăng xuất thành công' });
+  const response = NextResponse.json({ success: true, message: 'Signed out successfully' });
   clearAuthCookies(response.cookies);
   return response;
 }

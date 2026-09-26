@@ -52,21 +52,21 @@ export function toApiError(error: unknown): ApiError {
 
     if (error.code === 'ERR_NETWORK' || error.code === 'ECONNABORTED') {
       return new ApiError(
-        'Không kết nối được tới máy chủ. Kiểm tra lại đường truyền.',
+        'Failed to connect to server. Please check your network connection.',
         503,
         'NETWORK_ERROR',
       );
     }
 
     return new ApiError(
-      error.message || 'Đã có lỗi xảy ra',
+      error.message || 'An error occurred',
       error.response?.status ?? 500,
       'INTERNAL_ERROR',
     );
   }
 
   return new ApiError(
-    error instanceof Error ? error.message : 'Đã có lỗi không xác định',
+    error instanceof Error ? error.message : 'An unexpected error occurred',
     500,
     'INTERNAL_ERROR',
   );

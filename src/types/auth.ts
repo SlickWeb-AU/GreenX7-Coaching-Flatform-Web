@@ -18,12 +18,9 @@ export type UserStatus = (typeof USER_STATUSES)[keyof typeof USER_STATUSES];
 export interface AuthUser {
   id: string;
   email: string;
-  firstName?: string;
-  lastName?: string;
-  fullName?: string;
+  firstName: string;
+  lastName: string;
   role: UserRole;
-  avatarUrl?: string | null;
-  phone?: string | null;
   permissions: Permission[];
 }
 
@@ -37,6 +34,10 @@ export interface AuthTokens {
 export interface AuthResult {
   user: AuthUser;
   tokens: AuthTokens;
+}
+
+export interface RequestCodeResponse {
+  expiresIn?: number;
 }
 
 /** Access-token payload — middleware reads it for edge authorization */

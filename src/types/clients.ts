@@ -34,6 +34,7 @@ export interface ClientsQuery {
 }
 
 export interface ClientContact {
+  id?: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -43,7 +44,9 @@ export interface ClientContact {
 export interface ClientDepartment {
   id: string;
   name: string;
+  slug?: string;
   status: ClientStatus;
+  isCompanyWide?: boolean;
   participantCount?: number;
   batteryScore?: number | null;
 }
@@ -89,6 +92,32 @@ export interface UpdateClientPayload {
   autoSendReport: boolean;
 }
 
+export interface CreateContactPayload {
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: string;
+}
+
+export type UpdateContactPayload = Partial<CreateContactPayload>;
+
+export interface DepartmentListQuery {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+  sortBy?: string;
+  sortOrder?: SortOrder;
+  year?: number;
+  month?: number;
+}
+
+export interface CreateDepartmentPayload {
+  name: string;
+  status: ClientStatus;
+}
+
+export type UpdateDepartmentPayload = Partial<CreateDepartmentPayload>;
+
 export interface DeltaDto {
   change: number | null;
   changePercent: number | null;
@@ -101,7 +130,9 @@ export interface PeriodDto {
 }
 
 export interface ZoneDto {
-  name: string;
+  key?: string;
+  label?: string;
+  name?: string;
   slug?: string;
   description?: string;
 }

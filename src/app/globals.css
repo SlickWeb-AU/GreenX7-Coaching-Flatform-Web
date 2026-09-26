@@ -77,6 +77,9 @@
   .caption-12-regular {
     @apply text-xs/[18px] font-normal tracking-tight;
   }
+  .caption-12-bold {
+    @apply text-xs/[18px] font-bold tracking-tight;
+  }
 
   /* Ẩn spinner của input[type=number] */
   .no-spinner::-webkit-outer-spin-button,
@@ -86,5 +89,12 @@
   }
   .no-spinner {
     -moz-appearance: textfield;
+  }
+}
+
+@media print {
+  aside,
+  header {
+    display: none !important;
   }
 }

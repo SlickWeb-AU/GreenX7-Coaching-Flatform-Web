@@ -73,3 +73,38 @@ export function formatDayOfMonth(dateOrDay: Date | number): string {
   const day = typeof dateOrDay === 'number' ? dateOrDay : dateOrDay.getDate();
   return `${getOrdinalSuffix(day)} of the month`;
 }
+
+/**
+ * Standard arithmetic rounding: round up when decimal >= 0.5, down when < 0.5
+ */
+export function roundScore(value: number | null | undefined): number | null {
+  if (value === null || value === undefined || isNaN(value)) return null;
+  return Math.round(value);
+}
+
+/**
+ * Formats a score (whether given on a 1–10 scale e.g. 7.2 or 0–100 scale e.g. 72)
+ * into a whole-number percentage integer (e.g. 72).
+ * Calculation: to 1 decimal place on 1–10 scale (e.g. 7.2) -> displayed as whole-number percentage (72).
+ */
+export function formatScoreToPercent(score: number | null | undefined): number | null {
+  if (score === null || score === undefined || isNaN(score)) return null;
+  // If score is on 1–10 scale (e.g. 7.2), convert to 0–100 percentage (7.2 * 10 = 72)
+  if (score > 0 && score <= 10) {
+    return Math.round(score * 10);
+  }
+  return Math.round(score);
+}
+
+/**
+ * Calculates Average Battery % = (sum of the 8 area scores ÷ 8) × 10
+ * Each area score can be on 1–10 scale (e.g. 7.2) or 0–100 scale (e.g. 72).
+ * Returns a rounded whole-number percentage.
+ */
+export function calculateAverageBatteryScore(scores: (number | null | undefined)[]): number | null {
+  const validScores = scores.filter((s): s is number => s !== null && s !== undefined && !isNaN(s));
+  if (validScores.length === 0) return null;
+  const sum = validScores.reduce((acc, s) => acc + (s <= 10 ? s * 10 : s), 0);
+  const avg = sum / validScores.length;
+  return Math.round(avg);
+}

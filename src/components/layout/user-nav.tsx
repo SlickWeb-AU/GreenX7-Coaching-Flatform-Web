@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { BaseLink } from '@/components/base';
 import { ROUTES } from '@/config/routes';
 import { authApi } from '@/features/auth';
+import { toApiError } from '@/lib/api-error';
 import { useAuth } from '@/components/providers';
 import { getInitials } from '@/lib/utils';
 
@@ -51,20 +52,22 @@ export function UserNav() {
     onSuccess: () => {
       setUser(null);
       queryClient.clear();
-      toast.success('Đã đăng xuất');
+      toast.success('Signed out successfully');
       router.replace(ROUTES.login);
       router.refresh();
     },
-    onError: () => toast.error('Đăng xuất thất bại, vui lòng thử lại'),
+    onError: (err) => toast.error(toApiError(err).message),
   });
 
   if (!user) {
     return (
       <div className="flex items-center gap-2">
-        <BaseLink href={ROUTES.login}>Đăng nhập</BaseLink>
+        <BaseLink href={ROUTES.login}>Sign in</BaseLink>
       </div>
     );
   }
+
+  const displayName = [user.firstName, user.lastName].filter(Boolean).join(' ') || user.email;
 
   return (
     <div ref={menuRef} className="relative inline-block">
@@ -72,16 +75,11 @@ export function UserNav() {
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
         className="flex items-center gap-2 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-brand-green-2 focus-visible:ring-offset-2"
-        aria-label="Menu tài khoản"
+        aria-label="User account menu"
         aria-expanded={isOpen}
       >
         <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-neutral-grey-7 text-xs font-bold text-neutral-grey-1">
-          {user.avatarUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={user.avatarUrl} alt={user.fullName} className="h-full w-full object-cover" />
-          ) : (
-            getInitials(user.fullName || user.email)
-          )}
+          {getInitials(displayName)}
         </div>
       </button>
 
@@ -91,7 +89,7 @@ export function UserNav() {
           className="absolute right-0 top-full z-50 mt-2 w-56 animate-fade-in overflow-hidden rounded-xl border border-neutral-grey-5 bg-white p-1 text-neutral-grey-1 shadow-lg shadow-black/5"
         >
           <div className="px-3 py-2">
-            <p className="truncate text-sm font-semibold text-neutral-grey-1">{user.fullName}</p>
+            <p className="truncate text-sm font-semibold text-neutral-grey-1">{displayName}</p>
             <p className="truncate text-xs text-neutral-grey-3">{user.email}</p>
           </div>
           <div className="-mx-1 my-1 h-px bg-neutral-grey-6" />
@@ -104,7 +102,7 @@ export function UserNav() {
               role="menuitem"
             >
               <LayoutDashboard className="h-4 w-4 shrink-0 text-neutral-grey-3" />
-              <span>Trang quản trị</span>
+              <span>Admin panel</span>
             </Link>
           )}
 
@@ -119,7 +117,7 @@ export function UserNav() {
             role="menuitem"
           >
             <LogOut className="h-4 w-4 shrink-0 text-secondary-red-4" />
-            <span>Đăng xuất</span>
+            <span>Sign out</span>
           </button>
         </div>
       )}

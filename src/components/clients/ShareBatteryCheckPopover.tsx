@@ -77,8 +77,7 @@ export function ShareBatteryCheckPopover({
       } else {
         toast.error(`Failed to copy ${label}`);
       }
-    } catch (err) {
-      console.error('Failed to copy text:', err);
+    } catch {
       toast.error(`Failed to copy ${label}`);
     }
   };
@@ -103,7 +102,7 @@ export function ShareBatteryCheckPopover({
     <>
       <BasePopover
         align="end"
-        className="w-[520px] max-w-[90vw] p-6 shadow-2xl"
+        className="w-[640px] max-w-[90vw] p-6 shadow-2xl"
         trigger={
           <BaseButton
             variant="primary"
@@ -120,10 +119,10 @@ export function ShareBatteryCheckPopover({
           <div className="flex flex-col gap-4">
             <div className="flex items-start justify-between">
               <div className="flex flex-col gap-1">
-                <h3 className="heading-18-bold text-neutral-grey-1">
+                <h3 className="body-16-bold text-neutral-grey-1">
                   Share {departmentName} Battery Check
                 </h3>
-                <p className="body-14-medium text-neutral-grey-3">
+                <p className="body-14-medium text-neutral-grey-2">
                   Links are public for this department only.
                 </p>
               </div>
@@ -138,10 +137,10 @@ export function ShareBatteryCheckPopover({
 
             <div className="divide-y divide-neutral-grey-6 overflow-hidden rounded-xl border border-neutral-grey-6">
               <div className="grid grid-cols-1 divide-y divide-neutral-grey-6 sm:grid-cols-2 sm:divide-x sm:divide-y-0">
-                <div className="flex flex-col items-start gap-2 p-4">
+                <div className="flex flex-col items-start p-4">
                   <span className="body-14-bold text-brand-green-2">Battery Check link</span>
                   <span
-                    className="body-12-medium max-w-full truncate text-neutral-grey-3"
+                    className="body-12-medium mt-0.5 max-w-full truncate text-neutral-grey-3"
                     title={batteryCheckUrl || (isLoading ? 'Loading...' : 'Not available')}
                   >
                     {batteryCheckUrl || (isLoading ? 'Loading...' : 'Not available')}
@@ -153,15 +152,15 @@ export function ShareBatteryCheckPopover({
                     disabled={!batteryCheckUrl && isLoading}
                     startIcon={<Copy size={14} />}
                     onClick={() => handleCopy(batteryCheckUrl, 'Battery Check link')}
-                    className="mt-1"
+                    className="mt-5"
                   >
                     Copy link
                   </BaseButton>
                 </div>
 
-                <div className="flex flex-col items-start gap-2 p-4">
+                <div className="flex flex-col items-start p-4">
                   <span className="body-14-bold text-brand-green-2">QR code</span>
-                  <span className="body-12-medium text-neutral-grey-3">
+                  <span className="body-12-medium mt-0.5 text-neutral-grey-3">
                     Ready for posters, slides and email.
                   </span>
                   <BaseButton
@@ -170,7 +169,7 @@ export function ShareBatteryCheckPopover({
                     pill
                     startIcon={<QrCode size={14} />}
                     onClick={handlePreviewQR}
-                    className="mt-1"
+                    className="mt-5"
                   >
                     Preview QR
                   </BaseButton>
@@ -178,9 +177,9 @@ export function ShareBatteryCheckPopover({
               </div>
 
               <div className="grid grid-cols-1 divide-y divide-neutral-grey-6 sm:grid-cols-2 sm:divide-x sm:divide-y-0">
-                <div className="flex flex-col items-start gap-2 p-4">
+                <div className="flex flex-col items-start p-4">
                   <span className="body-14-bold text-brand-green-2">Live dashboard</span>
-                  <span className="body-12-medium text-neutral-grey-3">
+                  <span className="body-12-medium mt-0.5 text-neutral-grey-3">
                     Presentation-ready and free of admin controls.
                   </span>
                   <BaseButton
@@ -189,15 +188,15 @@ export function ShareBatteryCheckPopover({
                     pill
                     startIcon={<ExternalLink size={14} />}
                     onClick={handleOpenLive}
-                    className="mt-1"
+                    className="mt-5"
                   >
                     Open live view
                   </BaseButton>
                 </div>
 
-                <div className="flex flex-col items-start gap-2 p-4">
+                <div className="flex flex-col items-start p-4">
                   <span className="body-14-bold text-brand-green-2">Presentation link</span>
-                  <span className="body-12-medium text-neutral-grey-3">
+                  <span className="body-12-medium mt-0.5 text-neutral-grey-3">
                     Fixed coaching deck with live results.
                   </span>
                   <BaseButton
@@ -209,7 +208,7 @@ export function ShareBatteryCheckPopover({
                     onClick={() =>
                       handleCopy(presentationUrl || batteryCheckUrl, 'Presentation link')
                     }
-                    className="mt-1"
+                    className="mt-5"
                   >
                     Copy link
                   </BaseButton>

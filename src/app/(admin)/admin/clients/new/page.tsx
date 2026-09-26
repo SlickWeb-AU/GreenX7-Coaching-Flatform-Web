@@ -1,6 +1,6 @@
 'use client';
 
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 
 import { toast } from 'sonner';
@@ -11,10 +11,12 @@ import { ROUTES } from '@/config/routes';
 import { CreateClientForm } from '@/components/clients';
 import { clientsApi } from '@/features/admin-clients';
 import { settingsApi } from '@/features/admin-settings';
+import { toApiError } from '@/lib/api-error';
 import { queryKeys } from '@/lib/query-client';
 
 export default function NewClientPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const industriesQuery = useQuery({
     queryKey: queryKeys.industries.all,
@@ -27,9 +29,12 @@ export default function NewClientPage() {
 
   const create = useMutation({
     mutationFn: clientsApi.create,
-    onSuccess: () => router.push(ROUTES.admin.clients),
-    onError: (error: unknown) =>
-      toast.error(error instanceof Error ? error.message : 'Create client failed'),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.adminClients.all });
+      toast.success('Client created successfully');
+      router.push(ROUTES.admin.clients);
+    },
+    onError: (error: unknown) => toast.error(toApiError(error).message),
   });
 
   return (

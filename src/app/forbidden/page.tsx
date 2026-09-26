@@ -3,7 +3,7 @@ import { ShieldOff } from 'lucide-react';
 import { BaseLink } from '@/components/base';
 import { ROUTES } from '@/config/routes';
 
-export const metadata = { title: 'Không có quyền truy cập' };
+export const metadata = { title: 'Access Denied' };
 
 export default function ForbiddenPage() {
   return (
@@ -11,14 +11,14 @@ export default function ForbiddenPage() {
       <div className="rounded-full bg-secondary-red-2 p-4">
         <ShieldOff className="h-8 w-8 text-secondary-red-4" aria-hidden />
       </div>
-      <h1 className="text-2xl font-semibold text-neutral-grey-1">Bạn không có quyền truy cập</h1>
+      <h1 className="text-2xl font-semibold text-neutral-grey-1">Access Denied</h1>
       <p className="max-w-md text-neutral-grey-3">
-        Khu vực này chỉ dành cho tài khoản có quyền phù hợp. Nếu bạn cho rằng đây là nhầm lẫn, hãy
-        liên hệ quản trị viên.
+        This area is restricted to authorized accounts only. If you believe this is an error, please
+        contact your administrator.
       </p>
       <div className="flex gap-2">
-        <BaseLink href={ROUTES.home}>Về trang chủ</BaseLink>
-        <BaseLink href={ROUTES.admin.dashboard}>Về trang quản trị</BaseLink>
+        <BaseLink href={ROUTES.home}>Back to home</BaseLink>
+        <BaseLink href={ROUTES.admin.dashboard}>Back to dashboard</BaseLink>
       </div>
     </main>
   );

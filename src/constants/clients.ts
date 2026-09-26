@@ -1,4 +1,6 @@
 export const ALL_FILTER_VALUE = 'ALL';
+export const OVERALL_FILTER_VALUE = 'overall';
+
 export const CLIENTS_PAGE_SIZE = 10;
 
 export const CLIENT_SORT_FIELDS = {
@@ -81,6 +83,16 @@ export const CLIENT_COMPANY_SIZE_OPTIONS = [
 
 /** CreateClientDto / UpdateClientDto cap check-in days at 28 */
 export const CLIENT_CHECK_IN_DAY_MAX = 28;
+
+export const DEFAULT_CLIENT_TIMEZONE = 'Australia/Sydney';
+
+export const CLIENT_TABS = {
+  DASHBOARD: 'dashboard',
+  DEPARTMENTS: 'departments',
+  CHECK_IN_HISTORY: 'check-in-history',
+} as const;
+
+export type ClientTab = (typeof CLIENT_TABS)[keyof typeof CLIENT_TABS];
 
 export const CLIENT_STATE_OPTIONS = [
   { value: 'NSW', label: 'New South Wales' },

@@ -3,7 +3,7 @@
 import { type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
-export type BaseTagVariant = 'green' | 'yellow' | 'cyan' | 'red';
+export type BaseTagVariant = 'green' | 'green-neutral' | 'yellow' | 'cyan' | 'red';
 
 export interface BaseTagProps {
   variant?: BaseTagVariant;
@@ -13,6 +13,7 @@ export interface BaseTagProps {
 
 const TAG_VARIANTS: Record<BaseTagVariant, string> = {
   green: 'bg-secondary-green-2 text-brand-green-2',
+  'green-neutral': 'bg-secondary-green-2 text-neutral-grey-1',
   yellow: 'bg-secondary-yellow-2 text-secondary-yellow-3',
   cyan: 'bg-secondary-cyan-2 text-secondary-cyan-3',
   red: 'bg-secondary-red-2 text-secondary-red-4',

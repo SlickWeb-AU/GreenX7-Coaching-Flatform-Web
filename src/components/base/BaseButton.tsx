@@ -6,7 +6,7 @@ import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { BaseSize, BaseVariant } from '@/types/ui';
 
-import { baseButtonClass, baseButtonSizeClass } from './utils/button-styles';
+import { baseButtonClass, baseButtonSizeClass } from '@/lib/button-styles';
 
 export interface BaseButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: BaseVariant;

@@ -1,10 +1,10 @@
 'use client';
 
+import { Download } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useMemo } from 'react';
 
 import { BaseButton, BaseHeader, BaseLoading } from '@/components/base';
-import { ExportIcon } from '@/components/icons';
 import {
   BatteryScoreBanner,
   HistoricalTrendChart,
@@ -88,7 +88,7 @@ function ReportViewContent() {
             <BaseButton
               variant="secondary"
               pill
-              startIcon={<ExportIcon aria-hidden />}
+              startIcon={<Download size={16} aria-hidden />}
               onClick={() => window.print()}
             >
               Export PDF
