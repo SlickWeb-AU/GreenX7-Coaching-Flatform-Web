@@ -10,9 +10,8 @@ Mandatory UI, design tokens, and component guidelines for all developers and AI 
 
 - **Styling**: Tailwind CSS v3 with CSS variables & customized tokens (`tailwind.config.ts`, `globals.css`).
 - **Icons**: Lucide React (`lucide-react`) and custom SVG icons in `@/components/icons`.
-- **Primitives**: Radix UI headless components (`@radix-ui/react-*`).
 - **Class Utilities**: `clsx` and `tailwind-merge` unified via `@/lib/utils` (`cn(...)`).
-- **Strict Rule**: **NO Material UI (MUI)**, **NO Emotion `styled()`**, **NO `sx` props**, **NO inline style objects** for layout.
+- **Strict Rule**: **NO Radix UI**, **NO Material UI (MUI)**, **NO Emotion `styled()`**, **NO `sx` props**, **NO inline style objects** for layout.
 
 ### Component Composition Rules
 

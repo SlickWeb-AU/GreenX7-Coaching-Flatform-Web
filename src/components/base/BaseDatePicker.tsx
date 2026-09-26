@@ -5,6 +5,7 @@ import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 
 import { MONTH_NAMES } from '@/constants';
 import { cn } from '@/lib/utils';
+import { BaseHelperText } from './BaseHelperText';
 
 export { formatDayOfMonth, getOrdinalSuffix } from '@/lib/utils';
 
@@ -63,6 +64,7 @@ export function BaseDatePicker({
   const generatedId = useId();
   const datePickerId = id ?? generatedId;
   const popoverId = `${datePickerId}-popover`;
+
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -331,16 +333,7 @@ export function BaseDatePicker({
         )}
       </div>
 
-      {helperText && (
-        <p
-          className={cn(
-            'body-14-medium mt-2',
-            error ? 'text-secondary-red-4' : 'text-neutral-grey-3',
-          )}
-        >
-          {helperText}
-        </p>
-      )}
+      <BaseHelperText helperText={helperText} error={error} />
     </div>
   );
 }

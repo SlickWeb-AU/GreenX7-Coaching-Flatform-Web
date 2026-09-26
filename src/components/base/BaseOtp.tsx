@@ -3,6 +3,7 @@
 import { useRef, type ClipboardEvent, type KeyboardEvent } from 'react';
 
 import { cn } from '@/lib/utils';
+import { BaseHelperText } from './BaseHelperText';
 
 export interface BaseOtpProps {
   label?: string;
@@ -33,7 +34,11 @@ export function BaseOtp({
     const next = [...value];
     let lastFilledIndex = startIndex;
 
-    for (let offset = 0; offset < pastedData.length && startIndex + offset < value.length; offset++) {
+    for (
+      let offset = 0;
+      offset < pastedData.length && startIndex + offset < value.length;
+      offset++
+    ) {
       const char = pastedData[offset];
       if (char !== undefined) {
         next[startIndex + offset] = char;
@@ -114,23 +119,14 @@ export function BaseOtp({
             autoComplete={i === 0 ? 'one-time-code' : 'off'}
             aria-label={`Digit ${i + 1}`}
             className={cn(
-              'h-12 flex-1 min-w-0 rounded-lg border text-center text-base font-medium',
+              'h-12 min-w-0 flex-1 rounded-lg border text-center text-base font-medium',
               error ? 'border-secondary-red-4' : 'border-neutral-grey-5',
               'outline-none focus:outline-none focus:ring-0 focus:ring-transparent focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-transparent',
             )}
           />
         ))}
       </div>
-      {helperText && (
-        <p
-          className={cn(
-            'body-16-medium mt-2',
-            error ? 'text-secondary-red-4' : 'text-neutral-grey-3',
-          )}
-        >
-          {helperText}
-        </p>
-      )}
+      <BaseHelperText helperText={helperText} error={error} />
     </div>
   );
 }

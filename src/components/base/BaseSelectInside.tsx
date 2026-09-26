@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useId, useRef, useState } from 'react';
-import { Check, ChevronDown } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 
@@ -25,6 +25,7 @@ export function BaseSelectInside<T extends string>({
   placeholder,
   variant = 'primary',
   disabled = false,
+  readOnly = false,
   className,
   containerClassName,
 }: {
@@ -35,6 +36,7 @@ export function BaseSelectInside<T extends string>({
   placeholder?: string;
   variant?: BaseSelectInsideVariant;
   disabled?: boolean;
+  readOnly?: boolean;
   className?: string;
   containerClassName?: string;
 }) {
@@ -92,13 +94,14 @@ export function BaseSelectInside<T extends string>({
         aria-controls={isOpen ? listboxId : undefined}
         aria-haspopup="listbox"
         disabled={disabled}
-        onClick={() => !disabled && setIsOpen((prev) => !prev)}
+        onClick={() => !disabled && !readOnly && setIsOpen((prev) => !prev)}
         className={cn(
           'inline-flex min-h-11 w-auto min-w-[166px] flex-col items-stretch gap-0.5 rounded-lg border px-3 py-1 text-left shadow-none transition-colors',
           variantClasses[variant],
           isOpen && (variant === 'primary' ? 'border-brand-green-2' : 'bg-neutral-grey-7'),
           'outline-none focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0',
           disabled && 'cursor-not-allowed opacity-50',
+          readOnly && 'cursor-default',
           className,
         )}
       >
@@ -123,7 +126,7 @@ export function BaseSelectInside<T extends string>({
           id={listboxId}
           role="listbox"
           className={cn(
-            'absolute left-0 z-50 max-h-80 w-max min-w-full animate-fade-in overflow-y-auto rounded-xl border border-neutral-grey-5 bg-white p-1 text-neutral-grey-1 shadow-lg shadow-black/5',
+            'absolute left-0 z-50 max-h-80 w-max min-w-full animate-fade-in overflow-y-auto rounded-lg border border-neutral-grey-6 bg-white p-1 text-neutral-grey-2 shadow-lg shadow-black/5',
             openUpward ? 'bottom-full mb-1.5' : 'top-full mt-1.5',
           )}
         >
@@ -139,14 +142,11 @@ export function BaseSelectInside<T extends string>({
                   setIsOpen(false);
                 }}
                 className={cn(
-                  'relative flex w-full cursor-pointer select-none items-center justify-between gap-4 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
-                  isSelected
-                    ? 'bg-neutral-grey-7/60 font-semibold text-brand-green-2'
-                    : 'text-neutral-grey-1 hover:bg-neutral-grey-7',
+                  'body-16-medium relative flex w-full cursor-pointer select-none items-center justify-between gap-4 rounded-md p-2 text-neutral-grey-2 transition-colors hover:bg-brand-green-5 hover:text-neutral-grey-1',
+                  isSelected && 'bg-brand-green-5 font-semibold text-neutral-grey-1',
                 )}
               >
                 <span>{opt.label}</span>
-                {isSelected && <Check className="h-4 w-4 shrink-0 text-brand-green-2" />}
               </div>
             );
           })}
