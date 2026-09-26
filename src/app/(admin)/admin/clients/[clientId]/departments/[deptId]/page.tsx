@@ -18,7 +18,7 @@ import {
 } from '@/components/icons';
 import { ROUTES } from '@/config/routes';
 import { MONTH_NAMES } from '@/constants';
-import { CLIENT_STATUSES, CLIENT_TABS } from '@/constants/clients';
+import { CLIENT_STATUSES } from '@/constants/clients';
 import { CHART_COLORS } from '@/constants/tokens';
 import { clientsApi } from '@/features/admin-clients';
 import { queryKeys } from '@/lib/query-client';
@@ -129,7 +129,7 @@ export default function DepartmentDetailPage() {
           pill
           startIcon={<SlidersHorizontal size={16} aria-hidden />}
           onClick={() => {
-            router.push(`${ROUTES.admin.clientDetail(clientId)}?tab=${CLIENT_TABS.DEPARTMENTS}`);
+            router.push(ROUTES.admin.clientEdit(clientId));
           }}
         >
           Manage Department
@@ -141,7 +141,7 @@ export default function DepartmentDetailPage() {
           pill
           startIcon={<Download size={16} aria-hidden />}
           onClick={() => {
-            // PDF export
+            window.print();
           }}
         >
           Export PDF
@@ -181,9 +181,10 @@ export default function DepartmentDetailPage() {
   const prevMonthIdx = (monthIdx - 1 + 12) % 12;
   const previousMonthName = MONTH_NAMES[prevMonthIdx];
 
-  const effectiveScore = deptDashboard?.batteryScore ?? department.batteryScore ?? 0;
-  const effectiveZone = deptDashboard?.zone?.name ?? '';
-  const effectiveParticipants = deptDashboard?.participantCount ?? department.participantCount ?? 0;
+  const effectiveScore = deptDashboard?.batteryScore ?? department.batteryScore ?? null;
+  const effectiveZone = deptDashboard?.zone?.label ?? deptDashboard?.zone?.name ?? '';
+  const effectiveParticipants =
+    deptDashboard?.participantCount ?? department.participantCount ?? null;
   const effectiveStrengths = mapInsightItems(deptDashboard?.strengths);
   const effectiveFocus = mapInsightItems(deptDashboard?.focus);
   const effectiveWellbeing = mapWellbeingAreas(deptDashboard?.wellbeingAreas);
@@ -210,9 +211,9 @@ export default function DepartmentDetailPage() {
             badgeText={openUntilLabel}
             score={effectiveScore}
             periodLabel={`${MONTH_NAMES[monthIdx]} ${selectedYear}`}
-            changeVsLastMonth={deptDashboard?.vsPrevious?.change ?? 0}
+            changeVsLastMonth={deptDashboard?.vsPrevious?.change ?? null}
             lastMonthLabel={previousMonthName}
-            changeVsFirstCheck={deptDashboard?.vsFirstCheck?.change ?? 0}
+            changeVsFirstCheck={deptDashboard?.vsFirstCheck?.change ?? null}
             firstCheckLabel={deptDashboard?.firstCheck?.label}
             className="h-full"
           />

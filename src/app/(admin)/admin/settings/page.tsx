@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Pencil, Plus, Trash2, UserPlus } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
+import { toast } from 'sonner';
 
 import { BaseButton, BaseDialog, BaseHeader, BaseIconButton, BaseInput } from '@/components/base';
 
@@ -38,7 +39,6 @@ export default function SettingsPage() {
   const invalidateIndustries = () => {
     queryClient.invalidateQueries({ queryKey: queryKeys.industries.all });
   };
-
   const invalidateAdmins = () => {
     queryClient.invalidateQueries({ queryKey: queryKeys.admins.all });
   };
@@ -46,6 +46,7 @@ export default function SettingsPage() {
   const createIndustry = useMutation({
     mutationFn: settingsApi.createIndustry,
     onSuccess: () => {
+      toast.success('Industry added successfully');
       setShowIndustry(false);
       setIndustryName('');
       setEditingId(null);
@@ -57,6 +58,7 @@ export default function SettingsPage() {
     mutationFn: ({ id, name }: { id: string; name: string }) =>
       settingsApi.updateIndustry(id, name),
     onSuccess: () => {
+      toast.success('Industry updated successfully');
       setShowIndustry(false);
       setIndustryName('');
       setEditingId(null);
@@ -66,7 +68,17 @@ export default function SettingsPage() {
   });
   const deleteIndustry = useMutation({
     mutationFn: settingsApi.deleteIndustry,
-    onSuccess: invalidateIndustries,
+    onSuccess: () => {
+      toast.success('Industry deleted successfully');
+      invalidateIndustries();
+    },
+    onError: (e: unknown) => {
+      toast.error(
+        e instanceof Error
+          ? e.message
+          : 'Cannot delete this industry because it is currently assigned to one or more clients.',
+      );
+    },
   });
   const inviteAdmin = useMutation({
     mutationFn: settingsApi.inviteAdmin,

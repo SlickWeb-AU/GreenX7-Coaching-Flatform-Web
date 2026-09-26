@@ -1,9 +1,18 @@
-import type { AreaScoreDto, PeriodDto } from './clients';
+import type { AreaScoreDto, PeriodDto, ReportStatus } from './clients';
 import type {
   DashboardTrendPointDto,
   DashboardWellbeingAreaDto,
   DashboardZoneDistributionDto,
 } from './dashboard';
+
+export interface SendReportResultDto {
+  id: string;
+  checkInId: string;
+  status: ReportStatus;
+  sentAt: string | null;
+  expiresAt?: string;
+  recipientsCount?: number;
+}
 
 export interface ReportViewDto {
   token: string;

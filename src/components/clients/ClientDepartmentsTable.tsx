@@ -19,6 +19,7 @@ export interface ClientDepartmentsTableProps {
   onSortChange?: (field: string) => void;
   loading?: boolean;
   className?: string;
+  previousMonthName?: string;
 }
 
 export function ClientDepartmentsTable({
@@ -33,6 +34,7 @@ export function ClientDepartmentsTable({
   onSortChange,
   loading = false,
   className,
+  previousMonthName,
 }: ClientDepartmentsTableProps) {
   const columns: BaseColumn<DepartmentListItemDto | ClientDepartment>[] = [
     {
@@ -46,7 +48,9 @@ export function ClientDepartmentsTable({
       title: 'Participants',
       sorter: 'participantCount',
       render: (_, row) => (
-        <span className="body-14-medium text-neutral-grey-2">{row.participantCount ?? 0}</span>
+        <span className="body-14-medium text-neutral-grey-2">
+          {row.participantCount && row.participantCount > 0 ? row.participantCount : '—'}
+        </span>
       ),
     },
     {
@@ -54,20 +58,24 @@ export function ClientDepartmentsTable({
       title: 'Score',
       sorter: 'score',
       render: (_, row) => {
+        const hasSubmissions = (row.participantCount ?? 0) > 0;
         const scoreVal = 'score' in row ? row.score : row.batteryScore;
         return (
           <span className="body-14-bold text-brand-green-2">
-            {scoreVal !== undefined && scoreVal !== null ? formatBatteryScore(scoreVal) : '—'}
+            {hasSubmissions && scoreVal !== undefined && scoreVal !== null
+              ? formatBatteryScore(scoreVal)
+              : '—'}
           </span>
         );
       },
     },
     {
       key: 'vsPrevious',
-      title: 'vs. June',
+      title: previousMonthName ? `vs. ${previousMonthName}` : 'vs. Previous',
       sorter: 'vsPreviousChange',
       render: (_, row) => {
-        const vsPrev = 'vsPreviousChange' in row ? row.vsPreviousChange : null;
+        const hasSubmissions = (row.participantCount ?? 0) > 0;
+        const vsPrev = hasSubmissions && 'vsPreviousChange' in row ? row.vsPreviousChange : null;
         return <BaseTrend value={vsPrev} />;
       },
     },
@@ -76,7 +84,9 @@ export function ClientDepartmentsTable({
       title: 'vs. First Check',
       sorter: 'vsFirstCheckChange',
       render: (_, row) => {
-        const vsFirst = 'vsFirstCheckChange' in row ? row.vsFirstCheckChange : null;
+        const hasSubmissions = (row.participantCount ?? 0) > 0;
+        const vsFirst =
+          hasSubmissions && 'vsFirstCheckChange' in row ? row.vsFirstCheckChange : null;
         return <BaseTrend value={vsFirst} />;
       },
     },

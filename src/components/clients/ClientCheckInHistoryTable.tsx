@@ -1,9 +1,13 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
 import { BaseTable, BaseTag, type BaseColumn, type BaseTagVariant } from '@/components/base';
 import { ROUTES } from '@/config/routes';
+import { clientsApi } from '@/features/admin-clients';
 import { formatBatteryScore } from '@/lib/clients';
 import { cn, formatDateTime } from '@/lib/utils';
 import type { CheckInHistoryItemDto, CheckinStatus, PaginationMeta, ReportStatus } from '@/types';
@@ -41,6 +45,32 @@ export function ClientCheckInHistoryTable({
   loading = false,
   className,
 }: ClientCheckInHistoryTableProps) {
+  const queryClient = useQueryClient();
+  const [sendingId, setSendingId] = useState<string | null>(null);
+
+  const sendMutation = useMutation({
+    mutationFn: (checkInId: string) => clientsApi.sendReport(checkInId),
+    onSuccess: (_, checkInId) => {
+      const item = data.find((d) => d.checkInId === checkInId);
+      const isNotSent = item?.reportStatus === 'NOT_SENT';
+      toast.success(isNotSent ? 'Report sent successfully' : 'Report resent successfully');
+      queryClient.invalidateQueries({
+        queryKey: ['admin-client-check-ins', clientId],
+      });
+    },
+    onError: (err) => {
+      toast.error(err instanceof Error ? err.message : 'Failed to send report');
+    },
+    onSettled: () => {
+      setSendingId(null);
+    },
+  });
+
+  const handleSendReport = (checkInId: string) => {
+    setSendingId(checkInId);
+    sendMutation.mutate(checkInId);
+  };
+
   const columns: BaseColumn<CheckInHistoryItemDto>[] = [
     {
       key: 'periodLabel',
@@ -62,14 +92,20 @@ export function ClientCheckInHistoryTable({
       key: 'participants',
       title: 'Participants',
       render: (_, row) => (
-        <span className="body-14-medium text-neutral-grey-2">{row.participants ?? 0}</span>
+        <span className="body-14-medium text-neutral-grey-2">
+          {row.participants && row.participants > 0 ? row.participants : '—'}
+        </span>
       ),
     },
     {
       key: 'score',
       title: 'Score',
       render: (_, row) => (
-        <span className="body-16-bold text-brand-green-2">{formatBatteryScore(row.score)}</span>
+        <span className="body-16-bold text-brand-green-2">
+          {row.participants && row.participants > 0 && row.score !== null && row.score !== undefined
+            ? formatBatteryScore(row.score)
+            : '—'}
+        </span>
       ),
     },
     {
@@ -100,20 +136,20 @@ export function ClientCheckInHistoryTable({
       align: 'right',
       render: (_, row) => {
         const isNotSent = row.reportStatus === 'NOT_SENT';
+        const isSending = sendingId === row.checkInId;
 
         return (
           <div className="flex items-center justify-end gap-4">
             <button
               type="button"
-              onClick={() => {
-                // Future action: send/resend report
-              }}
+              disabled={isSending}
+              onClick={() => handleSendReport(row.checkInId)}
               className={cn(
-                'body-14-bold transition-colors hover:underline',
+                'body-14-bold transition-colors hover:underline disabled:cursor-not-allowed disabled:opacity-50',
                 isNotSent ? 'text-brand-green-2' : 'text-secondary-orange-1',
               )}
             >
-              {isNotSent ? 'Send' : 'Resend'}
+              {isSending ? 'Sending...' : isNotSent ? 'Send' : 'Resend'}
             </button>
 
             <Link

@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus, Search } from 'lucide-react';
 
 import { BaseButton, BaseDialog, BaseInput, BaseSelect } from '@/components/base';
+import { MONTH_NAMES } from '@/constants';
 import { CLIENT_FORM_STATUS_OPTIONS, CLIENT_STATUSES } from '@/constants/clients';
 import { clientsApi } from '@/features/admin-clients';
 import { queryKeys } from '@/lib/query-client';
@@ -30,6 +31,12 @@ export function ClientDepartmentsTab({
   const [sortBy, setSortBy] = useState('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1;
+  const prevMonthIdx = (now.getMonth() - 1 + 12) % 12;
+  const previousMonthName = MONTH_NAMES[prevMonthIdx];
+
   // Modal State
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [newDeptName, setNewDeptName] = useState('');
@@ -44,16 +51,18 @@ export function ClientDepartmentsTab({
       searchTerm,
       sortBy,
       sortOrder,
+      currentYear,
+      currentMonth,
     ),
     queryFn: () =>
-      clientsApi.getDepartments(clientId, {
+      clientsApi.getDepartmentsOverview(clientId, {
         page,
         pageSize,
         search: searchTerm || undefined,
         sortBy,
         sortOrder,
-        year: 2026,
-        month: 7,
+        year: currentYear,
+        month: currentMonth,
       }),
     retry: false,
   });
@@ -151,6 +160,7 @@ export function ClientDepartmentsTab({
           }
         }}
         loading={isLoading || isFetching}
+        previousMonthName={previousMonthName}
       />
 
       {/* Add Department Modal */}

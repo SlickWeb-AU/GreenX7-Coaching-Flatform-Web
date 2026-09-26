@@ -82,7 +82,7 @@ function ClientLayoutContent({ children }: { children: ReactNode }) {
         pill
         startIcon={<Download size={16} aria-hidden />}
         onClick={() => {
-          // Future PDF export
+          window.print();
         }}
       >
         Export PDF

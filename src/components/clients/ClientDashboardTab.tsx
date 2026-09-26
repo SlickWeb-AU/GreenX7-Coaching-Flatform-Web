@@ -58,9 +58,9 @@ export function ClientDashboardTab({
   const prevMonthIdx = (monthIdx - 1 + 12) % 12;
   const previousMonthName = MONTH_NAMES[prevMonthIdx];
 
-  const effectiveScore = data?.batteryScore ?? batteryScore ?? 0;
-  const effectiveZoneName = data?.zone?.name;
-  const effectiveParticipants = data?.participantCount ?? participantCount;
+  const effectiveScore = data?.batteryScore ?? batteryScore ?? null;
+  const effectiveZoneName = data?.zone?.label ?? data?.zone?.name;
+  const effectiveParticipants = data?.participantCount ?? participantCount ?? null;
   const effectiveTrend =
     data?.historicalTrend && data.historicalTrend.length > 0
       ? data.historicalTrend.map((t) => ({
@@ -81,9 +81,9 @@ export function ClientDashboardTab({
           <ClientBatteryCard
             score={effectiveScore}
             periodLabel={`${currentMonthName} ${selectedYear}`}
-            changeVsLastMonth={data?.vsPrevious?.change ?? 0}
+            changeVsLastMonth={data?.vsPrevious?.change ?? null}
             lastMonthLabel={`${previousMonthName} ${selectedYear}`}
-            changeVsFirstCheck={data?.vsFirstCheck?.change ?? 0}
+            changeVsFirstCheck={data?.vsFirstCheck?.change ?? null}
             firstCheckLabel={firstCheckLabel}
             className="h-full"
           />
@@ -104,7 +104,9 @@ export function ClientDashboardTab({
         </div>
 
         <div className="flex h-full flex-col items-center justify-center gap-2 rounded-2xl bg-white p-4 shadow-none lg:col-span-2">
-          <div className="body-32-bold text-brand-green-2">{effectiveParticipants}</div>
+          <div className="body-32-bold text-brand-green-2">
+            {effectiveParticipants !== null ? effectiveParticipants : '—'}
+          </div>
           <div className="body-14-medium text-neutral-grey-3">Participants</div>
         </div>
       </div>

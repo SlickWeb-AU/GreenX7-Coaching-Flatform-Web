@@ -7,13 +7,13 @@ import { BaseTag } from '@/components/base';
 import { cn } from '@/lib/utils';
 
 export interface DepartmentLiveDataCardProps {
-  participantCount?: number;
+  participantCount?: number | null;
   dashboardHref?: string;
   className?: string;
 }
 
 export function DepartmentLiveDataCard({
-  participantCount = 0,
+  participantCount = null,
   dashboardHref = '#',
   className,
 }: DepartmentLiveDataCardProps) {
@@ -40,7 +40,10 @@ export function DepartmentLiveDataCard({
         </div>
 
         <div className="body-14-bold flex flex-col items-center justify-center text-center text-neutral-grey-1">
-          <span>{participantCount} participants</span>
+          <span>
+            {participantCount !== null && participantCount !== undefined ? participantCount : '—'}{' '}
+            participants
+          </span>
           <span>received</span>
         </div>
       </div>
