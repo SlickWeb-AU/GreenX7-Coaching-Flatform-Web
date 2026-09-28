@@ -11,17 +11,17 @@ export interface DashboardZoneSummaryDto {
 export interface DashboardOverviewDto {
   averageBatteryScore: number | null;
   change: number | null;
-  clientCount: number;
-  participantCount: number;
-  departmentCount: number;
-  industryCount?: number;
+  clientCount: number | null;
+  participantCount: number | null;
+  departmentCount: number | null;
+  industryCount?: number | null;
 }
 
 export interface DashboardWellbeingAreaDto {
   area: string;
   label: string;
   score: number | null;
-  change?: number;
+  change?: number | null;
   vsPrevious?: DashboardVsChangeDto;
   vsFirstCheck?: DashboardVsChangeDto;
 }
@@ -31,8 +31,8 @@ export interface DashboardZoneDistributionDto {
   label: string;
   min?: number;
   max?: number;
-  count: number;
-  percentage: number;
+  count: number | null;
+  percentage: number | null;
 }
 
 export interface DashboardTrendPointDto {
@@ -65,9 +65,4 @@ export interface AdminDashboardDto {
   wellbeingAreas?: DashboardWellbeingAreaDto[];
   zoneDistribution?: DashboardZoneDistributionDto[];
   historicalTrend?: DashboardTrendPointDto[];
-}
-
-export interface IndustryDto {
-  id: string;
-  name: string;
 }

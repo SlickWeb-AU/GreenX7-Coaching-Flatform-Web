@@ -1,7 +1,8 @@
 'use client';
 
-import { ChevronLeft, Pencil } from 'lucide-react';
+import { ChevronLeft, Download, Pencil } from 'lucide-react';
 import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
+import type { ReactNode } from 'react';
 
 import {
   BaseBreadcrumb,
@@ -12,8 +13,8 @@ import {
   BaseTabs,
   BaseTag,
 } from '@/components/base';
-import { ExportIcon } from '@/components/icons';
 import { ROUTES } from '@/config/routes';
+import { CLIENT_STATUSES, CLIENT_TABS } from '@/constants/clients';
 import {
   ClientHeaderProvider,
   ClientProvider,
@@ -22,12 +23,12 @@ import {
 } from '@/components/clients';
 
 const TABS = [
-  { key: 'dashboard', label: 'Dashboard' },
-  { key: 'departments', label: 'Departments' },
-  { key: 'check-in-history', label: 'Check-in History' },
+  { key: CLIENT_TABS.DASHBOARD, label: 'Dashboard' },
+  { key: CLIENT_TABS.DEPARTMENTS, label: 'Departments' },
+  { key: CLIENT_TABS.CHECK_IN_HISTORY, label: 'Check-in History' },
 ];
 
-function ClientLayoutContent({ children }: { children: React.ReactNode }) {
+function ClientLayoutContent({ children }: { children: ReactNode }) {
   const { clientId, client, isLoading } = useClient();
   const { headerSlot } = useClientHeaderSlot();
   const router = useRouter();
@@ -47,7 +48,9 @@ function ClientLayoutContent({ children }: { children: React.ReactNode }) {
 
   if (!client) return null;
 
-  const activeTab = isDeptDetail ? 'departments' : searchParams.get('tab') || 'dashboard';
+  const activeTab = isDeptDetail
+    ? CLIENT_TABS.DEPARTMENTS
+    : searchParams.get('tab') || CLIENT_TABS.DASHBOARD;
 
   const handleTabChange = (tabKey: string) => {
     if (isDeptDetail) {
@@ -63,7 +66,7 @@ function ClientLayoutContent({ children }: { children: React.ReactNode }) {
     <div className="flex items-center gap-2">
       <span>{client.businessName}</span>
       <BaseTag
-        variant={client.status?.toLowerCase() === 'active' ? 'green' : 'yellow'}
+        variant={client.status === CLIENT_STATUSES.ACTIVE ? 'green' : 'yellow'}
         className="capitalize"
       >
         {client.status?.toLowerCase()}
@@ -77,9 +80,9 @@ function ClientLayoutContent({ children }: { children: React.ReactNode }) {
         variant="secondary"
         size="medium"
         pill
-        startIcon={<ExportIcon size={16} />}
+        startIcon={<Download size={16} aria-hidden />}
         onClick={() => {
-          // Future PDF export
+          window.print();
         }}
       >
         Export PDF
@@ -107,15 +110,13 @@ function ClientLayoutContent({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex flex-col">
-      {/* 1. Breadcrumb */}
       <BaseBreadcrumb items={breadcrumbItems} />
 
-      {/* 2. Back Link */}
       <BaseLink
         className="mb-6"
         href={
           isDeptDetail
-            ? `${ROUTES.admin.clientDetail(clientId)}?tab=departments`
+            ? `${ROUTES.admin.clientDetail(clientId)}?tab=${CLIENT_TABS.DEPARTMENTS}`
             : ROUTES.admin.clients
         }
         startIcon={<ChevronLeft size={20} aria-hidden="true" />}
@@ -123,22 +124,19 @@ function ClientLayoutContent({ children }: { children: React.ReactNode }) {
         {isDeptDetail ? 'Back to Departments' : 'Back to Clients'}
       </BaseLink>
 
-      {/* 3. Base Header */}
       <BaseHeader
         title={headerSlot?.title ?? defaultTitle}
         actions={headerSlot?.actions ?? defaultActions}
       />
 
-      {/* 4. Tab Navigation Bar */}
       <BaseTabs className="mb-8" items={TABS} activeKey={activeTab} onChange={handleTabChange} />
 
-      {/* 5. Content */}
       {children}
     </div>
   );
 }
 
-export default function ClientRootLayout({ children }: { children: React.ReactNode }) {
+export default function ClientRootLayout({ children }: { children: ReactNode }) {
   const params = useParams<{ clientId: string }>();
 
   return (

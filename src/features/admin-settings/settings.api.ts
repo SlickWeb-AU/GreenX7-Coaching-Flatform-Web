@@ -4,8 +4,6 @@ import { del, get, patch, post } from '@/lib/axios';
 
 import type { AdminUser, Industry } from '@/types';
 
-export type { AdminUser, Industry };
-
 export const settingsApi = {
   getIndustries: () => get<Industry[]>('/industries'),
   createIndustry: (name: string) => post<Industry>('/industries', { name }),

@@ -6,6 +6,7 @@ import type { AdminUser } from '@/types';
 
 export interface AdminsTableProps {
   admins: AdminUser[];
+  loading?: boolean;
 }
 
 const titleCase = (value: string) => value.charAt(0) + value.slice(1).toLowerCase();
@@ -45,12 +46,13 @@ const columns: BaseColumn<AdminUser>[] = [
   },
 ];
 
-export function AdminsTable({ admins }: AdminsTableProps) {
+export function AdminsTable({ admins, loading = false }: AdminsTableProps) {
   return (
     <BaseTable
       columns={columns}
       data={admins}
       rowKey="id"
+      loading={loading}
       emptyTitle="No administrators yet"
       emptyDescription="Invite an administrator to get started."
     />

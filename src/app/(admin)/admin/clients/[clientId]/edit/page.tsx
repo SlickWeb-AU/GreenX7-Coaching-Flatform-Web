@@ -1,6 +1,6 @@
 'use client';
 
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useParams, useRouter } from 'next/navigation';
 import { useMemo } from 'react';
 
@@ -12,12 +12,14 @@ import { ROUTES } from '@/config/routes';
 import { EditClientForm } from '@/components/clients';
 import { clientsApi } from '@/features/admin-clients';
 import { settingsApi } from '@/features/admin-settings';
+import { toApiError } from '@/lib/api-error';
 import { queryKeys } from '@/lib/query-client';
 import type { UpdateClientPayload } from '@/types';
 
 export default function EditClientPage() {
   const params = useParams<{ clientId: string }>();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const clientId = params.clientId;
 
   const { data, isLoading } = useQuery({
@@ -48,10 +50,10 @@ export default function EditClientPage() {
         id: d.id,
         name: d.name,
         status: d.status,
+        isCompanyWide: d.isCompanyWide,
       })),
       checkInStartDay: data.checkInStartDay,
       checkInEndDay: data.checkInEndDay,
-      timezone: data.timezone ?? 'Australia/Sydney',
       autoSendReport: data.autoSendReport,
     };
   }, [data]);
@@ -59,11 +61,12 @@ export default function EditClientPage() {
   const update = useMutation({
     mutationFn: (payload: UpdateClientPayload) => clientsApi.update(clientId, payload),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.adminClients.detail(clientId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.adminClients.all });
       toast.success('Client updated successfully');
       router.push(ROUTES.admin.clientDetail(clientId));
     },
-    onError: (error: unknown) =>
-      toast.error(error instanceof Error ? error.message : 'Update client failed'),
+    onError: (error: unknown) => toast.error(toApiError(error).message),
   });
 
   if (isLoading) {
@@ -110,6 +113,7 @@ export default function EditClientPage() {
       />
       <EditClientForm
         key={clientId}
+        clientId={clientId}
         formId="edit-client-form"
         initial={initialValues}
         industryOptions={industryOptions}

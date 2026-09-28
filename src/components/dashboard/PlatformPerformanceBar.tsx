@@ -1,5 +1,6 @@
 'use client';
 
+import { BaseCard } from '@/components/base';
 import { cn } from '@/lib/utils';
 import { ZONE_COLORS } from '@/constants/tokens';
 
@@ -22,37 +23,35 @@ function getZoneKey(key: string): keyof typeof ZONE_COLORS {
 
 export function PlatformPerformanceBar({
   distribution,
+  className,
 }: {
   distribution?: DashboardZoneDistributionDto[];
+  className?: string;
 }) {
   if (!distribution || distribution.length === 0) {
     return (
-      <div className="flex h-full min-h-[260px] flex-col rounded-2xl bg-white p-6 shadow-none">
-        <div className="mb-6 flex flex-col gap-0.5">
-          <h2 className="heading-20-bold text-neutral-grey-1">Platform Performance</h2>
-          <p className="body-14-medium text-neutral-grey-3">
-            Score range distribution this period.
-          </p>
-        </div>
-      </div>
+      <BaseCard
+        title="Platform Performance"
+        subtitle="Score range distribution this period."
+        isEmpty
+        className={cn('flex h-full min-h-[260px] flex-col', className)}
+      />
     );
   }
 
   return (
-    <div className="flex h-full flex-col rounded-2xl bg-white p-6 shadow-none">
+    <BaseCard
+      title="Platform Performance"
+      subtitle="Score range distribution this period."
+      className={cn('flex h-full flex-col', className)}
+    >
       <div>
-        <div className="mb-6 flex flex-col gap-0.5">
-          <h2 className="heading-20-bold text-neutral-grey-1">Platform Performance</h2>
-          <p className="body-14-medium text-neutral-grey-3">
-            Score range distribution this period.
-          </p>
-        </div>
         <div className="mb-4 flex h-[22px] w-full overflow-hidden rounded-md bg-neutral-grey-7">
           {distribution.map((item) => {
             const zoneKey = getZoneKey(item.key);
             const zone = ZONE_COLORS[zoneKey];
-            const percentage = item.percentage ?? 0;
-            if (!zone || percentage <= 0) return null;
+            const percentage = item.percentage ?? null;
+            if (!zone || percentage === null || percentage <= 0) return null;
             return (
               <div
                 key={item.key}
@@ -76,11 +75,14 @@ export function PlatformPerformanceBar({
                 <span className="body-14-bold text-neutral-grey-2">{zone.label}</span>
                 <span className="body-12-medium text-neutral-grey-3">{zone.range}</span>
               </div>
-              <span className="body-14-bold text-neutral-grey-1">{item.percentage ?? 0}%</span>
+              <span className="body-14-bold text-neutral-grey-1">
+                {item.percentage ?? '—'}
+                {item.percentage !== null && item.percentage !== undefined ? '%' : ''}
+              </span>
             </div>
           );
         })}
       </div>
-    </div>
+    </BaseCard>
   );
 }

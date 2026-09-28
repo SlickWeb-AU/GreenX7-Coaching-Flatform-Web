@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
-import { Check } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 
-import { ChevronDownIcon } from '@/components/icons';
 import { cn } from '@/lib/utils';
+import { BaseHelperText } from './BaseHelperText';
 
 export type BaseSelectSize = 'small' | 'medium' | 'mediumPlus';
 export type BaseSelectVariant = 'primary' | 'secondary';
@@ -42,6 +42,7 @@ export interface BaseSelectProps<T extends string = string> {
   helperText?: string;
   loading?: boolean;
   disabled?: boolean;
+  readOnly?: boolean;
   required?: boolean;
   className?: string;
   startIcon?: ReactNode;
@@ -61,6 +62,7 @@ export function BaseSelect<T extends string = string>({
   helperText,
   loading = false,
   disabled = false,
+  readOnly = false,
   required = false,
   className,
   startIcon,
@@ -146,14 +148,14 @@ export function BaseSelect<T extends string = string>({
           aria-invalid={error}
           aria-required={required}
           disabled={disabled}
-          onClick={() => !disabled && setIsOpen((prev) => !prev)}
+          onClick={() => !disabled && !readOnly && setIsOpen((prev) => !prev)}
           className={cn(
-            'flex w-full items-center justify-between rounded-lg border px-3 py-2 text-neutral-grey-1 shadow-none transition-colors',
+            'flex w-full items-center justify-between rounded-lg border border-neutral-grey-5 px-3 py-2 text-neutral-grey-1 shadow-none transition-colors',
+            readOnly
+              ? 'cursor-default bg-white'
+              : [variantBg[variant], 'hover:border-neutral-grey-4 focus:border-brand-green-2'],
             sizeClass[size],
-            variantBg[variant],
-            error
-              ? 'border-secondary-red-4 focus:border-secondary-red-4'
-              : 'border-neutral-grey-5 hover:border-neutral-grey-4 focus:border-brand-green-2',
+            error && 'border-secondary-red-4 focus:border-secondary-red-4',
             'outline-none focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0',
             disabled && 'cursor-not-allowed opacity-50',
           )}
@@ -171,8 +173,12 @@ export function BaseSelect<T extends string = string>({
             </span>
           </div>
           <span className="ml-3 shrink-0">
-            <ChevronDownIcon
-              className={cn('transition-transform duration-200', isOpen && 'rotate-180')}
+            <ChevronDown
+              size={16}
+              className={cn(
+                'text-neutral-grey-3 transition-transform duration-200',
+                isOpen && 'rotate-180',
+              )}
               aria-hidden
             />
           </span>
@@ -183,7 +189,7 @@ export function BaseSelect<T extends string = string>({
             id={listboxId}
             role="listbox"
             className={cn(
-              'absolute left-0 z-50 max-h-80 w-full animate-fade-in overflow-y-auto rounded-xl border border-neutral-grey-5 bg-white p-1 text-neutral-grey-1 shadow-lg shadow-black/5',
+              'absolute left-0 z-50 max-h-80 w-full animate-fade-in overflow-y-auto rounded-lg border border-neutral-grey-6 bg-white p-1 text-neutral-grey-2 shadow-lg shadow-black/5',
               openUpward ? 'bottom-full mb-1.5' : 'top-full mt-1.5',
             )}
           >
@@ -200,15 +206,12 @@ export function BaseSelect<T extends string = string>({
                     setIsOpen(false);
                   }}
                   className={cn(
-                    'relative flex w-full cursor-pointer select-none items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-colors',
-                    isSelected
-                      ? 'bg-neutral-grey-7/60 font-semibold text-brand-green-2'
-                      : 'text-neutral-grey-1 hover:bg-neutral-grey-7',
+                    'body-16-medium relative flex w-full cursor-pointer select-none items-center justify-between rounded-md p-2 text-neutral-grey-2 transition-colors hover:bg-brand-green-5 hover:text-neutral-grey-1',
+                    isSelected && 'bg-brand-green-5 font-semibold text-neutral-grey-1',
                     opt.disabled && 'cursor-not-allowed opacity-50',
                   )}
                 >
                   <span className="truncate">{opt.label}</span>
-                  {isSelected && <Check className="h-4 w-4 shrink-0 text-brand-green-2" />}
                 </div>
               );
             })}
@@ -216,16 +219,7 @@ export function BaseSelect<T extends string = string>({
         )}
       </div>
 
-      {helperText && (
-        <p
-          className={cn(
-            'body-14-medium mt-2',
-            error ? 'text-secondary-red-4' : 'text-neutral-grey-3',
-          )}
-        >
-          {helperText}
-        </p>
-      )}
+      <BaseHelperText helperText={helperText} error={error} />
     </div>
   );
 }

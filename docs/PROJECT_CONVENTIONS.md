@@ -265,16 +265,17 @@ const createMutation = useMutation({
 
 ## 6. Feedback & Notifications
 
-| Scenario                                       | Handled By                 | UI Component / Action                                   |
-| :--------------------------------------------- | :------------------------- | :------------------------------------------------------ |
-| **Mutation success / write alert**             | `useMutation` `onSuccess`  | `toast.success(...)` (`sonner`)                         |
-| **Mutation failure / write error**             | `useMutation` `onError`    | `toast.error(...)` (`sonner`)                           |
-| **Destructive / critical action confirmation** | `useConfirm()`             | `<ConfirmProvider>` dialog modal                        |
-| **Initial page load**                          | `isLoading && !data`       | `<BaseLoading message="..." fullScreen />`              |
-| **Table / list fetch failure**                 | Query `error`              | Inline error card with **Retry** button                 |
-| **Empty list (200 OK, `[]`)**                  | `data.length === 0`        | Dashed border empty container with CTA button           |
-| **Field validation error**                     | Client Zod / API 422       | Field `error` + `helperText` below input                |
-| **Session expired (401)**                      | Axios response interceptor | Auto refresh; if failed, reset auth & redirect `/login` |
+| Scenario                                       | Handled By                                      | UI Component / Action                                               |
+| :--------------------------------------------- | :---------------------------------------------- | :------------------------------------------------------------------ |
+| **Mutation success / write alert**             | `useMutation` `onSuccess`                       | `toast.success(...)` (`sonner`)                                     |
+| **Mutation failure / write error**             | `useMutation` `onError`                         | `toast.error(...)` (`sonner`)                                       |
+| **Destructive / critical action confirmation** | `useConfirm()`                                  | `<ConfirmProvider>` dialog modal                                    |
+| **Initial page load**                          | `isLoading && !data`                            | `<BaseLoading message="..." fullScreen />`                          |
+| **Aggregate dashboard fetch failure**          | Query `error` (single query drives many blocks) | `toast.error(...)` (`sonner`), keep cached UI, no full-screen error |
+| **Table / list fetch failure**                 | Query `error`                                   | Inline error card with **Retry** button                             |
+| **Empty list (200 OK, `[]`)**                  | `data.length === 0`                             | Dashed border empty container with CTA button                       |
+| **Field validation error**                     | Client Zod / API 422                            | Field `error` + `helperText` below input                            |
+| **Session expired (401)**                      | Axios response interceptor                      | Auto refresh; if failed, reset auth & redirect `/login`             |
 
 ---
 

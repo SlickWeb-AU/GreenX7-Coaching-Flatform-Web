@@ -1,8 +1,7 @@
 'use client';
 
 import { useId, useState } from 'react';
-
-import { UploadIcon } from '@/components/icons';
+import { Upload } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export type LogoUploadVariant = 'dark' | 'reversed' | 'white';
@@ -46,9 +45,9 @@ export function LogoUploadBox({
         className,
       )}
     >
-      <UploadIcon
-        color={isReversed ? '#EDF3EF' : '#6A7A72'}
-        className={cn('mb-3 h-6 w-6', isReversed ? 'text-neutral-grey-7' : 'text-neutral-grey-3')}
+      <Upload
+        size={24}
+        className={cn('mb-3', isReversed ? 'text-neutral-grey-7' : 'text-neutral-grey-3')}
         aria-hidden
       />
       <span

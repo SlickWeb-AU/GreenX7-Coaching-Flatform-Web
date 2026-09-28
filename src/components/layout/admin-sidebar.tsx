@@ -1,18 +1,18 @@
 'use client';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { X } from 'lucide-react';
+import { CircleUser, LogOut, X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 import { BaseButton } from '@/components/base';
-import { AvatarPlaceholderIcon, LogoutIcon } from '@/components/icons';
 import { NavLink } from '@/components/layout/nav-link';
 import { ADMIN_NAVIGATION } from '@/config/navigation';
 import { ROUTES } from '@/config/routes';
 import { authApi } from '@/features/auth';
+import { toApiError } from '@/lib/api-error';
 import { useAuth } from '@/components/providers';
 import { useUiStore } from '@/stores/ui.store';
 
@@ -34,7 +34,7 @@ function SidebarContent({ onNavigate }: SidebarBodyProps) {
       router.replace(ROUTES.login);
       router.refresh();
     },
-    onError: () => toast.error('Sign out failed, please try again'),
+    onError: (err) => toast.error(toApiError(err).message),
   });
 
   return (
@@ -79,15 +79,26 @@ function SidebarContent({ onNavigate }: SidebarBodyProps) {
         <div className="mb-4 border-t border-neutral-grey-5" />
 
         {/* User profile */}
-        <div className="flex items-center gap-3 px-4">
-          <AvatarPlaceholderIcon className="shrink-0" />
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-bold text-neutral-grey-1">{user?.fullName}</p>
-            <p className="truncate text-xs text-neutral-grey-3">
-              {user?.role === 'ADMINISTRATOR' ? 'Administrator' : 'User'}
-            </p>
-          </div>
-        </div>
+        {(() => {
+          const displayName =
+            [user?.firstName, user?.lastName].filter(Boolean).join(' ') ||
+            user?.email ||
+            'Administrator';
+
+          return (
+            <div className="flex items-center gap-3 px-4">
+              <CircleUser size={32} className="shrink-0 text-neutral-grey-3" aria-hidden />
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-bold text-neutral-grey-1" title={displayName}>
+                  {displayName}
+                </p>
+                <p className="truncate text-xs text-neutral-grey-3">
+                  {user?.role === 'ADMINISTRATOR' ? 'Administrator' : 'User'}
+                </p>
+              </div>
+            </div>
+          );
+        })()}
 
         {/* Sign out button */}
         <BaseButton
@@ -97,7 +108,7 @@ function SidebarContent({ onNavigate }: SidebarBodyProps) {
           className="justify-start gap-3"
           onClick={() => logout.mutate()}
           disabled={logout.isPending}
-          startIcon={<LogoutIcon className="shrink-0" />}
+          startIcon={<LogOut size={20} className="shrink-0" aria-hidden />}
         >
           Sign Out
         </BaseButton>
@@ -111,7 +122,7 @@ export function AdminSidebar() {
 
   return (
     <>
-      {/* Sidebar cố định — desktop */}
+      {/* Fixed sidebar — desktop */}
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-56 flex-col border-r-0.5 border-neutral-grey-5 bg-neutral-grey-7 lg:flex">
         <SidebarContent />
       </aside>
@@ -123,7 +134,7 @@ export function AdminSidebar() {
             type="button"
             className="absolute inset-0 bg-black/50"
             onClick={() => setMobileSidebarOpen(false)}
-            aria-label="Đóng menu"
+            aria-label="Close menu"
           />
           <aside className="relative flex h-full w-56 animate-slide-up flex-col border-r-0.5 border-neutral-grey-5 bg-neutral-grey-7">
             <div className="absolute right-3 top-4 z-10">
@@ -131,7 +142,7 @@ export function AdminSidebar() {
                 type="button"
                 className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-neutral-grey-2 transition-colors hover:bg-neutral-grey-6"
                 onClick={() => setMobileSidebarOpen(false)}
-                aria-label="Đóng menu"
+                aria-label="Close menu"
               >
                 <X className="h-5 w-5" />
               </button>

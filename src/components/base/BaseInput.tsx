@@ -3,6 +3,7 @@
 import { useId, type InputHTMLAttributes, type ReactNode } from 'react';
 
 import { cn } from '@/lib/utils';
+import { BaseHelperText } from './BaseHelperText';
 
 export type BaseInputSize = 'small' | 'medium' | 'mediumPlus';
 export type BaseInputVariant = 'primary' | 'secondary';
@@ -12,8 +13,6 @@ export const sizeClass: Record<BaseInputSize, string> = {
   medium: 'h-10 body-16-medium',
   mediumPlus: 'h-12 body-16-medium',
 };
-
-export const inputSizeClass = sizeClass;
 
 const variantBg: Record<BaseInputVariant, string> = {
   primary: 'bg-white',
@@ -92,14 +91,12 @@ export function BaseInput({
           aria-invalid={error}
           placeholder={resolvedPlaceholder}
           className={cn(
-            'flex w-full rounded-lg border px-3 py-2 text-neutral-grey-1 shadow-none transition-colors placeholder:text-neutral-grey-3',
-            variantBg[variant],
+            'flex w-full rounded-lg border border-neutral-grey-5 px-3 py-2 text-neutral-grey-1 shadow-none transition-colors placeholder:text-neutral-grey-3',
+            readOnly
+              ? 'cursor-default bg-white'
+              : [variantBg[variant], 'hover:border-neutral-grey-4 focus:border-brand-green-2'],
             sizeClass[size],
-            error
-              ? 'border-secondary-red-4 focus:border-secondary-red-4'
-              : readOnly
-                ? 'cursor-default border-neutral-grey-5'
-                : 'border-neutral-grey-5 hover:border-neutral-grey-4 focus:border-brand-green-2',
+            error && 'border-secondary-red-4 focus:border-secondary-red-4',
             'outline-none focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0',
             'disabled:cursor-not-allowed disabled:opacity-50',
             prefix && 'pl-9',
@@ -113,16 +110,7 @@ export function BaseInput({
           </div>
         )}
       </div>
-      {helperText && (
-        <p
-          className={cn(
-            'body-14-medium mt-2',
-            error ? 'text-secondary-red-4' : 'text-neutral-grey-3',
-          )}
-        >
-          {helperText}
-        </p>
-      )}
+      <BaseHelperText helperText={helperText} error={error} />
     </div>
   );
 }

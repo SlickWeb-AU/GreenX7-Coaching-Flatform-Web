@@ -10,9 +10,8 @@ Mandatory UI, design tokens, and component guidelines for all developers and AI 
 
 - **Styling**: Tailwind CSS v3 with CSS variables & customized tokens (`tailwind.config.ts`, `globals.css`).
 - **Icons**: Lucide React (`lucide-react`) and custom SVG icons in `@/components/icons`.
-- **Primitives**: Radix UI headless components (`@radix-ui/react-*`).
 - **Class Utilities**: `clsx` and `tailwind-merge` unified via `@/lib/utils` (`cn(...)`).
-- **Strict Rule**: **NO Material UI (MUI)**, **NO Emotion `styled()`**, **NO `sx` props**, **NO inline style objects** for layout.
+- **Strict Rule**: **NO Radix UI**, **NO Material UI (MUI)**, **NO Emotion `styled()`**, **NO `sx` props**, **NO inline style objects** for layout.
 
 ### Component Composition Rules
 
@@ -80,6 +79,7 @@ Always use the predefined typography utility classes instead of manual arbitrary
 |             | `body-12-bold`       | `text-xs/[18px]`            | Bold (700)    | `tracking-tight` |
 |             | `body-12-medium`     | `text-xs/[18px]`            | Medium (500)  | `tracking-tight` |
 | **Caption** | `caption-12-regular` | `text-xs/[18px]`            | Regular (400) | `tracking-tight` |
+|             | `caption-12-bold`    | `text-xs/[18px]`            | Bold (700)    | `tracking-tight` |
 
 - **Font family**: Satoshi (`font-satoshi` / `var(--font-satoshi)`).
 
@@ -88,6 +88,8 @@ Always use the predefined typography utility classes instead of manual arbitrary
 | Category             | Tailwind Class Prefix                                                  | Hex Values           | Usage                                                                |
 | :------------------- | :--------------------------------------------------------------------- | :------------------- | :------------------------------------------------------------------- |
 | **Brand Primary**    | `bg-brand-green-2`, `text-brand-green-2`, `border-brand-green-2`       | `#005943`            | Primary brand action, active sidebar item, primary button background |
+|                      | `bg-brand-green-3`, `text-brand-green-3`                               | `#63D556`            | Live data dot & active pulsing indicator                             |
+|                      | `bg-brand-green-4`, `border-brand-green-4`                             | `#C7E3A9`            | Live data card border                                                |
 | **Neutral Grey**     | `text-neutral-grey-1`, `bg-neutral-grey-1`                             | `#12211C`            | Primary heading text, dark surfaces                                  |
 |                      | `text-neutral-grey-2`                                                  | `#53635C`            | Secondary body text, form field labels                               |
 |                      | `text-neutral-grey-3`                                                  | `#6A7A72`            | Muted descriptions, placeholder text, chevron icons                  |
@@ -243,13 +245,14 @@ const columns: BaseColumn<ClientListItem>[] = [
 
 Every data-driven page or section must handle all 5 primary states:
 
-| State                      | Condition                         | Rendering Pattern                                                                                 |
-| :------------------------- | :-------------------------------- | :------------------------------------------------------------------------------------------------ |
-| **1. Loading (Initial)**   | `isLoading && !data`              | `<BaseLoading message="Loading..." fullScreen />` for pages, or skeleton rows in `BaseTable`      |
-| **2. Background Fetching** | `isFetching && data`              | Keep existing UI rendered without full-screen overlays (no jarring layout shift)                  |
-| **3. Error**               | `error && !data`                  | Error card with message and **Retry** button (`<BaseButton onClick={refetch}>Retry</BaseButton>`) |
-| **4. Empty**               | `!isLoading && rows.length === 0` | Dashed border container with descriptive text + CTA action button                                 |
-| **5. Content**             | Normal data available             | Render interactive `BaseTable`, `BaseCard` grid, or forms                                         |
+| State                      | Condition                                     | Rendering Pattern                                                                                                                                                                       |
+| :------------------------- | :-------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **1. Loading (Initial)**   | `isLoading && !data`                          | `<BaseLoading message="Loading..." fullScreen />` for pages, or skeleton rows in `BaseTable`                                                                                            |
+| **2. Background Fetching** | `isFetching && data`                          | Keep existing UI rendered without full-screen overlays (no jarring layout shift)                                                                                                        |
+| **3. Error**               | `error && !data`                              | Error card with message and **Retry** button (`<BaseButton onClick={refetch}>Retry</BaseButton>`) for tables/lists; aggregate dashboard pages use `toast.error(...)` and keep cached UI |
+| **3b. No submissions**     | Period has data `null` (200 OK, no check-ins) | Display `—`, never `0`, for scores, changes, counts and zone percentages                                                                                                                |
+| **4. Empty**               | `!isLoading && rows.length === 0`             | Dashed border container with descriptive text + CTA action button                                                                                                                       |
+| **5. Content**             | Normal data available                         | Render interactive `BaseTable`, `BaseCard` grid, or forms                                                                                                                               |
 
 ---
 

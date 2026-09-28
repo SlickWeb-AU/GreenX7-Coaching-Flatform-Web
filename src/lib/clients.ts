@@ -1,4 +1,5 @@
 import { ALL_FILTER_VALUE, CLIENTS_PAGE_SIZE } from '@/constants/clients';
+import { formatScoreToPercent } from '@/lib/utils';
 import type { ClientsQuery } from '@/types';
 
 export function buildClientsQuery(q: ClientsQuery): string {
@@ -25,6 +26,7 @@ export function industryName(industry: unknown): string {
 }
 
 export function formatBatteryScore(score: number | null | undefined): string {
-  if (score === null || score === undefined) return '—';
-  return `${score}%`;
+  const rounded = formatScoreToPercent(score);
+  if (rounded === null) return '—';
+  return `${rounded}%`;
 }

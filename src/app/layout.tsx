@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     default: 'GreenX7',
     template: '%s | GreenX7',
   },
-  description: 'Nền tảng thực phẩm sạch GreenX7',
+  description: 'GreenX7 Coaching Platform',
   icons: {
     icon: '/images/favicon.png',
     shortcut: '/images/favicon.png',
@@ -57,7 +57,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   const user = await serverGet<AuthUser>('/auth/me');
 
   return (
-    <html lang="vi" className={Satoshi.variable} suppressHydrationWarning>
+    <html lang="en" className={Satoshi.variable} suppressHydrationWarning>
       <body className="font-satoshi">
         <AppProviders initialUser={user}>{children}</AppProviders>
       </body>

@@ -1,12 +1,12 @@
 'use client';
 
-import { ArrowBackIcon, ArrowForwardIcon } from '@/components/icons';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { PaginationMeta } from '@/types/api';
 
 import { BaseButton } from './BaseButton';
 import { BaseIconButton } from './BaseIconButton';
-import { buildPageItems } from './utils/pagination';
+import { buildPageItems } from '@/lib/pagination';
 
 export interface BasePaginationProps {
   meta?: PaginationMeta | null;
@@ -54,7 +54,7 @@ export function BasePagination({
           size={32}
           disabled={!hasPreviousPage}
           aria-label="Previous page"
-          icon={<ArrowBackIcon size={16} color="currentColor" aria-hidden />}
+          icon={<ChevronLeft size={16} aria-hidden />}
           onClick={() => hasPreviousPage && onPageChange(page - 1)}
         />
         {buildPageItems(page, totalPages).map((item, index) =>
@@ -84,7 +84,7 @@ export function BasePagination({
           size={32}
           disabled={!hasNextPage}
           aria-label="Next page"
-          icon={<ArrowForwardIcon size={16} color="currentColor" aria-hidden />}
+          icon={<ChevronRight size={16} aria-hidden />}
           onClick={() => hasNextPage && onPageChange(page + 1)}
         />
       </div>
