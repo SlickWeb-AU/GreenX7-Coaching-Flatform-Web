@@ -7,13 +7,13 @@ import { MONTH_NAMES } from '@/constants';
 import { CHART_COLORS } from '@/constants/tokens';
 import { clientsApi } from '@/features/admin-clients';
 import { queryKeys } from '@/lib/query-client';
-import type { AreaScoreDto } from '@/types';
+import type { AreaScoreDto, WellbeingItemData } from '@/types';
 import { HistoricalTrendChart } from '@/components/dashboard';
 
 import { ClientBatteryCard } from './ClientBatteryCard';
 import { ClientCurrentZoneCard } from './ClientCurrentZoneCard';
 import { ClientPeriodFilter } from './ClientPeriodFilter';
-import { ClientWellbeingCard, type WellbeingItemData } from './ClientWellbeingCard';
+import { ClientWellbeingCard } from './ClientWellbeingCard';
 
 export interface ClientDashboardTabProps {
   clientId: string;
