@@ -4,6 +4,10 @@ export const ROUTES = {
   home: '/',
   login: '/login',
   forbidden: '/forbidden',
+  live: (clientSlug: string, departmentSlug: string) =>
+    `/live/clients/${clientSlug}/departments/${departmentSlug}`,
+  presentation: (clientSlug: string, departmentSlug: string) =>
+    `/presentation/clients/${clientSlug}/departments/${departmentSlug}`,
 
   // Admin area
   admin: {

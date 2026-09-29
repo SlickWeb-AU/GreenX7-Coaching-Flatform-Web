@@ -48,7 +48,7 @@ async function proxy(request: NextRequest, params: Promise<{ path: string[] }>) 
     const upstream = await fetch(targetUrl, {
       method: request.method,
       headers,
-      body: hasBody ? await request.text() : undefined,
+      body: hasBody ? Buffer.from(await request.arrayBuffer()) : undefined,
       cache: 'no-store',
     });
 

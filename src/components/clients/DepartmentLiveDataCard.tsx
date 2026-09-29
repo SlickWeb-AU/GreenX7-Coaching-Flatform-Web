@@ -4,6 +4,7 @@ import { ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 
 import { BaseTag } from '@/components/base';
+import { LiveIndicator } from '@/components/dashboard';
 import { cn } from '@/lib/utils';
 
 export interface DepartmentLiveDataCardProps {
@@ -28,13 +29,7 @@ export function DepartmentLiveDataCard({
       <div className="flex flex-col items-center">
         <div className="mb-[14px]">
           <BaseTag variant="green" className="gap-2 px-2.5 py-1 text-secondary-green-4">
-            <span
-              className="relative flex h-2 w-2 shrink-0 items-center justify-center"
-              aria-hidden="true"
-            >
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-green-3 opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-green-3 shadow-live-dot" />
-            </span>
+            <LiveIndicator />
             <span>LIVE DATA</span>
           </BaseTag>
         </div>

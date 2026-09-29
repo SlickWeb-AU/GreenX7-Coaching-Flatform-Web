@@ -6,13 +6,17 @@ import { Copy, ExternalLink, QrCode, Share2, X } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { BaseButton, BaseDialog, BaseIconButton, BasePopover } from '@/components/base';
+import { ROUTES } from '@/config/routes';
 import { clientsApi } from '@/features/admin-clients';
 import { queryKeys } from '@/lib/query-client';
+import { normalizeUrl } from '@/lib/utils';
 
 export interface ShareBatteryCheckPopoverProps {
   departmentName: string;
   clientId?: string;
   departmentId?: string;
+  clientSlug?: string;
+  departmentSlug?: string;
   shareUrl?: string;
   liveUrl?: string;
   presentationUrl?: string;
@@ -20,17 +24,12 @@ export interface ShareBatteryCheckPopoverProps {
   className?: string;
 }
 
-const normalizeUrl = (url?: string): string => {
-  if (!url) return '';
-  const trimmed = url.trim();
-  if (/^https?:\/\//i.test(trimmed)) return trimmed;
-  return `https://${trimmed}`;
-};
-
 export function ShareBatteryCheckPopover({
   departmentName,
   clientId,
   departmentId,
+  clientSlug,
+  departmentSlug,
   shareUrl: initialShareUrl,
   liveUrl: initialLiveUrl,
   presentationUrl: initialPresentationUrl,
@@ -46,9 +45,17 @@ export function ShareBatteryCheckPopover({
   });
 
   const batteryCheckUrl = initialShareUrl || shareLinks?.batteryCheckUrl || '';
-  const liveDashboardUrl = initialLiveUrl || shareLinks?.liveDashboardUrl || '';
-  const presentationUrl = initialPresentationUrl || shareLinks?.presentationUrl || '';
-  const qrCode = initialQrCode || shareLinks?.qrCode;
+  const liveDashboardUrl =
+    initialLiveUrl ||
+    (clientSlug && departmentSlug ? ROUTES.live(clientSlug, departmentSlug) : '') ||
+    shareLinks?.liveDashboardUrl ||
+    '';
+  const presentationUrl =
+    initialPresentationUrl ||
+    (clientSlug && departmentSlug ? ROUTES.presentation(clientSlug, departmentSlug) : '') ||
+    shareLinks?.presentationUrl ||
+    '';
+  const qrCode = initialQrCode || shareLinks?.qrCodeDataUri || shareLinks?.qrCode;
 
   const handleCopy = async (rawUrl: string | undefined, label: string) => {
     if (!rawUrl) {
@@ -127,8 +134,8 @@ export function ShareBatteryCheckPopover({
                 </p>
               </div>
               <BaseIconButton
-                size={24}
-                icon={<X size={18} aria-hidden="true" />}
+                size={32}
+                icon={<X size={20} aria-hidden="true" />}
                 aria-label="Close"
                 onClick={close}
                 className="text-neutral-grey-3 hover:text-neutral-grey-1"
@@ -150,7 +157,7 @@ export function ShareBatteryCheckPopover({
                     size="small"
                     pill
                     disabled={!batteryCheckUrl && isLoading}
-                    startIcon={<Copy size={14} />}
+                    startIcon={<Copy size={16} />}
                     onClick={() => handleCopy(batteryCheckUrl, 'Battery Check link')}
                     className="mt-5"
                   >
@@ -167,7 +174,7 @@ export function ShareBatteryCheckPopover({
                     variant="secondary"
                     size="small"
                     pill
-                    startIcon={<QrCode size={14} />}
+                    startIcon={<QrCode size={16} />}
                     onClick={handlePreviewQR}
                     className="mt-5"
                   >
@@ -186,7 +193,7 @@ export function ShareBatteryCheckPopover({
                     variant="secondary"
                     size="small"
                     pill
-                    startIcon={<ExternalLink size={14} />}
+                    startIcon={<ExternalLink size={16} />}
                     onClick={handleOpenLive}
                     className="mt-5"
                   >
@@ -204,7 +211,7 @@ export function ShareBatteryCheckPopover({
                     size="small"
                     pill
                     disabled={!presentationUrl && !batteryCheckUrl && isLoading}
-                    startIcon={<Copy size={14} />}
+                    startIcon={<Copy size={16} />}
                     onClick={() =>
                       handleCopy(presentationUrl || batteryCheckUrl, 'Presentation link')
                     }
@@ -227,6 +234,7 @@ export function ShareBatteryCheckPopover({
         >
           <div className="flex flex-col items-center justify-center p-4">
             {qrCode && (
+              // QR data URI bypasses next/image optimizer
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={qrCode}

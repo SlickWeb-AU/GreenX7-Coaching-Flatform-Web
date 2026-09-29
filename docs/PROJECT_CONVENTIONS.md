@@ -300,3 +300,50 @@ const createMutation = useMutation({
 - **Lint Check**: Run `npm run lint:check` (or `npm run lint` for auto-fixing).
 - **Unit Tests**: Run `npm test` (`vitest run`).
 - **Forbidden in Dev Verification**: Do NOT run `npm run build` just to verify code or type changes. Next.js build prerenders all static routes, consuming excessive time and memory. Always use `npm run typecheck` and `npm run lint:check`.
+
+---
+
+## 9. URL Design & Routing Conventions
+
+To ensure URLs are unambiguous, self-documenting, and consistent across the platform, follow these Next.js routing conventions:
+
+### 1. Prohibition of Adjacent Dynamic Route Parameters
+
+- **Never** place two dynamic parameter segments adjacent to each other without resource qualifiers (e.g., ❌ `/:clientId/:deptId` or ❌ `/live/:clientId/:deptId`).
+- Adjacent IDs create routing ambiguities, degrade analytics/logging readability, and make nested routing fragile.
+
+### 2. Explicit Resource Scoping & Slug-Based Routes
+
+- Every dynamic identifier segment **must** be prefixed with its explicit plural resource noun:
+  - ❌ `/live/:clientId/:deptId`
+  - ✅ `/live/clients/[clientSlug]/departments/[departmentSlug]`
+  - ✅ `/presentation/clients/[clientSlug]/departments/[departmentSlug]`
+  - ✅ `/admin/clients/[clientId]/departments/[deptId]`
+- **Slug-only for Public/Live/Presentation Routes**:
+  - Public-facing views (Live Dashboard, Presentation Decks) strictly use semantic slugs (`[clientSlug]`, `[departmentSlug]`) to align with API design and ensure clean branding without UUID fallbacks.
+  - Admin management views use entity UUIDs (`[clientId]`, `[deptId]`).
+
+### 3. Symmetrical Route Structure Across Functional Areas
+
+- Keep resource hierarchies consistent whether in the Admin portal, Live Dashboard, or Presentation views:
+  - **Admin**: `/admin/clients/:clientId/departments/:deptId`
+  - **Live Dashboard**: `/live/clients/:clientSlug/departments/:departmentSlug`
+  - **Presentation Mode**: `/presentation/clients/:clientSlug/departments/:departmentSlug`
+- Centralize all route paths in `src/config/routes.ts` (`ROUTES.live(...)`, `ROUTES.presentation(...)`, `ROUTES.admin.departmentDetail(...)`). Never construct dynamic route paths with inline string interpolation.
+
+### 4. Navigation & Link Opening Conventions
+
+- **Internal SPA Navigation**:
+  - Always use Next.js primitives (`router.push(...)` from `useRouter()` or `<Link href="...">`).
+  - Do NOT use vanilla JS `window.location.href` or plain `<a href>` for internal admin/app transitions.
+- **Standalone Live & Presentation Views (New Tab)**:
+  - When launching presentation decks, live dashboards, or public check-in forms from the admin interface, open them in a new tab to preserve the administrator's active workspace and state:
+    ```tsx
+    const fullUrl = normalizeUrl(ROUTES.live(clientSlug, departmentSlug));
+    window.open(fullUrl, '_blank', 'noopener,noreferrer');
+    ```
+  - Always wrap relative route paths with `normalizeUrl(...)` to ensure the fully-qualified origin (`http(s)://...`) is resolved properly.
+
+### 5. URL Refactoring & Obsolete Route Cleanup
+
+- When retiring non-compliant routes (e.g. adjacent `/:clientId/:deptId` or old `[clientId]` folders), remove the obsolete directories completely and migrate all callers to canonical resource-scoped URLs (`/clients/:clientSlug/departments/:departmentSlug`).
