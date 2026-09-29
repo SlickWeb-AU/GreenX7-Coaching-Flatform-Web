@@ -64,15 +64,20 @@ Always use the predefined typography utility classes instead of manual arbitrary
 | Group       | Utility Class        | Tailwind Font / Line-height | Weight        | Letter Spacing   |
 | :---------- | :------------------- | :-------------------------- | :------------ | :--------------- |
 | **Heading** | `heading-64-bold`    | `text-[64px]/[68px]`        | Bold (700)    | `tracking-tight` |
+|             | `heading-52-black`   | `text-[52px]/[56px]`        | Black (900)   | `tracking-tight` |
 |             | `heading-48-bold`    | `text-[48px]/[52px]`        | Bold (700)    | `tracking-tight` |
 |             | `heading-28-bold`    | `text-[28px]/[32px]`        | Bold (700)    | `tracking-tight` |
 |             | `heading-20-bold`    | `text-xl/[26px]`            | Bold (700)    | `tracking-tight` |
 | **Body**    | `body-32-bold`       | `text-[32px]/[38px]`        | Bold (700)    | `tracking-tight` |
+|             | `body-24-bold`       | `text-[24px]/[30px]`        | Bold (700)    | `tracking-tight` |
 |             | `body-20-bold`       | `text-xl/[26px]`            | Bold (700)    | `tracking-tight` |
+|             | `body-20-medium`     | `text-xl/[26px]`            | Medium (500)  | `tracking-tight` |
+|             | `body-18-black`      | `text-lg/[24px]`            | Black (900)   | `tracking-tight` |
 |             | `body-18-bold`       | `text-lg/[24px]`            | Bold (700)    | `tracking-tight` |
 |             | `body-18-medium`     | `text-lg/[24px]`            | Medium (500)  | `tracking-tight` |
 |             | `body-16-bold`       | `text-base/[22px]`          | Bold (700)    | `tracking-tight` |
 |             | `body-16-medium`     | `text-base/[22px]`          | Medium (500)  | `tracking-tight` |
+|             | `body-16-regular`    | `text-base/[22px]`          | Regular (400) | `tracking-tight` |
 |             | `body-14-bold`       | `text-sm/[20px]`            | Bold (700)    | `tracking-tight` |
 |             | `body-14-medium`     | `text-sm/[20px]`            | Medium (500)  | `tracking-tight` |
 |             | `body-14-regular`    | `text-sm/[20px]`            | Regular (400) | `tracking-tight` |
