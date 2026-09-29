@@ -37,6 +37,14 @@ export const clientFormSchema = z
       .array(clientDepartmentSchema)
       .min(1, 'Please add at least one department.')
       .default([]),
+    darkLogo: z
+      .custom<File>((v) => v instanceof File || v === null || v === undefined)
+      .optional()
+      .nullable(),
+    whiteLogo: z
+      .custom<File>((v) => v instanceof File || v === null || v === undefined)
+      .optional()
+      .nullable(),
     checkInStartDay: z.preprocess(
       (val) => (val === '' || val === null || val === undefined ? undefined : Number(val)),
       z.number().min(1).max(CLIENT_CHECK_IN_DAY_MAX).optional(),

@@ -14,7 +14,7 @@ import { clientsApi } from '@/features/admin-clients';
 import { settingsApi } from '@/features/admin-settings';
 import { toApiError } from '@/lib/api-error';
 import { queryKeys } from '@/lib/query-client';
-import type { UpdateClientPayload } from '@/types';
+import type { ClientFormValues } from '@/validations';
 
 export default function EditClientPage() {
   const params = useParams<{ clientId: string }>();
@@ -59,7 +59,25 @@ export default function EditClientPage() {
   }, [data]);
 
   const update = useMutation({
-    mutationFn: (payload: UpdateClientPayload) => clientsApi.update(clientId, payload),
+    mutationFn: async (values: ClientFormValues) => {
+      const { darkLogo, whiteLogo, ...payload } = values;
+      if (darkLogo || whiteLogo) {
+        await clientsApi.uploadClientLogos(clientId, { darkLogo, whiteLogo });
+      }
+
+      const updated = await clientsApi.update(clientId, {
+        businessName: payload.businessName,
+        industryId: payload.industryId,
+        companySize: payload.companySize,
+        state: payload.state,
+        status: payload.status,
+        checkInStartDay: payload.checkInStartDay,
+        checkInEndDay: payload.checkInEndDay,
+        autoSendReport: payload.autoSendReport,
+      });
+
+      return updated;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.adminClients.detail(clientId) });
       queryClient.invalidateQueries({ queryKey: queryKeys.adminClients.all });
@@ -116,21 +134,14 @@ export default function EditClientPage() {
         clientId={clientId}
         formId="edit-client-form"
         initial={initialValues}
+        darkLogoUrl={data.darkLogoUrl}
+        whiteLogoUrl={data.whiteLogoUrl}
         industryOptions={industryOptions}
         showSubmitAction={false}
         onCancel={() => router.push(ROUTES.admin.clientDetail(clientId))}
         isSubmitting={update.isPending}
         onSubmit={(values) => {
-          update.mutate({
-            businessName: values.businessName,
-            industryId: values.industryId,
-            companySize: values.companySize,
-            state: values.state,
-            status: values.status,
-            checkInStartDay: values.checkInStartDay,
-            checkInEndDay: values.checkInEndDay,
-            autoSendReport: values.autoSendReport,
-          });
+          update.mutate(values);
         }}
       />
     </>

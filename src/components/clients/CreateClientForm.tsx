@@ -32,7 +32,7 @@ import {
   DepartmentsIcon,
   MonthlyScheduleIcon,
 } from '@/components/icons';
-import { ClientLogoUpload } from './ClientLogoUpload';
+import { ControlledClientLogoUpload } from './ClientLogoUpload';
 import { useEditableRows } from '@/features/admin-clients';
 import {
   clientFormSchema,
@@ -90,6 +90,8 @@ export function CreateClientForm({
       status: CLIENT_STATUSES.ACTIVE,
       contacts: [{ ...DEFAULT_CONTACT_ROW }],
       departments: [{ ...DEFAULT_DEPARTMENT_ROW }],
+      darkLogo: null,
+      whiteLogo: null,
       checkInStartDay: undefined,
       checkInEndDay: undefined,
       autoSendReport: true,
@@ -444,7 +446,7 @@ export function CreateClientForm({
         subtitle="Used on the Battery Check, live dashboard and presentation."
         prefixIcon={<BrandingIcon label="Branding icon" />}
       >
-        <ClientLogoUpload />
+        <ControlledClientLogoUpload control={control} />
       </BaseCard>
 
       {/* 4. Departments */}
