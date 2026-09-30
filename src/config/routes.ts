@@ -31,11 +31,12 @@ export const GUEST_ONLY_ROUTES = ['/login'];
  * Middleware scans top-down and takes the FIRST match.
  */
 export const PROTECTED_ROUTE_RULES: { prefix: string; roles: UserRole[] }[] = [
-  { prefix: '/admin', roles: [USER_ROLES.ADMINISTRATOR] },
+  { prefix: '/admin', roles: [USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMINISTRATOR] },
 ];
 
 /** Where each role lands after sign-in */
 export const DEFAULT_REDIRECT_BY_ROLE: Record<UserRole, string> = {
+  [USER_ROLES.SUPER_ADMIN]: ROUTES.admin.dashboard,
   [USER_ROLES.ADMINISTRATOR]: ROUTES.admin.dashboard,
   [USER_ROLES.GUEST]: ROUTES.login,
 };

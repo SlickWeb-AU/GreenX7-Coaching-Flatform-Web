@@ -1,6 +1,7 @@
 import type { Permission } from '@/config/permissions';
 
 export const USER_ROLES = {
+  SUPER_ADMIN: 'SUPER_ADMIN',
   ADMINISTRATOR: 'ADMINISTRATOR',
   GUEST: 'GUEST',
 } as const;

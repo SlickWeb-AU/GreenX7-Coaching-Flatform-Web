@@ -13,6 +13,7 @@ import { ADMIN_NAVIGATION } from '@/config/navigation';
 import { ROUTES } from '@/config/routes';
 import { authApi } from '@/features/auth';
 import { toApiError } from '@/lib/api-error';
+import { formatRoleLabel } from '@/lib/utils';
 import { useAuth } from '@/components/providers';
 import { useUiStore } from '@/stores/ui.store';
 
@@ -93,7 +94,7 @@ function SidebarContent({ onNavigate }: SidebarBodyProps) {
                   {displayName}
                 </p>
                 <p className="truncate text-xs text-neutral-grey-3">
-                  {user?.role === 'ADMINISTRATOR' ? 'Administrator' : 'User'}
+                  {formatRoleLabel(user?.role)}
                 </p>
               </div>
             </div>
