@@ -17,7 +17,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
   const user = await serverGet<AuthUser>('/auth/me');
 
   if (!user) redirect('/login');
-  if (user.role !== USER_ROLES.ADMINISTRATOR) {
+  if (user.role !== USER_ROLES.ADMINISTRATOR && user.role !== USER_ROLES.SUPER_ADMIN) {
     redirect('/forbidden');
   }
 

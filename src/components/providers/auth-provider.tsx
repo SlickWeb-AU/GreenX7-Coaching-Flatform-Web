@@ -13,6 +13,7 @@ interface AuthContextValue {
   user: AuthUser | null;
   isAuthenticated: boolean;
   isAdmin: boolean;
+  isSuperAdmin: boolean;
   /** Có ĐỦ tất cả permission truyền vào */
   can: (permission: Permission | Permission[]) => boolean;
   /** Có ÍT NHẤT MỘT permission trong danh sách */
@@ -59,7 +60,8 @@ export function AuthProvider({
     () => ({
       user,
       isAuthenticated: user !== null,
-      isAdmin: user?.role === USER_ROLES.ADMINISTRATOR,
+      isAdmin: user?.role === USER_ROLES.ADMINISTRATOR || user?.role === USER_ROLES.SUPER_ADMIN,
+      isSuperAdmin: user?.role === USER_ROLES.SUPER_ADMIN,
       can: (permission) => hasPermission(user?.permissions, permission),
       canAny: (permissions) => hasAnyPermission(user?.permissions, permissions),
       hasRole: (roles) => {

@@ -1,6 +1,8 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
+import { USER_ROLES } from '@/types/auth';
+
 /** Gộp class Tailwind, class sau ghi đè class trước đúng cách */
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -49,6 +51,13 @@ export function getInitials(fullName: string): string {
     .slice(-2)
     .map((part) => part[0]?.toUpperCase() ?? '')
     .join('');
+}
+
+export function formatRoleLabel(role?: string | null): string {
+  if (!role) return '—';
+  if (role === USER_ROLES.SUPER_ADMIN) return 'Super Admin';
+  if (role === USER_ROLES.ADMINISTRATOR) return 'Administrator';
+  return role.charAt(0) + role.slice(1).toLowerCase();
 }
 
 /** Bỏ các key rỗng khỏi query params để URL sạch và cache key ổn định */
