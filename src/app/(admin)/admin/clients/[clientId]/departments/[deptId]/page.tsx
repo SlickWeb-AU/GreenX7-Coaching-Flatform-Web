@@ -22,6 +22,7 @@ import { CLIENT_STATUSES } from '@/constants/clients';
 import { CHART_COLORS } from '@/constants/tokens';
 import { clientsApi } from '@/features/admin-clients';
 import { queryKeys } from '@/lib/query-client';
+import { normalizeUrl } from '@/lib/utils';
 import {
   ClientBatteryCard,
   ClientCurrentZoneCard,
@@ -33,10 +34,9 @@ import {
   useClient,
   useClientHeader,
   type InsightItem,
-  type WellbeingItemData,
 } from '@/components/clients';
 import { HistoricalTrendChart } from '@/components/dashboard';
-import type { AreaScoreDto } from '@/types';
+import type { AreaScoreDto, WellbeingItemData } from '@/types';
 
 const ICON_BY_AREA: Record<string, typeof HeartIcon> = {
   PHYSICAL: HeartIcon,
@@ -116,6 +116,11 @@ export default function DepartmentDetailPage() {
   };
 
   const departmentName = deptDashboard?.departmentName || department.name;
+  const clientSlug = client?.slug;
+  const deptSlug = department?.slug;
+  const liveUrl = clientSlug && deptSlug ? ROUTES.live(clientSlug, deptSlug) : undefined;
+  const presentationUrl =
+    clientSlug && deptSlug ? ROUTES.presentation(clientSlug, deptSlug) : undefined;
 
   // Synchronize department header into persistent layout shell
   useClientHeader({
@@ -153,8 +158,8 @@ export default function DepartmentDetailPage() {
           pill
           startIcon={<Tv size={16} />}
           onClick={() => {
-            if (deptDashboard?.presentationUrl) {
-              window.open(deptDashboard.presentationUrl, '_blank');
+            if (presentationUrl) {
+              window.open(normalizeUrl(presentationUrl), '_blank', 'noopener,noreferrer');
             }
           }}
         >
@@ -164,10 +169,12 @@ export default function DepartmentDetailPage() {
         <ShareBatteryCheckPopover
           clientId={clientId}
           departmentId={deptId}
+          clientSlug={client?.slug}
+          departmentSlug={department?.slug}
           departmentName={departmentName}
           shareUrl={deptDashboard?.shareUrl}
-          liveUrl={deptDashboard?.liveUrl}
-          presentationUrl={deptDashboard?.presentationUrl}
+          liveUrl={liveUrl}
+          presentationUrl={presentationUrl}
         />
       </>
     ),
@@ -226,7 +233,7 @@ export default function DepartmentDetailPage() {
         <div className="lg:col-span-2">
           <DepartmentLiveDataCard
             participantCount={effectiveParticipants}
-            dashboardHref={deptDashboard?.liveUrl || '#'}
+            dashboardHref={liveUrl || '#'}
             className="h-full"
           />
         </div>

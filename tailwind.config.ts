@@ -18,7 +18,7 @@ const config: Config = {
     container: {
       center: true,
       padding: { DEFAULT: '1rem', sm: '1.5rem', lg: '2rem' },
-      screens: { '2xl': '1400px' },
+      screens: { '2xl': '87.5rem' },
     },
     extend: {
       colors: {
@@ -88,11 +88,14 @@ const config: Config = {
         '0.5': '0.5px',
       },
       spacing: {
-        '1.25': '5px',
+        '1.25': '0.3125rem',
       },
       boxShadow: {
-        'pill-tab': '0px 1px 3px 0px #003F3226',
-        'live-dot': '0px 0px 0px 4px #58E3AA2B',
+        'pill-tab': '0 0.0625rem 0.1875rem 0 #003F3226',
+        'live-dot': '0 0 0 0.25rem #58E3AA2B',
+      },
+      maxWidth: {
+        '1440': '90rem',
       },
       fontFamily: {
         satoshi: ['var(--font-satoshi)', 'sans-serif'],

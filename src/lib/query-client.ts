@@ -6,13 +6,12 @@ function makeQueryClient() {
   return new QueryClient({
     defaultOptions: {
       queries: {
-        // 60s: đủ để việc điều hướng qua lại không bắn lại request,
-        // nhưng vẫn đủ tươi cho dashboard admin.
+        // 60s: Prevents duplicate requests during navigation while keeping admin dashboard data fresh
         staleTime: 60 * 1000,
         gcTime: 5 * 60 * 1000,
         refetchOnWindowFocus: false,
         retry: (failureCount, error) => {
-          // Đừng retry lỗi do người dùng (401/403/404/422) — chỉ tốn thời gian
+          // Do not retry client errors (401/403/404/422)
           if (error instanceof ApiError && error.statusCode < 500) return false;
           return failureCount < 2;
         },
@@ -27,9 +26,8 @@ function makeQueryClient() {
 let browserQueryClient: QueryClient | undefined;
 
 /**
- * Server: tạo mới mỗi request (không được chia sẻ cache giữa các user).
- * Browser: dùng lại một instance duy nhất, và KHÔNG tạo lại khi React re-render
- * trong lúc suspense — nếu tạo lại, toàn bộ cache sẽ mất.
+ * Server: create a new client per request to avoid sharing cache between users.
+ * Browser: reuse a single instance so cache persists across React suspense re-renders.
  */
 export function getQueryClient(): QueryClient {
   if (isServer) return makeQueryClient();
@@ -77,6 +75,9 @@ export const queryKeys = {
     all: ['admin-dashboard'] as const,
     metrics: (month?: number | string, year?: number | string, industry?: string) =>
       ['admin-dashboard', month, year, industry] as const,
+  },
+  batteryCheck: {
+    live: (client: string, dept: string) => ['battery-check-live', client, dept] as const,
   },
   reports: {
     all: ['reports'] as const,

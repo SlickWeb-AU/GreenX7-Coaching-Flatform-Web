@@ -36,6 +36,23 @@ export const clientsApi = {
   create: (payload: CreateClientPayload) => post<ClientDetail>('/clients', payload),
   update: (id: string, payload: UpdateClientPayload) =>
     patch<ClientDetail>(`/clients/${id}`, payload),
+  uploadLogo: (id: string, variant: 'dark' | 'white', file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return post<void>(`/clients/${id}/logos/${variant}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
+  uploadClientLogos: (id: string, logos: { darkLogo?: File | null; whiteLogo?: File | null }) => {
+    const uploads: Promise<unknown>[] = [];
+    if (logos.darkLogo instanceof File) {
+      uploads.push(clientsApi.uploadLogo(id, 'dark', logos.darkLogo));
+    }
+    if (logos.whiteLogo instanceof File) {
+      uploads.push(clientsApi.uploadLogo(id, 'white', logos.whiteLogo));
+    }
+    return uploads.length > 0 ? Promise.all(uploads) : Promise.resolve([]);
+  },
   getDashboard: (
     id: string,
     params: { year: number; month: number; trendMonths?: number; industryId?: string },

@@ -13,6 +13,7 @@ import { clientsApi } from '@/features/admin-clients';
 import { settingsApi } from '@/features/admin-settings';
 import { toApiError } from '@/lib/api-error';
 import { queryKeys } from '@/lib/query-client';
+import type { ClientFormValues } from '@/validations';
 
 export default function NewClientPage() {
   const router = useRouter();
@@ -28,7 +29,12 @@ export default function NewClientPage() {
     .map((industry) => ({ value: industry.id, label: industry.name }));
 
   const create = useMutation({
-    mutationFn: clientsApi.create,
+    mutationFn: async (values: ClientFormValues) => {
+      const { darkLogo, whiteLogo, ...payload } = values;
+      const client = await clientsApi.create(payload);
+      await clientsApi.uploadClientLogos(client.id, { darkLogo, whiteLogo });
+      return client;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.adminClients.all });
       toast.success('Client created successfully');

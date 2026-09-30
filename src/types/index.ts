@@ -5,3 +5,4 @@ export * from './clients';
 export * from './dashboard';
 export * from './settings';
 export * from './reports';
+export * from './presentation';

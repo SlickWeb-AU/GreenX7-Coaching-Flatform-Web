@@ -108,3 +108,24 @@ export function calculateAverageBatteryScore(scores: (number | null | undefined)
   const avg = sum / validScores.length;
   return Math.round(avg);
 }
+
+/**
+ * Normalizes URL strings:
+ * - Full URLs starting with http:// or https:// are preserved.
+ * - Relative paths starting with / are prefixed with window.location.origin.
+ * - Domain strings without protocol (e.g. battery.greenx7.com) are prefixed with https://.
+ */
+export function normalizeUrl(url?: string): string {
+  if (!url) return '';
+  const trimmed = url.trim();
+  if (!trimmed) return '';
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  if (trimmed.startsWith('/')) {
+    if (typeof window !== 'undefined') {
+      return `${window.location.origin}${trimmed}`;
+    }
+    const appUrl = process.env.APP_URL ?? 'http://localhost:3000';
+    return `${appUrl.replace(/\/+$/, '')}${trimmed}`;
+  }
+  return `https://${trimmed}`;
+}

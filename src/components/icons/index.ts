@@ -19,9 +19,11 @@ export * from './MonthlyScheduleIcon';
 // Trend Icons
 export * from './TrendUpIcon';
 export * from './TrendDownIcon';
+export * from './TrendNeutralIcon';
 
 // Custom Graphics & Illustrations
 export * from './BatteryIcon';
+export * from './BadgeStarIcon';
 export * from './CurrentZoneWaveIcon';
 export * from './DecorativeWaveBottomRight';
 export * from './DecorativeWaveTopRight';

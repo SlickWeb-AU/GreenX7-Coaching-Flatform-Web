@@ -32,6 +32,9 @@
   .heading-64-bold {
     @apply text-[64px]/[68px] font-bold tracking-tight;
   }
+  .heading-52-black {
+    @apply text-[52px]/[56px] font-black tracking-tight;
+  }
   .heading-48-bold {
     @apply text-[48px]/[52px] font-bold tracking-tight;
   }
@@ -41,11 +44,21 @@
   .heading-20-bold {
     @apply text-xl/[26px] font-bold tracking-tight;
   }
+  .body-32-bold {
+    @apply text-[32px]/[38px] font-bold tracking-tight;
+  }
+  .body-24-bold {
+    @apply text-[24px]/[30px] font-bold tracking-tight;
+  }
   .body-20-bold {
     @apply text-xl/[26px] font-bold tracking-tight;
   }
-  .body-32-bold {
-    @apply text-[32px]/[38px] font-bold tracking-tight;
+  .body-20-medium {
+    @apply text-xl/[26px] font-medium tracking-tight;
+  }
+
+  .body-18-black {
+    @apply text-lg/[24px] font-black tracking-tight;
   }
   .body-18-bold {
     @apply text-lg/[24px] font-bold tracking-tight;
@@ -58,6 +71,9 @@
   }
   .body-16-medium {
     @apply text-base/[22px] font-medium tracking-tight;
+  }
+  .body-16-regular {
+    @apply text-base/[22px] font-normal tracking-tight;
   }
   .body-14-bold {
     @apply text-sm/[20px] font-bold tracking-tight;

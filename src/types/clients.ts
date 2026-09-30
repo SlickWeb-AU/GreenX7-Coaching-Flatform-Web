@@ -53,11 +53,14 @@ export interface ClientDepartment {
 
 export interface ClientDetail {
   id: string;
+  slug?: string;
   businessName: string;
   industry: IndustryBrief | string;
   companySize: string;
   state: string;
   status: ClientStatus;
+  darkLogoUrl?: string | null;
+  whiteLogoUrl?: string | null;
   checkInStartDay: number;
   checkInEndDay: number;
   timezone: string;
@@ -211,4 +214,5 @@ export interface DepartmentShareLinksDto {
   liveDashboardUrl: string;
   presentationUrl: string;
   qrCode?: string;
+  qrCodeDataUri?: string;
 }

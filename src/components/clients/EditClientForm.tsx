@@ -41,7 +41,7 @@ import {
 } from '@/features/admin-clients';
 import { cn } from '@/lib/utils';
 
-import { ClientLogoUpload } from './ClientLogoUpload';
+import { ControlledClientLogoUpload } from './ClientLogoUpload';
 import { DEFAULT_CONTACT_ROW, DEFAULT_DEPARTMENT_ROW } from './CreateClientForm';
 import {
   clientFormSchema,
@@ -53,6 +53,8 @@ import {
 export interface EditClientFormProps {
   clientId?: string;
   initial: ClientFormValues;
+  darkLogoUrl?: string | null;
+  whiteLogoUrl?: string | null;
   onSubmit: (values: ClientFormValues) => void;
   onCancel?: () => void;
   isSubmitting?: boolean;
@@ -65,6 +67,8 @@ export interface EditClientFormProps {
 export function EditClientForm({
   clientId,
   initial,
+  darkLogoUrl,
+  whiteLogoUrl,
   onSubmit,
   onCancel,
   isSubmitting = false,
@@ -464,7 +468,11 @@ export function EditClientForm({
         subtitle="Used on the Battery Check, live dashboard and presentation."
         prefixIcon={<BrandingIcon label="Branding icon" />}
       >
-        <ClientLogoUpload />
+        <ControlledClientLogoUpload
+          control={control}
+          darkLogoUrl={darkLogoUrl}
+          whiteLogoUrl={whiteLogoUrl}
+        />
       </BaseCard>
 
       {/* 4. Departments */}
@@ -603,7 +611,7 @@ export function EditClientForm({
       >
         <div className="space-y-4">
           {isWindowOpen && currentEndDay && (
-            <div className="body-14-medium rounded-lg border border-neutral-grey-5 bg-white p-3.5 text-brand-green-2">
+            <div className="body-14-medium rounded-lg border border-neutral-grey-5 bg-white p-3.5 text-secondary-orange-1">
               The current check-in window is open until {formatDayOfMonth(currentEndDay)}. Schedule
               changes will apply from the next period.
             </div>
