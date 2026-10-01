@@ -1,4 +1,6 @@
 import Image from 'next/image';
+import Link from 'next/link';
+import { ROUTES } from '@/config/routes';
 import { LiveIndicator } from './LiveIndicator';
 
 export interface LiveDashboardHeaderProps {
@@ -9,14 +11,20 @@ export function LiveDashboardHeader({ periodLabel }: LiveDashboardHeaderProps) {
   return (
     <header className="flex w-full items-center justify-between border-b border-white/10 px-10 py-6">
       <div className="flex items-center">
-        <Image
-          src="/icons/greenx7-logo-light.svg"
-          alt="GreenX7"
-          width={130}
-          height={32}
-          className="h-8 w-auto"
-          priority
-        />
+        <Link
+          href={ROUTES.admin.dashboard}
+          aria-label="Back to admin dashboard"
+          className="inline-block"
+        >
+          <Image
+            src="/icons/greenx7-logo-light.svg"
+            alt="GreenX7"
+            width={130}
+            height={32}
+            className="h-8 w-auto"
+            priority
+          />
+        </Link>
       </div>
 
       <div className="flex items-center gap-2">

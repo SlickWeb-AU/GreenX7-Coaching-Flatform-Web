@@ -12,7 +12,6 @@ export function useBatteryLive(clientSlug?: string, departmentSlug?: string) {
   const { data, isLoading } = useQuery({
     queryKey: queryKeys.batteryCheck.live(clientSlug || '', departmentSlug || ''),
     queryFn: () => batteryCheckApi.live(clientSlug || '', departmentSlug || ''),
-    refetchInterval: 10000,
     retry: false,
     enabled: Boolean(clientSlug && departmentSlug),
   });
@@ -24,9 +23,9 @@ export function useBatteryLive(clientSlug?: string, departmentSlug?: string) {
       area: string;
       label?: string;
       score: number | null;
-      vsPrevious?: { change: number; changePercent: number };
-      vsFirstCheck?: { change: number; changePercent: number };
-    }[] = data?.wellbeingAreas ?? data?.areas ?? [];
+      vsPrevious?: { change?: number | null; changePercent?: number | null };
+      vsFirstCheck?: { change?: number | null; changePercent?: number | null };
+    }[] = data?.wellbeingAreas ?? [];
     const apiAreaMap = new Map(
       source.map(
         (a) =>

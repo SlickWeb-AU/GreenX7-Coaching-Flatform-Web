@@ -15,6 +15,8 @@ export interface BatteryWheelChartProps {
   size?: number;
   className?: string;
   showScore?: boolean;
+  scoreClassName?: string;
+  percentClassName?: string;
 }
 
 /**
@@ -47,6 +49,8 @@ export function BatteryWheelChart({
   size = 220,
   className,
   showScore = true,
+  scoreClassName,
+  percentClassName,
 }: BatteryWheelChartProps) {
   const cx = size / 2;
   const cy = size / 2;
@@ -116,7 +120,12 @@ export function BatteryWheelChart({
       className={cn('relative inline-flex items-center justify-center bg-white', className)}
       style={{ width: size, height: size }}
     >
-      <PieChart width={size} height={size} className="[&_*:focus]:outline-none">
+      <PieChart
+        width={size}
+        height={size}
+        margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
+        className="[&_*:focus]:outline-none"
+      >
         <Tooltip
           isAnimationActive={false}
           content={({ active, payload }) => {
@@ -164,11 +173,25 @@ export function BatteryWheelChart({
             <BadgeStarIcon size={badgeSize} />
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="flex items-center gap-0.5">
-                <span className="heading-52-black leading-none text-neutral-grey-1">
+                <span
+                  className={cn(
+                    size <= 160 ? 'text-[40px]' : 'heading-52-black',
+                    'font-black leading-none text-neutral-grey-1',
+                    scoreClassName,
+                  )}
+                >
                   {score === null || score === undefined ? '—' : Math.round(score)}
                 </span>
                 {score !== null && score !== undefined && (
-                  <span className="body-18-black leading-none text-neutral-grey-1">%</span>
+                  <span
+                    className={cn(
+                      size <= 160 ? 'text-[12px]' : 'body-18-black',
+                      'font-black leading-none text-neutral-grey-1',
+                      percentClassName,
+                    )}
+                  >
+                    %
+                  </span>
                 )}
               </div>
             </div>

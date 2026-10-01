@@ -1,5 +1,6 @@
-import { FIXED_WELLBEING_AREAS } from '@/constants/dashboard';
-import type { InsightBadgeItem, WellbeingItemData } from '@/types';
+import { FIXED_WELLBEING_AREAS, MONTH_NAMES } from '@/constants/dashboard';
+import type { BatteryCheckLiveResult, InsightBadgeItem, WellbeingItemData } from '@/types';
+import { formatSlugLabel } from './utils';
 
 export function calculateStrengthsAndFocus(items: WellbeingItemData[]): {
   strengths: InsightBadgeItem[];
@@ -9,7 +10,6 @@ export function calculateStrengthsAndFocus(items: WellbeingItemData[]): {
     return { strengths: [], focus: [] };
   }
 
-  // ponytail: tie-break by fixed area order so equal scores are deterministic
   const order: Map<string, number> = new Map(FIXED_WELLBEING_AREAS.map((d, i) => [d.area, i]));
   const sorted = [...items]
     .filter((item) => item.score !== null && item.score !== undefined)
@@ -28,4 +28,34 @@ export function calculateStrengthsAndFocus(items: WellbeingItemData[]): {
     strengths: sorted.slice(0, 2).map(toBadge),
     focus: sorted.slice(-2).reverse().map(toBadge),
   };
+}
+
+/** Display names prefer API branding, fall back to formatted slugs. */
+export function resolveLiveNames(
+  data: BatteryCheckLiveResult | null | undefined,
+  clientSlug?: string | null,
+  departmentSlug?: string | null,
+): { clientName: string; departmentName: string } {
+  return {
+    clientName:
+      data?.branding?.clientName ||
+      data?.clientName ||
+      data?.businessName ||
+      formatSlugLabel(clientSlug),
+    departmentName:
+      data?.branding?.departmentName || data?.departmentName || formatSlugLabel(departmentSlug),
+  };
+}
+
+/** White logo suits dark surfaces; dark logo is the fallback. */
+export function resolveLiveLogoUrl(data: BatteryCheckLiveResult | null | undefined): string | null {
+  return data?.branding?.whiteLogoUrl || data?.branding?.darkLogoUrl || null;
+}
+
+/** Current period as 'October 2026'; raw label, then null when unknown. */
+export function resolvePeriodLabel(data: BatteryCheckLiveResult | null | undefined): string | null {
+  if (data?.period?.month && data?.period?.year) {
+    return `${MONTH_NAMES[data.period.month - 1]} ${data.period.year}`;
+  }
+  return data?.period?.label ?? null;
 }

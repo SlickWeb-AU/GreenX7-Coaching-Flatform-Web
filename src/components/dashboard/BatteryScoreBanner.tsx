@@ -41,7 +41,7 @@ export function BatteryScoreBanner({
           <div className="flex items-center gap-1">
             <span
               className={cn(
-                'body-14-bold rounded-[99px] px-1 text-white',
+                'body-14-bold rounded-pill px-1 text-white',
                 hasChange && !isPositive ? 'bg-secondary-red-4' : 'bg-secondary-green-4',
               )}
             >
