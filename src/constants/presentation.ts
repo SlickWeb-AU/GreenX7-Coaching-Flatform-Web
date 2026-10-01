@@ -1,0 +1,110 @@
+import { PurposeIcon } from '@/components/icons';
+import { AREA_BAR_COLORS, AREA_ICON_MAP } from './dashboard';
+import type { OrbitItem, SlideConfig, SlideType } from '@/types';
+
+export const SLIDE_TYPES = {
+  STATIC: 'static',
+  DYNAMIC: 'dynamic',
+} as const satisfies Record<string, SlideType>;
+
+export const PRESENTATION_SLIDES: SlideConfig[] = [
+  { id: 1, slug: 'cover', title: 'Cover', type: SLIDE_TYPES.STATIC },
+  { id: 2, slug: '8-areas-one-battery', title: '8 areas. One battery.', type: SLIDE_TYPES.STATIC },
+  { id: 3, slug: 'start-check-in', title: 'Start your Battery Check', type: SLIDE_TYPES.DYNAMIC },
+  { id: 4, slug: 'take-a-moment', title: 'Take a moment', type: SLIDE_TYPES.STATIC },
+  { id: 5, slug: 'reflect-prompts', title: 'Before you move forward', type: SLIDE_TYPES.STATIC },
+  {
+    id: 6,
+    slug: 'energy-area',
+    title: 'Which battery area gives you the most energy?',
+    type: SLIDE_TYPES.STATIC,
+  },
+  {
+    id: 7,
+    slug: 'difference-area',
+    title: 'Which one area would make the biggest difference?',
+    type: SLIDE_TYPES.STATIC,
+  },
+  {
+    id: 8,
+    slug: 'small-action',
+    title: "What's one small action you will actually do?",
+    type: SLIDE_TYPES.STATIC,
+  },
+  { id: 9, slug: 'make-it-easy', title: 'Make it easy', type: SLIDE_TYPES.STATIC },
+  { id: 10, slug: 'my-promise', title: 'My promise', type: SLIDE_TYPES.STATIC },
+  { id: 11, slug: 'team-battery', title: 'Team Battery', type: SLIDE_TYPES.DYNAMIC },
+  { id: 12, slug: 'closing', title: 'Closing', type: SLIDE_TYPES.STATIC },
+];
+
+export const PRESENTATION_TOTAL_SLIDES = PRESENTATION_SLIDES.length;
+
+export const QR_COUNTDOWN_SECONDS = 60;
+
+export const PRESENTATION_TITLE_SUFFIX = 'Monthly Coaching Check-in';
+
+export const FIXED_AREA_SEQUENCE = [
+  'Physical',
+  'Sleep',
+  'Nutrition',
+  'Fun',
+  'Mindset',
+  'Friendships',
+  'Relationships',
+  'Purpose',
+] as const;
+
+export const COVER_PILLS = [
+  {
+    src: '/images/cover-pill-office.jpg',
+    alt: 'Office team meeting',
+    img: '-scale-x-100 object-cover object-[51%_20%]',
+    pad: 'pt-[52px]',
+  },
+  {
+    src: '/images/cover-pill-remote.jpg',
+    alt: 'Remote work',
+    img: 'object-cover object-[65%_30%]',
+    pad: 'pt-28',
+  },
+  {
+    src: '/images/cover-pill-surfing.jpg',
+    alt: 'Lifestyle thriving',
+    img: 'object-cover object-[55%_35%]',
+    pad: '',
+  },
+] as const;
+
+export const DIMENSION_CARDS = [
+  { label: 'Purpose', src: '/images/GreenX_Areas_Purpose.png' },
+  { label: 'Sleep', src: '/images/GreenX_Areas_Sleep.png' },
+  { label: 'Physical Health', src: '/images/GreenX_Areas_Physical-Health.png' },
+  { label: 'Nutrition', src: '/images/GreenX_Areas_Nutrition.png' },
+  { label: 'Mindset', src: '/images/GreenX_Areas_Mindset.png' },
+  { label: 'Fun', src: '/images/GreenX_Areas_Fun.png' },
+  { label: 'Relationships', src: '/images/GreenX_Areas_Relationships.png' },
+  { label: 'Friendships', src: '/images/GreenX_Areas_Friendship.png' },
+] as const;
+
+export const DIMENSION_ORBIT_LABELS: Record<string, string> = {
+  Physical: 'Physical Health',
+};
+
+export const DIMENSION_ORBIT_ORDER = [
+  'Purpose',
+  'Sleep',
+  'Physical',
+  'Nutrition',
+  'Mindset',
+  'Fun',
+  'Relationships',
+  'Friendships',
+] as const;
+
+export const ORBIT_ITEMS: OrbitItem[] = DIMENSION_ORBIT_ORDER.map((area, idx) => ({
+  key: area,
+  label: DIMENSION_ORBIT_LABELS[area] ?? area,
+  angle: idx * 45,
+  bg: AREA_BAR_COLORS[area] ?? 'bg-secondary-teal-1',
+  icon: AREA_ICON_MAP[area] ?? PurposeIcon,
+}));
