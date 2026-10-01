@@ -1,5 +1,8 @@
 export const DASHBOARD_COLORS = {
-  brand: { green2: '#005943' },
+  brand: {
+    green1: '#004736',
+    green2: '#005943',
+  },
   accent: {
     yellow: '#F5D547',
     green: '#63D556',

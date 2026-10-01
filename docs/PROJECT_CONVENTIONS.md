@@ -53,6 +53,8 @@ src/
 │   │   ├── auth/        # /api/auth/login, /api/auth/refresh, /api/auth/logout
 │   │   └── bff/         # /api/bff/[...path] proxy to NestJS backend
 │   ├── report/          # Public/client report pages
+│   ├── live/            # Live dashboard (slug routes: clients/[clientSlug]/departments/[departmentSlug])
+│   ├── presentation/    # Presentation decks (slug routes: clients/[clientSlug]/departments/[departmentSlug])
 │   ├── forbidden/       # 403 Forbidden page
 │   ├── globals.css      # Tailwind base layers, typography utilities, scrollbar
 │   └── layout.tsx       # Root layout with server session fetching
@@ -63,6 +65,7 @@ src/
 │   ├── providers/       # AppProviders, AuthProvider, QueryProvider, ConfirmProvider
 │   ├── clients/         # Clients domain components (table, forms, cards, tabs)
 │   ├── dashboard/       # Dashboard domain components (charts, score banners, grids)
+│   ├── presentation/    # Presentation deck components (DeckShell, slides/, layouts, contexts)
 │   └── settings/        # Settings domain components (admins table, forms)
 ├── config/              # Central configuration
 │   ├── navigation.ts    # Sidebar menu items & role-based route matching
@@ -71,7 +74,8 @@ src/
 ├── constants/           # Business & UI constants, design tokens
 │   ├── auth.ts          # Auth flow steps, token keys
 │   ├── clients.ts       # Status options, timezones, check-in limits, sort mappings
-│   ├── dashboard.ts     # Month options, fixed zones, trend options
+│   ├── dashboard.ts     # Month options, fixed zones, trend options, wellbeing areas
+│   ├── presentation.ts  # Slide configs, cover pills, area sequence, countdown
 │   ├── tokens.ts        # Dashboard color palettes, zone colors, pill tone styles
 │   └── ui.ts            # Base component size & variant class dictionaries
 ├── features/            # Pure Business & API Service Layer
@@ -80,6 +84,7 @@ src/
 │   ├── admin-dashboard/ # dashboardApi service
 │   ├── admin-settings/  # settingsApi service
 │   ├── auth/            # authApi service
+│   ├── battery-check/   # batteryCheckApi + useBatteryLive hook
 │   └── report-login/    # reportApi service
 ├── lib/                 # Core utilities, helpers & HTTP client
 │   ├── api-error.ts     # ApiError class & error parser
@@ -89,17 +94,20 @@ src/
 │   ├── cookies.ts       # Secure cookie parser & setter for tokens
 │   ├── dashboard.ts     # Dashboard query builders
 │   ├── jwt.ts           # JWT decode & verification helpers
+│   ├── live.ts          # Strengths/focus calculation for live battery data
 │   ├── otp.ts           # OTP timer & email masking formatters
+│   ├── presentation.ts  # Strengths/focus calculation for presentation decks
+│   ├── presentation-nav.ts # Hash-based slide navigation hook (fullscreen decks only)
 │   ├── query-client.ts  # TanStack QueryClient factory & query keys
 │   ├── search-params.ts # URL search param patch & merge utilities
 │   └── utils.ts         # cn (clsx + tailwind-merge) & common string helpers
-├── stores/              # Pure Client Global UI State (Zustand)
-│   └── ui.store.ts      # Sidebar collapse, mobile menu open state
 ├── types/               # ALL TypeScript Definitions, DTOs & API Contracts
 │   ├── api.ts           # ApiSuccessResponse, ApiErrorResponse, PaginationMeta, PaginatedResult
 │   ├── auth.ts          # AuthUser, UserRole, UserStatus, AuthTokens, AccessTokenPayload
 │   ├── clients.ts       # ClientListItem, ClientDetail, CreateClientPayload, DepartmentDto
 │   ├── dashboard.ts     # ClientDashboardDto, DepartmentDashboardDto, BatteryScoreDto
+│   ├── presentation.ts  # SlideConfig, InsightBadgeItem, WellbeingItemData, BatteryCheckLiveResult
+│   ├── reports.ts       # Report DTOs & payloads
 │   ├── settings.ts      # AdminUserDto, IndustryDto
 │   ├── ui.ts            # BaseSize, BaseVariant, BaseButtonStyleOptions
 │   └── index.ts
@@ -123,7 +131,6 @@ Always use path aliases. Never use deep relative paths (`../../../`).
 | `@/constants`           | `import { CLIENT_STATUS_OPTIONS } from '@/constants/clients';`          |
 | `@/config/routes`       | `import { ROUTES } from '@/config/routes';`                             |
 | `@/lib/{util}`          | `import { buildClientsQuery } from '@/lib/clients';`                    |
-| `@/stores/{store}`      | `import { useUiStore } from '@/stores/ui.store';`                       |
 
 ### Layer Responsibilities & Export Rules
 
@@ -132,13 +139,15 @@ Always use path aliases. Never use deep relative paths (`../../../`).
   - MUST NOT contain UI presentation components, Zod schemas, or domain types.
 - **`src/components/`**:
   - Contains presentation UI components grouped by feature/domain.
-  - Component files contain only the props interface and the component function.
+  - Colocate small helpers in the same file; split to a new file only when reused by a 2nd caller.
 - **`src/validations/`**:
   - All Zod schemas and validation helper functions live here and are re-exported via `src/validations/index.ts`.
 - **`src/types/`**:
   - All interfaces, DTOs, enums, payloads, and domain types live here and are re-exported via `src/types/index.ts`.
+  - Props interfaces for a component's own parameters (e.g. `XxxProps`) stay colocated in the component's tsx file (per `UI_CONVENTIONS.md`).
+  - Shared prop bases used by 2+ files (e.g. `BaseSlideProps`) and context value types (e.g. `SlideLayoutContextValue`, `PresentationContextValue`) must live in `src/types/` and be imported with `import type`.
 - **`src/constants/`**:
-  - All business constants, option lists, status definitions, and design tokens live here.
+  - All business constants, option lists, status definitions, and design tokens live here. Never define exported data constants inside tsx files.
 - **`src/lib/`**:
   - HTTP clients (`axios.ts`), search params mergers, formatters, and reusable helper functions live here.
 - **Barrel `index.ts` files**:
@@ -156,7 +165,7 @@ Classify each piece of state into the appropriate tier:
 | :--------------------------- | :------------------------------------------------------------------------------ | :-------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------- |
 | **1. URL State**             | Search, filters, tabs, sorting, pagination (must survive reload & be shareable) | `useSearchParams`, `useRouter`, `usePathname`, `mergeSearchParams`    | Use `router.replace` with debounced input to keep browser history clean. Wrap component in `<Suspense>`.                 |
 | **2. Server / Async State**  | Data fetched from or mutated to the backend                                     | `@tanstack/react-query` (`useQuery`, `useMutation`, `useQueryClient`) | Centralized query keys (`queryKeys` in `@/lib/query-client`), default `staleTime: 60s`, automatic background refetching. |
-| **3. Global UI State**       | Pure client UI state across pages (sidebar collapsed, mobile drawer)            | `zustand` (`src/stores/ui.store.ts`)                                  | Do NOT put server data in Zustand. Only client UI state.                                                                 |
+| **3. Global UI State**       | Pure client UI state across pages (sidebar collapsed, mobile drawer)            | Local `useState` in layout / React Context                            | Do NOT put server data here. Only client UI state. Add `zustand` only when 3+ distant components share the state.        |
 | **4. App Auth & RBAC**       | User session, permissions, role checking                                        | `AuthProvider` / `useAuth()` (`React Context`)                        | Populated from server-rendered layout session. Provides `can()`, `canAny()`, `hasRole()`.                                |
 | **5. Local Component State** | Modal/dialog visibility, draft form inputs, dropdown open state                 | `useState`, `useReducer`, `useRef`                                    | Keep as local and tightly scoped as possible.                                                                            |
 
@@ -317,7 +326,7 @@ To ensure URLs are unambiguous, self-documenting, and consistent across the plat
 - Every dynamic identifier segment **must** be prefixed with its explicit plural resource noun:
   - ❌ `/live/:clientId/:deptId`
   - ✅ `/live/clients/[clientSlug]/departments/[departmentSlug]`
-  - ✅ `/presentation/clients/[clientSlug]/departments/[departmentSlug]`
+  - ✅ `/check-in/[clientSlug]/[departmentSlug]/presentation`
   - ✅ `/admin/clients/[clientId]/departments/[deptId]`
 - **Slug-only for Public/Live/Presentation Routes**:
   - Public-facing views (Live Dashboard, Presentation Decks) strictly use semantic slugs (`[clientSlug]`, `[departmentSlug]`) to align with API design and ensure clean branding without UUID fallbacks.
@@ -328,7 +337,7 @@ To ensure URLs are unambiguous, self-documenting, and consistent across the plat
 - Keep resource hierarchies consistent whether in the Admin portal, Live Dashboard, or Presentation views:
   - **Admin**: `/admin/clients/:clientId/departments/:deptId`
   - **Live Dashboard**: `/live/clients/:clientSlug/departments/:departmentSlug`
-  - **Presentation Mode**: `/presentation/clients/:clientSlug/departments/:departmentSlug`
+  - **Presentation Mode**: `/check-in/:clientSlug/:departmentSlug/presentation`
 - Centralize all route paths in `src/config/routes.ts` (`ROUTES.live(...)`, `ROUTES.presentation(...)`, `ROUTES.admin.departmentDetail(...)`). Never construct dynamic route paths with inline string interpolation.
 
 ### 4. Navigation & Link Opening Conventions
@@ -342,7 +351,7 @@ To ensure URLs are unambiguous, self-documenting, and consistent across the plat
     const fullUrl = normalizeUrl(ROUTES.live(clientSlug, departmentSlug));
     window.open(fullUrl, '_blank', 'noopener,noreferrer');
     ```
-  - Always wrap relative route paths with `normalizeUrl(...)` to ensure the fully-qualified origin (`http(s)://...`) is resolved properly.
+  - Use `normalizeUrl(...)` only when the URL may be relative or a bare domain; skip it for already-absolute `https://` URLs.
 
 ### 5. URL Refactoring & Obsolete Route Cleanup
 

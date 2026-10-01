@@ -57,63 +57,35 @@ Pick the first option that fits:
 
 ## 2. Design Tokens & Styling System
 
-### Typography Utility Classes (`src/app/globals.css`)
+### Typography Utility Classes (`src/app/globals.css` is the source of truth)
 
-Always use the predefined typography utility classes instead of manual arbitrary font sizes:
-
-| Group       | Utility Class        | Tailwind Font / Line-height | Weight        | Letter Spacing   |
-| :---------- | :------------------- | :-------------------------- | :------------ | :--------------- |
-| **Heading** | `heading-64-bold`    | `text-[64px]/[68px]`        | Bold (700)    | `tracking-tight` |
-|             | `heading-52-black`   | `text-[52px]/[56px]`        | Black (900)   | `tracking-tight` |
-|             | `heading-48-bold`    | `text-[48px]/[52px]`        | Bold (700)    | `tracking-tight` |
-|             | `heading-28-bold`    | `text-[28px]/[32px]`        | Bold (700)    | `tracking-tight` |
-|             | `heading-20-bold`    | `text-xl/[26px]`            | Bold (700)    | `tracking-tight` |
-| **Body**    | `body-32-bold`       | `text-[32px]/[38px]`        | Bold (700)    | `tracking-tight` |
-|             | `body-24-bold`       | `text-[24px]/[30px]`        | Bold (700)    | `tracking-tight` |
-|             | `body-20-bold`       | `text-xl/[26px]`            | Bold (700)    | `tracking-tight` |
-|             | `body-20-medium`     | `text-xl/[26px]`            | Medium (500)  | `tracking-tight` |
-|             | `body-18-black`      | `text-lg/[24px]`            | Black (900)   | `tracking-tight` |
-|             | `body-18-bold`       | `text-lg/[24px]`            | Bold (700)    | `tracking-tight` |
-|             | `body-18-medium`     | `text-lg/[24px]`            | Medium (500)  | `tracking-tight` |
-|             | `body-16-bold`       | `text-base/[22px]`          | Bold (700)    | `tracking-tight` |
-|             | `body-16-medium`     | `text-base/[22px]`          | Medium (500)  | `tracking-tight` |
-|             | `body-16-regular`    | `text-base/[22px]`          | Regular (400) | `tracking-tight` |
-|             | `body-14-bold`       | `text-sm/[20px]`            | Bold (700)    | `tracking-tight` |
-|             | `body-14-medium`     | `text-sm/[20px]`            | Medium (500)  | `tracking-tight` |
-|             | `body-14-regular`    | `text-sm/[20px]`            | Regular (400) | `tracking-tight` |
-|             | `body-12-bold`       | `text-xs/[18px]`            | Bold (700)    | `tracking-tight` |
-|             | `body-12-medium`     | `text-xs/[18px]`            | Medium (500)  | `tracking-tight` |
-| **Caption** | `caption-12-regular` | `text-xs/[18px]`            | Regular (400) | `tracking-tight` |
-|             | `caption-12-bold`    | `text-xs/[18px]`            | Bold (700)    | `tracking-tight` |
+Use the predefined typography utilities instead of arbitrary font sizes. Full list lives in `globals.css`; common examples: `heading-64-bold`, `body-32-bold`, `body-16-medium`, `body-14-regular`, `caption-12-bold`.
 
 - **Font family**: Satoshi (`font-satoshi` / `var(--font-satoshi)`).
 
-### Color Tokens (`tailwind.config.ts` & `src/constants/tokens.ts`)
+### Color Tokens (`tailwind.config.ts` & `src/constants/tokens.ts` are the source of truth, no hex copy here)
 
-| Category             | Tailwind Class Prefix                                                  | Hex Values           | Usage                                                                |
-| :------------------- | :--------------------------------------------------------------------- | :------------------- | :------------------------------------------------------------------- |
-| **Brand Primary**    | `bg-brand-green-2`, `text-brand-green-2`, `border-brand-green-2`       | `#005943`            | Primary brand action, active sidebar item, primary button background |
-|                      | `bg-brand-green-3`, `text-brand-green-3`                               | `#63D556`            | Live data dot & active pulsing indicator                             |
-|                      | `bg-brand-green-4`, `border-brand-green-4`                             | `#C7E3A9`            | Live data card border                                                |
-| **Neutral Grey**     | `text-neutral-grey-1`, `bg-neutral-grey-1`                             | `#12211C`            | Primary heading text, dark surfaces                                  |
-|                      | `text-neutral-grey-2`                                                  | `#53635C`            | Secondary body text, form field labels                               |
-|                      | `text-neutral-grey-3`                                                  | `#6A7A72`            | Muted descriptions, placeholder text, chevron icons                  |
-|                      | `border-neutral-grey-4`                                                | `#BFCFC5`            | Input hover border                                                   |
-|                      | `border-neutral-grey-5`                                                | `#CBD1CD`            | Default input & select borders                                       |
-|                      | `border-neutral-grey-6`                                                | `#DFE5E1`            | Divider lines                                                        |
-|                      | `bg-neutral-grey-7`, `border-neutral-grey-7`                           | `#EDF3EF`            | Card borders, skeleton placeholders, subtle hover                    |
-|                      | `bg-neutral-grey-8`                                                    | `#F6F8F5`            | Page background, secondary input background                          |
-|                      | `bg-white`, `text-white`                                               | `#FFFFFF`            | Solid white cards, primary button text                               |
-| **Secondary Red**    | `text-secondary-red-4`, `border-secondary-red-4`, `bg-secondary-red-2` | `#B43E47`, `#FBE3E7` | Form errors, destructive actions, survive zone badge                 |
-| **Secondary Green**  | `text-secondary-green-4`, `bg-secondary-green-2`                       | `#087452`, `#E6F2D8` | Active status badges, success indicators                             |
-| **Secondary Yellow** | `text-secondary-yellow-3`, `bg-secondary-yellow-2`                     | `#9E892E`, `#FAF4D0` | Function zone badge, warning indicator                               |
+| Category             | Tailwind Class Prefix                                                  | Usage                                                                |
+| :------------------- | :--------------------------------------------------------------------- | :------------------------------------------------------------------- |
+| **Brand Primary**    | `bg-brand-green-2`, `text-brand-green-2`, `border-brand-green-2`       | Primary brand action, active sidebar item, primary button background |
+|                      | `bg-brand-green-3`, `text-brand-green-3`                               | Live data dot & active pulsing indicator                             |
+|                      | `bg-brand-green-4`, `border-brand-green-4`                             | Live data card border                                                |
+| **Neutral Grey**     | `text-neutral-grey-1`, `bg-neutral-grey-1`                             | Primary heading text, dark surfaces                                  |
+|                      | `text-neutral-grey-2`                                                  | Secondary body text, form field labels                               |
+|                      | `text-neutral-grey-3`                                                  | Muted descriptions, placeholder text, chevron icons                  |
+|                      | `border-neutral-grey-4`                                                | Input hover border                                                   |
+|                      | `border-neutral-grey-5`                                                | Default input & select borders                                       |
+|                      | `border-neutral-grey-6`                                                | Divider lines                                                        |
+|                      | `bg-neutral-grey-7`, `border-neutral-grey-7`                           | Card borders, skeleton placeholders, subtle hover                    |
+|                      | `bg-neutral-grey-8`                                                    | Page background, secondary input background                          |
+|                      | `bg-white`, `text-white`                                               | Solid white cards, primary button text                               |
+| **Secondary Red**    | `text-secondary-red-4`, `border-secondary-red-4`, `bg-secondary-red-2` | Form errors, destructive actions, survive zone badge                 |
+| **Secondary Green**  | `text-secondary-green-4`, `bg-secondary-green-2`                       | Active status badges, success indicators                             |
+| **Secondary Yellow** | `text-secondary-yellow-3`, `bg-secondary-yellow-2`                     | Function zone badge, warning indicator                               |
 
-### Wellbeing Zone Colors (`ZONE_COLORS` in `@/constants/tokens.ts`)
+### Wellbeing Zone Colors (`ZONE_COLORS` in `@/constants/tokens.ts` is the source of truth)
 
-- **Thrive Zone** (80–100%): `color: #005943`, `bg: #E6F2D8`
-- **Momentum Zone** (70–79%): `color: #087452`, `bg: #E6F2D8`
-- **Function Zone** (50–69%): `color: #53635C`, `bg: #FAF4D0`
-- **Survive Zone** (0–49%): `color: #B43E47`, `bg: #FBE3E7`
+Use `ZONE_COLORS` directly; zones: Thrive (80–100%), Momentum (70–79%), Function (50–69%), Survive (0–49%).
 
 ---
 
@@ -123,7 +95,7 @@ Always use the predefined typography utility classes instead of manual arbitrary
 
 ```tsx
 <BaseButton
-  variant="primary" // 'primary' (brand green) | 'secondary' (white with border) | 'ghost'
+  variant="primary" // 'primary' (brand green) | 'secondary' (white with border) | 'ghost' | 'outline' (brand green outline)
   size="medium" // 'small' (h-9 body-14-bold) | 'medium' (h-11 body-14-bold) | 'mediumPlus' (h-12 body-16-bold)
   pill // boolean: rounded-full (true) vs rounded-lg 8px (false)
   loading={isPending} // boolean: shows spin loader Loader2 and disables click
@@ -265,33 +237,16 @@ Every data-driven page or section must handle all 5 primary states:
 
 Standard admin pages follow a uniform 4-zone top-to-bottom structure:
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│ 1. Header: BaseHeader with title, breadcrumbs & action CTA   │
-│    (e.g. "Clients" + Pill "Add client" button)              │
-├─────────────────────────────────────────────────────────────┤
-│ 2. Toolbar Card: White rounded-2xl container                │
-│    - Left: BaseInput search with SearchIcon                 │
-│    - Right: BaseSelect filters (Industry, Status, Date)     │
-├─────────────────────────────────────────────────────────────┤
-│ 3. Main Content:                                            │
-│    - BaseTable (with skeleton loaders or empty state)       │
-│    - Or BaseCard responsive grid                            │
-├─────────────────────────────────────────────────────────────┤
-│ 4. Table Footer / Pagination:                               │
-│    - "Showing 1–10 of 48" + Windowed page buttons (1 … 4 5) │
-└─────────────────────────────────────────────────────────────┘
-```
+1. Header: BaseHeader with title, breadcrumbs & action CTA (e.g. "Clients" + Pill "Add client" button)
+2. Toolbar Card: white rounded-2xl container with search left (BaseInput + SearchIcon) and filters right (BaseSelect)
+3. Main Content: BaseTable or BaseCard responsive grid
+4. Table Footer / Pagination: "Showing 1–10 of 48" + windowed page buttons
 
 ---
 
 ## 6. Responsive & Accessibility Standards
 
-- **Breakpoints**: Standard Tailwind breakpoints:
-  - `sm`: 640px
-  - `md`: 768px
-  - `lg`: 1024px
-  - `xl`: 1280px
+- **Breakpoints**: Standard Tailwind breakpoints (`sm`/`md`/`lg`/`xl`, see Tailwind docs).
 - **Touch Targets**: All clickable buttons and interactive triggers must have a minimum target area of 36×36px (desktop) and 44×44px (mobile).
 - **ARIA Attributes**:
   - Inputs: `aria-invalid={error}`, `aria-required={required}`.

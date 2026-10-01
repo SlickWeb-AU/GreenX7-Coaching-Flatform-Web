@@ -1,4 +1,4 @@
-export type BaseVariant = 'primary' | 'secondary' | 'ghost';
+export type BaseVariant = 'primary' | 'secondary' | 'ghost' | 'outline';
 
 export type BaseSize = 'small' | 'medium' | 'mediumPlus';
 
