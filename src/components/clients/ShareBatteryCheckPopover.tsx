@@ -1,72 +1,45 @@
 'use client';
 
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { Copy, ExternalLink, QrCode, Share2, X } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { BaseButton, BaseDialog, BaseIconButton, BasePopover } from '@/components/base';
-import { ROUTES } from '@/config/routes';
-import { clientsApi } from '@/features/admin-clients';
-import { queryKeys } from '@/lib/query-client';
 import { normalizeUrl } from '@/lib/utils';
+import type { DepartmentShareLinksDto } from '@/types';
 
 export interface ShareBatteryCheckPopoverProps {
   departmentName: string;
-  clientId?: string;
-  departmentId?: string;
-  clientSlug?: string;
-  departmentSlug?: string;
-  shareUrl?: string;
-  liveUrl?: string;
-  presentationUrl?: string;
-  qrCode?: string;
+  label?: string;
+  shareLinks?: DepartmentShareLinksDto;
+  isLoading?: boolean;
   className?: string;
 }
 
 export function ShareBatteryCheckPopover({
   departmentName,
-  clientId,
-  departmentId,
-  clientSlug,
-  departmentSlug,
-  shareUrl: initialShareUrl,
-  liveUrl: initialLiveUrl,
-  presentationUrl: initialPresentationUrl,
-  qrCode: initialQrCode,
+  label = 'Share Battery Check',
+  shareLinks,
+  isLoading = false,
   className,
 }: ShareBatteryCheckPopoverProps) {
   const [showQrModal, setShowQrModal] = useState(false);
 
-  const { data: shareLinks, isLoading } = useQuery({
-    queryKey: queryKeys.adminClients.departmentShareLinks(clientId || '', departmentId || ''),
-    queryFn: () => clientsApi.getDepartmentShareLinks(clientId!, departmentId!),
-    enabled: Boolean(clientId && departmentId),
-  });
+  const batteryCheckUrl = shareLinks?.batteryCheckUrl || '';
+  const liveDashboardUrl = shareLinks?.liveDashboardUrl || '';
+  const presentationUrl = shareLinks?.presentationUrl || '';
+  const qrCode = shareLinks?.qrCodeDataUri || shareLinks?.qrCode;
 
-  const batteryCheckUrl = initialShareUrl || shareLinks?.batteryCheckUrl || '';
-  const liveDashboardUrl =
-    initialLiveUrl ||
-    (clientSlug && departmentSlug ? ROUTES.live(clientSlug, departmentSlug) : '') ||
-    shareLinks?.liveDashboardUrl ||
-    '';
-  const presentationUrl =
-    initialPresentationUrl ||
-    (clientSlug && departmentSlug ? ROUTES.presentation(clientSlug, departmentSlug) : '') ||
-    shareLinks?.presentationUrl ||
-    '';
-  const qrCode = initialQrCode || shareLinks?.qrCodeDataUri || shareLinks?.qrCode;
-
-  const handleCopy = async (rawUrl: string | undefined, label: string) => {
+  const handleCopy = async (rawUrl: string | undefined, copyLabel: string) => {
     if (!rawUrl) {
-      toast.error(`No link available for ${label}`);
+      toast.error(`No link available for ${copyLabel}`);
       return;
     }
     const urlToCopy = normalizeUrl(rawUrl);
     try {
       if (typeof navigator !== 'undefined' && navigator.clipboard && window.isSecureContext) {
         await navigator.clipboard.writeText(urlToCopy);
-        toast.success(`${label} copied to clipboard`);
+        toast.success(`${copyLabel} copied to clipboard`);
         return;
       }
       // Fallback for non-secure contexts
@@ -80,28 +53,12 @@ export function ShareBatteryCheckPopover({
       const successful = document.execCommand('copy');
       document.body.removeChild(textArea);
       if (successful) {
-        toast.success(`${label} copied to clipboard`);
+        toast.success(`${copyLabel} copied to clipboard`);
       } else {
-        toast.error(`Failed to copy ${label}`);
+        toast.error(`Failed to copy ${copyLabel}`);
       }
     } catch {
-      toast.error(`Failed to copy ${label}`);
-    }
-  };
-
-  const handleOpenLive = () => {
-    if (liveDashboardUrl) {
-      window.open(normalizeUrl(liveDashboardUrl), '_blank', 'noopener,noreferrer');
-    } else {
-      toast.info('Live dashboard link not configured');
-    }
-  };
-
-  const handlePreviewQR = () => {
-    if (qrCode) {
-      setShowQrModal(true);
-    } else {
-      toast.info('QR Code is not available for this department');
+      toast.error(`Failed to copy ${copyLabel}`);
     }
   };
 
@@ -116,9 +73,10 @@ export function ShareBatteryCheckPopover({
             size="medium"
             pill
             startIcon={<Share2 size={16} />}
+            skeleton={isLoading}
             className={className}
           >
-            Share Battery Check
+            {label}
           </BaseButton>
         }
       >
@@ -156,7 +114,7 @@ export function ShareBatteryCheckPopover({
                     variant="secondary"
                     size="small"
                     pill
-                    disabled={!batteryCheckUrl && isLoading}
+                    disabled={!batteryCheckUrl}
                     startIcon={<Copy size={16} />}
                     onClick={() => handleCopy(batteryCheckUrl, 'Battery Check link')}
                     className="mt-5"
@@ -174,8 +132,9 @@ export function ShareBatteryCheckPopover({
                     variant="secondary"
                     size="small"
                     pill
+                    disabled={!qrCode}
                     startIcon={<QrCode size={16} />}
-                    onClick={handlePreviewQR}
+                    onClick={() => qrCode && setShowQrModal(true)}
                     className="mt-5"
                   >
                     Preview QR
@@ -193,8 +152,11 @@ export function ShareBatteryCheckPopover({
                     variant="secondary"
                     size="small"
                     pill
+                    disabled={!liveDashboardUrl}
                     startIcon={<ExternalLink size={16} />}
-                    onClick={handleOpenLive}
+                    onClick={() =>
+                      window.open(normalizeUrl(liveDashboardUrl), '_blank', 'noopener,noreferrer')
+                    }
                     className="mt-5"
                   >
                     Open live view
@@ -210,11 +172,9 @@ export function ShareBatteryCheckPopover({
                     variant="secondary"
                     size="small"
                     pill
-                    disabled={!presentationUrl && !batteryCheckUrl && isLoading}
+                    disabled={!presentationUrl}
                     startIcon={<Copy size={16} />}
-                    onClick={() =>
-                      handleCopy(presentationUrl || batteryCheckUrl, 'Presentation link')
-                    }
+                    onClick={() => handleCopy(presentationUrl, 'Presentation link')}
                     className="mt-5"
                   >
                     Copy link

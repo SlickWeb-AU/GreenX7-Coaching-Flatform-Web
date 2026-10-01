@@ -142,7 +142,7 @@ export function ClientBatteryCard({
           <div className="flex items-center gap-1">
             <span
               className={cn(
-                'body-14-bold rounded-[99px] px-1 text-white',
+                'body-14-bold rounded-pill px-1 text-white',
                 !hasLastMonth
                   ? 'bg-white/20'
                   : isLastMonthPositive
@@ -164,7 +164,7 @@ export function ClientBatteryCard({
           <div className="flex items-center gap-1">
             <span
               className={cn(
-                'body-14-bold rounded-[99px] px-1 text-white',
+                'body-14-bold rounded-pill px-1 text-white',
                 !hasFirstCheck
                   ? 'bg-white/20'
                   : isFirstCheckPositive

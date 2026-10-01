@@ -7,7 +7,7 @@ export const ROUTES = {
   live: (clientSlug: string, departmentSlug: string) =>
     `/live/clients/${clientSlug}/departments/${departmentSlug}`,
   presentation: (clientSlug: string, departmentSlug: string) =>
-    `/presentation/clients/${clientSlug}/departments/${departmentSlug}`,
+    `/check-in/${clientSlug}/${departmentSlug}/presentation`,
 
   // Admin area
   admin: {

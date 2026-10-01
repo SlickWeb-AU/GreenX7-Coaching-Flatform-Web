@@ -16,6 +16,7 @@ export * from './CreateClientForm';
 export * from './EditClientForm';
 export * from './ClientContext';
 export * from './ClientHeaderProvider';
+export * from './ClientLayoutContent';
 export * from './ClientDepartmentsTable';
 export * from './ClientCheckInHistoryTable';
 export * from './ShareBatteryCheckPopover';

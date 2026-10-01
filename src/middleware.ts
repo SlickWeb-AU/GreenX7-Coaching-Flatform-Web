@@ -46,7 +46,10 @@ async function tryRefresh(refreshToken: string): Promise<RefreshOutcome> {
       cache: 'no-store',
     });
 
-    if (!response.ok) return { payload: null, tokens: null };
+    if (!response.ok) {
+      console.warn(`[auth] refresh failed: ${response.status} ${API_URL}/auth/refresh`);
+      return { payload: null, tokens: null };
+    }
 
     const body = (await response.json()) as { data?: { tokens?: AuthTokens } };
     const tokens = body.data?.tokens;

@@ -36,14 +36,10 @@ export function useClientHeader(slot: ClientHeaderSlot) {
   const { setHeaderSlot } = useContext(ClientHeaderContext);
   const slotRef = useRef(slot);
   slotRef.current = slot;
+  const titleKey = typeof slot.title === 'string' ? slot.title : undefined;
 
   useEffect(() => {
     setHeaderSlot(slotRef.current);
     return () => setHeaderSlot(null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    slot.breadcrumbLabel,
-    typeof slot.title === 'string' ? slot.title : undefined,
-    setHeaderSlot,
-  ]);
+  }, [slot.breadcrumbLabel, titleKey, slot.actions, setHeaderSlot]);
 }
