@@ -14,7 +14,6 @@ import type { BaseSlideProps } from '@/types';
 export function QrCountdownSlide({ ...layoutProps }: BaseSlideProps = {}) {
   const pres = usePresentation();
   const qrCodeUrl = pres.qrCodeUrl;
-  const batteryCheckUrl = pres.batteryCheckUrl;
   const [seconds, setSeconds] = useState(QR_COUNTDOWN_SECONDS);
 
   useEffect(() => {
@@ -56,19 +55,18 @@ export function QrCountdownSlide({ ...layoutProps }: BaseSlideProps = {}) {
             <div className="body-24-bold mb-4 uppercase tracking-widest text-secondary-yellow-1">
               {timeFormatted} REMAINING
             </div>
-            <div className="flex items-center justify-center rounded-[32px] bg-white p-6 shadow-2xl">
-              {qrCodeUrl ? (
-                // QR code URL is runtime data, bypasses next/image optimizer
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={qrCodeUrl} alt="QR Code" className="h-64 w-64 object-contain" />
-              ) : (
-                <div className="flex h-64 w-64 items-center justify-center text-neutral-grey-1">
-                  <QrCode className="h-56 w-56 stroke-[1.5]" />
-                </div>
-              )}
-            </div>
-            {batteryCheckUrl && (
-              <span className="caption-12-regular mt-3 text-white/60">{batteryCheckUrl}</span>
+            {qrCodeUrl ? (
+              // QR code URL is runtime data, bypasses next/image optimizer
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={qrCodeUrl}
+                alt="QR Code"
+                className="h-[332px] w-[332px] rounded-[36px] object-contain"
+              />
+            ) : (
+              <div className="flex h-[332px] w-[332px] items-center justify-center rounded-[36px] bg-white text-neutral-grey-1">
+                <QrCode className="h-72 w-72 stroke-[1.5]" />
+              </div>
             )}
           </div>
         }

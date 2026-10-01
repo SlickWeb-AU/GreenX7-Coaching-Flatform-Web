@@ -5,9 +5,9 @@ export const ROUTES = {
   login: '/login',
   forbidden: '/forbidden',
   live: (clientSlug: string, departmentSlug: string) =>
-    `/check-in/${clientSlug}/${departmentSlug}/live`,
+    `/battery/${clientSlug}/${departmentSlug}/live`,
   presentation: (clientSlug: string, departmentSlug: string) =>
-    `/check-in/${clientSlug}/${departmentSlug}/presentation`,
+    `/battery/${clientSlug}/${departmentSlug}/presentation`,
 
   // Admin area
   admin: {

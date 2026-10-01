@@ -1,6 +1,6 @@
 import type { ComponentType, ReactNode, SVGProps } from 'react';
 
-import type { DepartmentDashboardDto, WellbeingArea } from './clients';
+import type { DepartmentDashboardDto, DepartmentShareLinksDto, WellbeingArea } from './clients';
 
 export type SlideType = 'static' | 'dynamic';
 
@@ -43,12 +43,11 @@ export interface BatteryPeriod {
   label?: string | null;
 }
 
-export interface BatteryCheckLiveResult extends Partial<DepartmentDashboardDto> {
+export interface BatteryCheckLiveResult extends Omit<Partial<DepartmentDashboardDto>, 'shareUrl'> {
   clientName?: string;
   branding?: BatteryBranding | null;
   period?: BatteryPeriod | null;
-  qrCodeDataUri?: string;
-  batteryCheckUrl?: string;
+  shareLinks?: DepartmentShareLinksDto | null;
 }
 
 export type StaticSlideVariant = 'default' | 'cover';

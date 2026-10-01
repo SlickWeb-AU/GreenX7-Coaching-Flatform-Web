@@ -59,3 +59,13 @@ export function resolvePeriodLabel(data: BatteryCheckLiveResult | null | undefin
   }
   return data?.period?.label ?? null;
 }
+
+/** Previous month name as 'September'; wraps January -> December. */
+export function resolvePreviousMonthLabel(
+  data: BatteryCheckLiveResult | null | undefined,
+): string | null {
+  if (data?.period?.month) {
+    return MONTH_NAMES[(data.period.month - 2 + 12) % 12];
+  }
+  return null;
+}

@@ -8,9 +8,13 @@ import { LiveDashboardHeader } from '@/components/dashboard/LiveDashboardHeader'
 import { LiveSummaryPanel } from '@/components/dashboard/LiveSummaryPanel';
 import { TeamBatteryCard } from '@/components/dashboard/TeamBatteryCard';
 import { PresentationMobileWarning } from '@/components/presentation/PresentationMobileWarning';
-import { MONTH_NAMES } from '@/constants';
 import { useBatteryLive } from '@/features/battery-check';
-import { resolveLiveLogoUrl, resolveLiveNames, resolvePeriodLabel } from '@/lib/live';
+import {
+  resolveLiveLogoUrl,
+  resolveLiveNames,
+  resolvePeriodLabel,
+  resolvePreviousMonthLabel,
+} from '@/lib/live';
 
 function LiveDashboardContent() {
   const { clientSlug, departmentSlug } = useParams<{
@@ -26,9 +30,7 @@ function LiveDashboardContent() {
   const { clientName, departmentName } = resolveLiveNames(data, clientSlug, departmentSlug);
   const clientLogoUrl = resolveLiveLogoUrl(data);
   const periodLabel = resolvePeriodLabel(data);
-  const previousMonthLabel = data?.period?.month
-    ? MONTH_NAMES[(data.period.month - 2 + 12) % 12]
-    : null;
+  const previousMonthLabel = resolvePreviousMonthLabel(data);
   const dashboardTitle = `${clientName.toUpperCase()} — LIVE DASHBOARD`;
 
   return (

@@ -8,12 +8,30 @@ import { batteryCheckApi } from '@/features/battery-check/battery-check.api';
 import { queryKeys } from '@/lib/query-client';
 import type { WellbeingItemData } from '@/types';
 
-export function useBatteryLive(clientSlug?: string, departmentSlug?: string) {
+export interface UseBatteryLiveOptions {
+  refetchInterval?: number | false;
+  refetchIntervalInBackground?: boolean;
+  enabled?: boolean;
+}
+
+export function useBatteryLive(
+  clientSlug?: string,
+  departmentSlug?: string,
+  options?: UseBatteryLiveOptions,
+) {
+  const {
+    refetchInterval = 10_000,
+    refetchIntervalInBackground = true,
+    enabled = Boolean(clientSlug && departmentSlug),
+  } = options ?? {};
+
   const { data, isLoading } = useQuery({
     queryKey: queryKeys.batteryCheck.live(clientSlug || '', departmentSlug || ''),
     queryFn: () => batteryCheckApi.live(clientSlug || '', departmentSlug || ''),
     retry: false,
-    enabled: Boolean(clientSlug && departmentSlug),
+    enabled,
+    refetchInterval,
+    refetchIntervalInBackground,
   });
 
   const score = data?.batteryScore ?? null;

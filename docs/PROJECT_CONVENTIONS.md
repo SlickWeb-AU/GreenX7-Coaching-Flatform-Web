@@ -53,7 +53,7 @@ src/
 │   │   ├── auth/        # /api/auth/login, /api/auth/refresh, /api/auth/logout
 │   │   └── bff/         # /api/bff/[...path] proxy to NestJS backend
 │   ├── report/          # Public/client report pages (password, view)
-│   ├── check-in/        # Public check-in routes: [clientSlug]/[departmentSlug]/{live, presentation}
+│   ├── battery/         # Public battery routes: [clientSlug]/[departmentSlug]/{live, presentation}
 │   ├── forbidden/       # 403 Forbidden page
 │   ├── globals.css      # Tailwind base layers, typography utilities, scrollbar
 │   └── layout.tsx       # Root layout with server session fetching
@@ -95,7 +95,6 @@ src/
 │   ├── jwt.ts           # JWT decode & verification helpers
 │   ├── live.ts          # Strengths/focus calculation for live battery data
 │   ├── otp.ts           # OTP timer & email masking formatters
-│   ├── presentation.ts  # Strengths/focus calculation for presentation decks
 │   ├── presentation-nav.ts # Hash-based slide navigation hook (fullscreen decks only)
 │   ├── query-client.ts  # TanStack QueryClient factory & query keys
 │   ├── search-params.ts # URL search param patch & merge utilities
@@ -324,8 +323,8 @@ To ensure URLs are unambiguous, self-documenting, and consistent across the plat
 
 - Every dynamic identifier segment **must** be prefixed with its explicit plural resource noun:
   - ❌ `/live/:clientId/:deptId`
-  - ✅ `/check-in/[clientSlug]/[departmentSlug]/live`
-  - ✅ `/check-in/[clientSlug]/[departmentSlug]/presentation`
+  - ✅ `/battery/[clientSlug]/[departmentSlug]/live`
+  - ✅ `/battery/[clientSlug]/[departmentSlug]/presentation`
   - ✅ `/admin/clients/[clientId]/departments/[deptId]`
 - **Slug-only for Public/Live/Presentation Routes**:
   - Public-facing views (Live Dashboard, Presentation Decks) strictly use semantic slugs (`[clientSlug]`, `[departmentSlug]`) to align with API design and ensure clean branding without UUID fallbacks.
@@ -335,8 +334,8 @@ To ensure URLs are unambiguous, self-documenting, and consistent across the plat
 
 - Keep resource hierarchies consistent whether in the Admin portal, Live Dashboard, or Presentation views:
   - **Admin**: `/admin/clients/:clientId/departments/:deptId`
-  - **Live Dashboard**: `/check-in/:clientSlug/:departmentSlug/live`
-  - **Presentation Mode**: `/check-in/:clientSlug/:departmentSlug/presentation`
+  - **Live Dashboard**: `/battery/:clientSlug/:departmentSlug/live`
+  - **Presentation Mode**: `/battery/:clientSlug/:departmentSlug/presentation`
 - Centralize all route paths in `src/config/routes.ts` (`ROUTES.live(...)`, `ROUTES.presentation(...)`, `ROUTES.admin.departmentDetail(...)`). Never construct dynamic route paths with inline string interpolation.
 
 ### 4. Navigation & Link Opening Conventions

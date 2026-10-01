@@ -3,7 +3,7 @@
 import { createContext, useContext, type ReactNode } from 'react';
 
 import { useBatteryLive } from '@/features/battery-check';
-import { resolveLiveLogoUrl, resolveLiveNames, resolvePeriodLabel } from '@/lib/live';
+import { resolveLiveLogoUrl, resolveLiveNames, resolvePreviousMonthLabel } from '@/lib/live';
 import type { PresentationContextValue } from '@/types';
 
 const PresentationContext = createContext<PresentationContextValue | null>(null);
@@ -21,14 +21,14 @@ export function PresentationProvider({
 }: PresentationProviderProps) {
   const { data, score, items, isLoading } = useBatteryLive(clientSlug, departmentSlug);
 
-  const qrCodeUrl = data?.qrCodeDataUri ?? null;
-  const batteryCheckUrl = data?.shareUrl || data?.batteryCheckUrl || null;
+  const qrCodeUrl = data?.shareLinks?.qrCodeDataUri ?? null;
+  const batteryCheckUrl = data?.shareLinks?.batteryCheckUrl ?? null;
 
   const { clientName, departmentName } = resolveLiveNames(data, clientSlug, departmentSlug);
   const fullDisplayName = `${clientName} ${departmentName}`.trim();
 
   const clientLogoUrl = resolveLiveLogoUrl(data);
-  const previousMonthLabel = resolvePeriodLabel(data);
+  const previousMonthLabel = resolvePreviousMonthLabel(data);
 
   const value: PresentationContextValue = {
     clientSlug,

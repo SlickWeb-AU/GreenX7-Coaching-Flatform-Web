@@ -11,9 +11,13 @@ export function usePresentationNav(totalSlides: number = PRESENTATION_TOTAL_SLID
     return Math.min(Math.max(1, parsed), totalSlides);
   }, [totalSlides]);
 
-  const [currentSlide, setCurrentSlide] = useState<number>(getSlideFromHash);
+  const [currentSlide, setCurrentSlide] = useState<number>(1);
   const [direction, setDirection] = useState<'next' | 'prev'>('next');
   const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    setCurrentSlide(getSlideFromHash());
+  }, [getSlideFromHash]);
 
   const goToSlide = useCallback(
     (index: number) => {
