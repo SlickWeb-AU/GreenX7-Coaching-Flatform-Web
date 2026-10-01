@@ -2,18 +2,22 @@
 
 import type { ReactNode } from 'react';
 
-import { AdminHeader } from '@/components/layout/admin-header';
-import { AdminMobileWarning } from '@/components/layout/admin-mobile-warning';
 import { AdminSidebar } from '@/components/layout/admin-sidebar';
+import { PresentationMobileWarning } from '@/components/presentation/PresentationMobileWarning';
 
 export function AdminShell({ children }: { children: ReactNode }) {
   return (
     <>
-      <AdminMobileWarning />
+      <PresentationMobileWarning
+        title="Desktop Screen Required"
+        description="The GreenX7 Admin Portal is designed specifically for desktop viewports to give you the best experience for data analytics, client management, and reporting."
+        helperNotice="Please access this page from a laptop, desktop computer, or expand your browser window."
+        screenCode="AP/E9"
+        showCopyButton={false}
+      />
       <div className="hidden min-h-screen bg-neutral-grey-8 lg:block">
         <AdminSidebar />
         <div className="lg:pl-56">
-          <AdminHeader />
           <main className="p-4 lg:p-10">{children}</main>
         </div>
       </div>

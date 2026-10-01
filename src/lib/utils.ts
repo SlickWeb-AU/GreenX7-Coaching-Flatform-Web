@@ -3,7 +3,7 @@ import { twMerge } from 'tailwind-merge';
 
 import { USER_ROLES } from '@/types/auth';
 
-/** Gộp class Tailwind, class sau ghi đè class trước đúng cách */
+/** Merge Tailwind classes, later classes override earlier ones correctly */
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -60,7 +60,7 @@ export function formatRoleLabel(role?: string | null): string {
   return role.charAt(0) + role.slice(1).toLowerCase();
 }
 
-/** Bỏ các key rỗng khỏi query params để URL sạch và cache key ổn định */
+/** Drop empty keys from query params to keep URLs clean and cache keys stable */
 export function cleanParams<T extends object>(params: T): Partial<T> {
   return Object.fromEntries(
     Object.entries(params).filter(
@@ -137,4 +137,37 @@ export function normalizeUrl(url?: string): string {
     return `${appUrl.replace(/\/+$/, '')}${trimmed}`;
   }
   return `https://${trimmed}`;
+}
+
+/** Resolve image path to usable src: env domain + API link, fallback APP origin. */
+export function resolveImageUrl(path?: string | null, fallback = ''): string {
+  if (!path) return fallback;
+  const trimmed = path.trim();
+  if (!trimmed) return fallback;
+
+  // Blob / object URLs (e.g. URL.createObjectURL from local file upload) and base64 data URLs
+  if (trimmed.startsWith('blob:') || trimmed.startsWith('data:')) {
+    return trimmed;
+  }
+
+  // Already a full absolute or protocol-relative URL (API link)
+  if (/^(?:https?:)?\/\//i.test(trimmed)) {
+    return trimmed;
+  }
+
+  // Backend-relative image path: prepend the configured image domain
+  const domain = (process.env.NEXT_PUBLIC_IMAGE_DOMAIN ?? '').trim().replace(/\/+$/, '');
+  if (!domain) return trimmed;
+  const cleanPath = trimmed.replace(/^\/+/, '');
+  return `${domain}/${cleanPath}`;
+}
+
+/** Turn a URL slug into a display label: 'blackpole-advisory' -> 'Blackpole Advisory'. */
+export function formatSlugLabel(slug?: string | null): string {
+  if (!slug) return '';
+  return slug
+    .split('-')
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
 }

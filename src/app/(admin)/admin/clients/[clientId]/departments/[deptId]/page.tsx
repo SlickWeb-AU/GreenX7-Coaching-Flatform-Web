@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Download, SlidersHorizontal, Tv } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
@@ -20,7 +20,7 @@ import { ROUTES } from '@/config/routes';
 import { MONTH_NAMES } from '@/constants';
 import { CLIENT_STATUSES } from '@/constants/clients';
 import { CHART_COLORS } from '@/constants/tokens';
-import { clientsApi } from '@/features/admin-clients';
+import { clientsApi, useDepartmentShareLinks } from '@/features/admin-clients';
 import { queryKeys } from '@/lib/query-client';
 import { normalizeUrl } from '@/lib/utils';
 import {
@@ -116,17 +116,18 @@ export default function DepartmentDetailPage() {
   };
 
   const departmentName = deptDashboard?.departmentName || department.name;
-  const clientSlug = client?.slug;
-  const deptSlug = department?.slug;
-  const liveUrl = clientSlug && deptSlug ? ROUTES.live(clientSlug, deptSlug) : undefined;
-  const presentationUrl =
-    clientSlug && deptSlug ? ROUTES.presentation(clientSlug, deptSlug) : undefined;
+  const liveUrl = deptDashboard?.liveUrl || '';
+  const presentationUrl = deptDashboard?.presentationUrl || '';
+
+  const { data: shareLinks, isLoading: isShareLinksLoading } = useDepartmentShareLinks(
+    clientId,
+    deptId,
+  );
 
   // Synchronize department header into persistent layout shell
-  useClientHeader({
-    title: departmentName,
-    breadcrumbLabel: `${departmentName} Department`,
-    actions: (
+  // Memoized so header effect only re-syncs when async URLs actually change
+  const headerActions = useMemo(
+    () => (
       <>
         <BaseButton
           variant="secondary"
@@ -156,28 +157,29 @@ export default function DepartmentDetailPage() {
           variant="secondary"
           size="medium"
           pill
+          disabled={!presentationUrl}
           startIcon={<Tv size={16} />}
           onClick={() => {
-            if (presentationUrl) {
-              window.open(normalizeUrl(presentationUrl), '_blank', 'noopener,noreferrer');
-            }
+            window.open(normalizeUrl(presentationUrl), '_blank', 'noopener,noreferrer');
           }}
         >
           Launch presentation
         </BaseButton>
 
         <ShareBatteryCheckPopover
-          clientId={clientId}
-          departmentId={deptId}
-          clientSlug={client?.slug}
-          departmentSlug={department?.slug}
           departmentName={departmentName}
-          shareUrl={deptDashboard?.shareUrl}
-          liveUrl={liveUrl}
-          presentationUrl={presentationUrl}
+          shareLinks={shareLinks}
+          isLoading={isShareLinksLoading}
         />
       </>
     ),
+    [clientId, departmentName, presentationUrl, router, shareLinks, isShareLinksLoading],
+  );
+
+  useClientHeader({
+    title: departmentName,
+    breadcrumbLabel: `${departmentName} Department`,
+    actions: headerActions,
   });
 
   if (isClientLoading || isDeptDashboardLoading) {
@@ -233,7 +235,7 @@ export default function DepartmentDetailPage() {
         <div className="lg:col-span-2">
           <DepartmentLiveDataCard
             participantCount={effectiveParticipants}
-            dashboardHref={liveUrl || '#'}
+            dashboardHref={liveUrl}
             className="h-full"
           />
         </div>

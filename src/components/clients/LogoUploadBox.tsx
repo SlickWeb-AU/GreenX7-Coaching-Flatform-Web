@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useState } from 'react';
 import { Upload } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, resolveImageUrl } from '@/lib/utils';
 
 export type LogoUploadVariant = 'dark' | 'reversed' | 'white';
 
@@ -40,7 +40,7 @@ export function LogoUploadBox({
 
   useEffect(() => {
     if (!file) {
-      setPreviewUrl(currentUrl ?? null);
+      setPreviewUrl(currentUrl ? resolveImageUrl(currentUrl) : null);
       return;
     }
     const url = URL.createObjectURL(file);
@@ -66,7 +66,7 @@ export function LogoUploadBox({
         <img
           src={previewUrl}
           alt={file?.name ?? title ?? defaultTitle}
-          className="mb-3 max-h-[48px] w-auto max-w-full object-contain"
+          className="mb-3 max-h-12 w-auto max-w-full object-contain"
         />
       ) : (
         <Upload

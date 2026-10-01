@@ -28,73 +28,96 @@
 }
 
 @layer utilities {
-  /* Dashboard typography ported from battery-check Tailwind v4 */
+  .heading-96-black {
+    @apply text-[6rem] font-black leading-[0.92] tracking-tight-4;
+  }
+  .heading-80-black {
+    @apply text-[5rem] font-black leading-[0.92] tracking-tight-4;
+  }
+  .heading-80-bold {
+    @apply text-[5rem] font-bold leading-[1.0] tracking-tight-4;
+  }
   .heading-64-bold {
-    @apply text-[64px]/[68px] font-bold tracking-tight;
+    @apply text-[4rem]/[4.25rem] font-bold tracking-tight-3;
+  }
+  .heading-56-black {
+    @apply text-[3.5rem] font-black leading-[1.0] tracking-tight-3;
   }
   .heading-52-black {
-    @apply text-[52px]/[56px] font-black tracking-tight;
+    @apply text-[3.25rem]/[3.5rem] font-black tracking-tight-2;
   }
   .heading-48-bold {
-    @apply text-[48px]/[52px] font-bold tracking-tight;
+    @apply text-[3rem]/[3.25rem] font-bold tracking-tight-2;
+  }
+  .heading-48-medium {
+    @apply text-[3rem]/[3.25rem] font-medium tracking-tight-2;
   }
   .heading-28-bold {
-    @apply text-[28px]/[32px] font-bold tracking-tight;
+    @apply text-[1.75rem]/[2rem] font-bold tracking-tight-2;
   }
   .heading-20-bold {
-    @apply text-xl/[26px] font-bold tracking-tight;
+    @apply text-xl/[1.625rem] font-bold tracking-tight-2;
+  }
+  .body-32-black {
+    @apply text-[2rem]/[2.375rem] font-black tracking-tight-2;
   }
   .body-32-bold {
-    @apply text-[32px]/[38px] font-bold tracking-tight;
+    @apply text-[2rem]/[2.375rem] font-bold tracking-tight-2;
+  }
+  .body-32-medium {
+    @apply text-[2rem]/[2.375rem] font-medium tracking-tight-2;
+  }
+  .body-28-bold {
+    @apply text-[1.75rem]/[2.125rem] font-bold tracking-tight-2;
   }
   .body-24-bold {
-    @apply text-[24px]/[30px] font-bold tracking-tight;
+    @apply text-[1.5rem]/[1.875rem] font-bold tracking-tight-2;
   }
   .body-20-bold {
-    @apply text-xl/[26px] font-bold tracking-tight;
+    @apply text-xl/[1.625rem] font-bold tracking-tight-2;
   }
   .body-20-medium {
-    @apply text-xl/[26px] font-medium tracking-tight;
+    @apply text-xl/[1.625rem] font-medium tracking-tight-2;
   }
 
   .body-18-black {
-    @apply text-lg/[24px] font-black tracking-tight;
+    @apply text-lg/[1.5rem] font-black tracking-tight-2;
   }
   .body-18-bold {
-    @apply text-lg/[24px] font-bold tracking-tight;
+    @apply text-lg/[1.5rem] font-bold tracking-tight-2;
   }
   .body-18-medium {
-    @apply text-lg/[24px] font-medium tracking-tight;
+    @apply text-lg/[1.5rem] font-medium tracking-tight-2;
   }
   .body-16-bold {
-    @apply text-base/[22px] font-bold tracking-tight;
+    @apply text-base/[1.375rem] font-bold tracking-tight-2;
   }
   .body-16-medium {
-    @apply text-base/[22px] font-medium tracking-tight;
+    @apply text-base/[1.375rem] font-medium tracking-tight-2;
   }
   .body-16-regular {
-    @apply text-base/[22px] font-normal tracking-tight;
+    @apply text-base/[1.375rem] font-normal tracking-tight-2;
   }
   .body-14-bold {
-    @apply text-sm/[20px] font-bold tracking-tight;
+    @apply text-sm/[1.25rem] font-bold tracking-tight-1;
   }
   .body-14-medium {
-    @apply text-sm/[20px] font-medium tracking-tight;
+    @apply text-sm/[1.25rem] font-medium tracking-tight-1;
   }
   .body-14-regular {
-    @apply text-sm/[20px] font-normal tracking-tight;
+    @apply text-sm/[1.25rem] font-normal tracking-tight-1;
   }
   .body-12-bold {
-    @apply text-xs/[18px] font-bold tracking-tight;
+    @apply text-xs/[1.125rem] font-bold tracking-tight-1;
   }
   .body-12-medium {
-    @apply text-xs/[18px] font-medium tracking-tight;
+    @apply text-xs/[1.125rem] font-medium tracking-tight-1;
   }
   .caption-12-regular {
-    @apply text-xs/[18px] font-normal tracking-tight;
+    @apply text-xs/[1.125rem] font-normal tracking-tight-1;
   }
   .caption-12-bold {
-    @apply text-xs/[18px] font-bold tracking-tight;
+    @apply text-xs/[1.125rem] font-bold tracking-tight-1;
   }
 
   /* Ẩn spinner của input[type=number] */

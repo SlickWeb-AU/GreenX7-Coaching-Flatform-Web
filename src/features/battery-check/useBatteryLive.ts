@@ -8,13 +8,30 @@ import { batteryCheckApi } from '@/features/battery-check/battery-check.api';
 import { queryKeys } from '@/lib/query-client';
 import type { WellbeingItemData } from '@/types';
 
-export function useBatteryLive(clientSlug?: string, departmentSlug?: string) {
+export interface UseBatteryLiveOptions {
+  refetchInterval?: number | false;
+  refetchIntervalInBackground?: boolean;
+  enabled?: boolean;
+}
+
+export function useBatteryLive(
+  clientSlug?: string,
+  departmentSlug?: string,
+  options?: UseBatteryLiveOptions,
+) {
+  const {
+    refetchInterval = 10_000,
+    refetchIntervalInBackground = true,
+    enabled = Boolean(clientSlug && departmentSlug),
+  } = options ?? {};
+
   const { data, isLoading } = useQuery({
     queryKey: queryKeys.batteryCheck.live(clientSlug || '', departmentSlug || ''),
     queryFn: () => batteryCheckApi.live(clientSlug || '', departmentSlug || ''),
-    refetchInterval: 10000,
     retry: false,
-    enabled: Boolean(clientSlug && departmentSlug),
+    enabled,
+    refetchInterval,
+    refetchIntervalInBackground,
   });
 
   const score = data?.batteryScore ?? null;
@@ -24,9 +41,9 @@ export function useBatteryLive(clientSlug?: string, departmentSlug?: string) {
       area: string;
       label?: string;
       score: number | null;
-      vsPrevious?: { change: number; changePercent: number };
-      vsFirstCheck?: { change: number; changePercent: number };
-    }[] = data?.wellbeingAreas ?? data?.areas ?? [];
+      vsPrevious?: { change?: number | null; changePercent?: number | null };
+      vsFirstCheck?: { change?: number | null; changePercent?: number | null };
+    }[] = data?.wellbeingAreas ?? [];
     const apiAreaMap = new Map(
       source.map(
         (a) =>

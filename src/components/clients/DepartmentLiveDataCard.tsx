@@ -15,7 +15,7 @@ export interface DepartmentLiveDataCardProps {
 
 export function DepartmentLiveDataCard({
   participantCount = null,
-  dashboardHref = '#',
+  dashboardHref,
   className,
 }: DepartmentLiveDataCardProps) {
   return (
@@ -43,17 +43,25 @@ export function DepartmentLiveDataCard({
         </div>
       </div>
 
-      {/* Bottom cluster: Divider & Open dashboard link */}
       <div className="flex w-full flex-col items-center">
         <div className="w-full border-t border-neutral-grey-6" />
         <div className="mt-3">
-          <Link
-            href={dashboardHref}
-            className="body-14-bold inline-flex items-center gap-1 text-brand-green-2 transition-colors hover:underline"
-          >
-            <span>Open dashboard</span>
-            <ExternalLink size={15} aria-hidden="true" />
-          </Link>
+          {dashboardHref ? (
+            <Link
+              href={dashboardHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="body-14-bold inline-flex items-center gap-1 text-brand-green-2 transition-colors hover:underline"
+            >
+              <span>Open dashboard</span>
+              <ExternalLink size={15} aria-hidden="true" />
+            </Link>
+          ) : (
+            <span className="body-14-bold inline-flex cursor-not-allowed items-center gap-1 text-neutral-grey-4">
+              <span>Open dashboard</span>
+              <ExternalLink size={15} aria-hidden="true" />
+            </span>
+          )}
         </div>
       </div>
     </div>

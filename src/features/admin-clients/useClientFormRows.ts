@@ -55,7 +55,6 @@ export const contactDeleteKey = (id: string) => `contact:del:${id}`;
 export const deptSaveKey = (id: string) => `dept:${id}`;
 export const deptDeleteKey = (id: string) => `dept:del:${id}`;
 
-// ponytail: single busyKey, per-row busy maps if parallel row saves matter
 export function useClientRowPersistence(clientId?: string) {
   const queryClient = useQueryClient();
   const [busyKey, setBusyKey] = useState<string | null>(null);

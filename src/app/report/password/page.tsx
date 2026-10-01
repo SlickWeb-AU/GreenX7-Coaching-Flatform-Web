@@ -7,18 +7,18 @@ import { useState, Suspense, type FormEvent } from 'react';
 
 import { BaseButton, BaseInput, BaseLoading } from '@/components/base';
 import { DecorativeWaveBottomRight, DecorativeWaveTopRight } from '@/components/icons';
-import { reportApi } from '@/features/report-login';
+import { reportApi } from '@/features/report';
 import { reportSessionKey } from '@/lib/report-auth';
 
-export default function ReportLoginPage() {
+export default function ReportPasswordPage() {
   return (
     <Suspense fallback={<BaseLoading message="Loading..." fullScreen />}>
-      <ReportLoginContent />
+      <ReportPasswordContent />
     </Suspense>
   );
 }
 
-function ReportLoginContent() {
+function ReportPasswordContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get('token') || searchParams.get('clientId') || '';

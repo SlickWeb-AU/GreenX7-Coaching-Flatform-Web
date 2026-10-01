@@ -39,6 +39,6 @@ export interface ReportViewDto {
   expiredAt?: string;
 }
 
-export interface ReportLoginPayload {
+export interface ReportPasswordPayload {
   password: string;
 }

@@ -34,7 +34,8 @@ export async function verifyAccessToken(token: string): Promise<AccessTokenPaylo
       algorithms: ['HS256'],
     });
     return payload;
-  } catch {
+  } catch (e) {
+    console.warn('[auth] verifyAccessToken failed:', e instanceof Error ? e.message : e);
     return null;
   }
 }

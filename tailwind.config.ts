@@ -77,6 +77,7 @@ const config: Config = {
         },
         brand: {
           green: {
+            1: '#004736',
             2: '#005943',
             3: '#63D556',
             4: '#C7E3A9',
@@ -87,6 +88,9 @@ const config: Config = {
       borderWidth: {
         '0.5': '0.5px',
       },
+      borderRadius: {
+        pill: '99px',
+      },
       spacing: {
         '1.25': '0.3125rem',
       },
@@ -96,9 +100,16 @@ const config: Config = {
       },
       maxWidth: {
         '1440': '90rem',
+        '1600': '1600px',
       },
       fontFamily: {
         satoshi: ['var(--font-satoshi)', 'sans-serif'],
+      },
+      letterSpacing: {
+        'tight-4': '-0.04em', // -4%
+        'tight-3': '-0.03em', // -3%
+        'tight-2': '-0.02em', // -2%
+        'tight-1': '-0.01em', // -1%
       },
       keyframes: {
         'fade-in': { from: { opacity: '0' }, to: { opacity: '1' } },
