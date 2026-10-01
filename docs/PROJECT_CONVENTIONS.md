@@ -52,9 +52,8 @@ src/
 │   ├── api/             # BFF & Auth API route handlers
 │   │   ├── auth/        # /api/auth/login, /api/auth/refresh, /api/auth/logout
 │   │   └── bff/         # /api/bff/[...path] proxy to NestJS backend
-│   ├── report/          # Public/client report pages
-│   ├── live/            # Live dashboard (slug routes: clients/[clientSlug]/departments/[departmentSlug])
-│   ├── presentation/    # Presentation decks (slug routes: clients/[clientSlug]/departments/[departmentSlug])
+│   ├── report/          # Public/client report pages (password, view)
+│   ├── check-in/        # Public check-in routes: [clientSlug]/[departmentSlug]/{live, presentation}
 │   ├── forbidden/       # 403 Forbidden page
 │   ├── globals.css      # Tailwind base layers, typography utilities, scrollbar
 │   └── layout.tsx       # Root layout with server session fetching
@@ -85,7 +84,7 @@ src/
 │   ├── admin-settings/  # settingsApi service
 │   ├── auth/            # authApi service
 │   ├── battery-check/   # batteryCheckApi + useBatteryLive hook
-│   └── report-login/    # reportApi service
+│   └── report/         # reportApi service (password + view screens)
 ├── lib/                 # Core utilities, helpers & HTTP client
 │   ├── api-error.ts     # ApiError class & error parser
 │   ├── axios.ts         # Axios BFF client with refresh-token mutex queue & typed helpers (get, post, patch, del)
@@ -325,7 +324,7 @@ To ensure URLs are unambiguous, self-documenting, and consistent across the plat
 
 - Every dynamic identifier segment **must** be prefixed with its explicit plural resource noun:
   - ❌ `/live/:clientId/:deptId`
-  - ✅ `/live/clients/[clientSlug]/departments/[departmentSlug]`
+  - ✅ `/check-in/[clientSlug]/[departmentSlug]/live`
   - ✅ `/check-in/[clientSlug]/[departmentSlug]/presentation`
   - ✅ `/admin/clients/[clientId]/departments/[deptId]`
 - **Slug-only for Public/Live/Presentation Routes**:
@@ -336,7 +335,7 @@ To ensure URLs are unambiguous, self-documenting, and consistent across the plat
 
 - Keep resource hierarchies consistent whether in the Admin portal, Live Dashboard, or Presentation views:
   - **Admin**: `/admin/clients/:clientId/departments/:deptId`
-  - **Live Dashboard**: `/live/clients/:clientSlug/departments/:departmentSlug`
+  - **Live Dashboard**: `/check-in/:clientSlug/:departmentSlug/live`
   - **Presentation Mode**: `/check-in/:clientSlug/:departmentSlug/presentation`
 - Centralize all route paths in `src/config/routes.ts` (`ROUTES.live(...)`, `ROUTES.presentation(...)`, `ROUTES.admin.departmentDetail(...)`). Never construct dynamic route paths with inline string interpolation.
 

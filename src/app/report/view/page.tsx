@@ -40,7 +40,9 @@ function ReportViewContent() {
 
   useEffect(() => {
     if (!token || !report) {
-      router.replace(token ? `/report/login?token=${encodeURIComponent(token)}` : '/report/login');
+      router.replace(
+        token ? `/report/password?token=${encodeURIComponent(token)}` : '/report/password',
+      );
     }
   }, [token, report, router]);
 
@@ -51,8 +53,10 @@ function ReportViewContent() {
         <p className="body-14-medium mb-6 text-neutral-grey-3">
           This report may have expired or requires password verification.
         </p>
-        <BaseButton onClick={() => router.push(`/report/login?token=${encodeURIComponent(token)}`)}>
-          Go to Password Login
+        <BaseButton
+          onClick={() => router.push(`/report/password?token=${encodeURIComponent(token)}`)}
+        >
+          Go to Password Verification
         </BaseButton>
       </div>
     );
