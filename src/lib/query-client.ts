@@ -78,6 +78,7 @@ export const queryKeys = {
   },
   batteryCheck: {
     live: (client: string, dept: string) => ['battery-check-live', client, dept] as const,
+    submit: (client: string, dept: string) => ['battery-check-submit', client, dept] as const,
   },
   reports: {
     all: ['reports'] as const,
