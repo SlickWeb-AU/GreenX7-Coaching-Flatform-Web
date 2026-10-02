@@ -8,6 +8,8 @@ export const ROUTES = {
     `/battery/${clientSlug}/${departmentSlug}/live`,
   presentation: (clientSlug: string, departmentSlug: string) =>
     `/battery/${clientSlug}/${departmentSlug}/presentation`,
+  batteryCheck: (clientSlug: string, departmentSlug: string) =>
+    `/battery/${clientSlug}/${departmentSlug}`,
 
   // Admin area
   admin: {

@@ -47,6 +47,7 @@ export interface BatteryCheckLiveResult extends Omit<Partial<DepartmentDashboard
   clientName?: string;
   branding?: BatteryBranding | null;
   period?: BatteryPeriod | null;
+  isWindowOpen?: boolean | null;
   shareLinks?: DepartmentShareLinksDto | null;
 }
 

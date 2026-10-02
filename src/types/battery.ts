@@ -13,4 +13,9 @@ export type BatteryZone = 'Survive' | 'Function' | 'Momentum' | 'Thrive';
 
 export interface BatterySubmitPayload {
   scores: { area: string; score: number }[];
+  deviceId?: string;
+}
+
+export interface BatterySubmitResult {
+  resultToken?: string;
 }
