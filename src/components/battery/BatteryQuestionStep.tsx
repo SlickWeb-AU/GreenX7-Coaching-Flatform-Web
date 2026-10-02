@@ -34,9 +34,14 @@ export function BatteryQuestionStep({
 }: BatteryQuestionStepProps) {
   const Icon = AREA_ICON_MAP[area];
   return (
-    <main className="flex min-h-screen flex-col bg-white">
+    <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col bg-white">
       <header className="flex items-center justify-between px-4 py-3">
-        <BaseIconButton aria-label="Back" onClick={onBack} icon={<ArrowLeftIcon size={20} />} />
+        <BaseIconButton
+          size={44}
+          aria-label="Back"
+          onClick={onBack}
+          icon={<ArrowLeftIcon size={20} />}
+        />
         <h1 className="body-16-bold text-neutral-grey-1">Battery Check</h1>
         <span className="body-14-medium text-neutral-grey-2">{`${index + 1} of 8`}</span>
       </header>

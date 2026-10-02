@@ -31,7 +31,7 @@ export function BatteryResultsView({
 
   if (average === null || zone === null) return null;
   return (
-    <main className="min-h-screen bg-neutral-grey-8 pb-10">
+    <main className="mx-auto min-h-screen max-w-lg bg-neutral-grey-8 pb-10">
       <BatteryResultsHero average={average} zone={zone} areas={areas} />
       <div className="mt-4">
         <BatteryScoreBreakdown areas={areas} />

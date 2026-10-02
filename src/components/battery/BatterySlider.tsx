@@ -29,7 +29,7 @@ export function BatterySlider({ value, onChange }: BatterySliderProps) {
         aria-valuetext={value === null ? 'No score selected' : `${value} out of 10`}
         onChange={(e) => onChange(Number(e.target.value))}
         className={cn(
-          'h-2 w-full cursor-pointer accent-brand-green-2',
+          'h-8 w-full cursor-pointer accent-brand-green-2',
           value === null && 'opacity-60',
         )}
       />

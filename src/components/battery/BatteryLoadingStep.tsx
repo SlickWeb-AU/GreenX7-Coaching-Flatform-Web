@@ -23,7 +23,7 @@ export function BatteryLoadingStep({ score, onDone }: { score: number; onDone: (
   }, [score, onDone]);
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-4 bg-white px-6 text-center">
+    <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col items-center justify-center gap-4 bg-white px-6 text-center">
       <HowsYourBatterySticker className="max-w-[200px]" />
       <div className="mt-2 flex justify-center">
         <BatteryIcon percentage={shown} />
