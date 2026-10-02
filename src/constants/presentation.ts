@@ -1,58 +1,12 @@
 import { PurposeIcon } from '@/components/icons';
 import { AREA_BAR_COLORS, AREA_ICON_MAP } from './dashboard';
-import type { OrbitItem, SlideConfig, SlideType } from '@/types';
+import type { OrbitItem } from '@/types';
 
-export const SLIDE_TYPES = {
-  STATIC: 'static',
-  DYNAMIC: 'dynamic',
-} as const satisfies Record<string, SlideType>;
-
-export const PRESENTATION_SLIDES: SlideConfig[] = [
-  { id: 1, slug: 'cover', title: 'Cover', type: SLIDE_TYPES.STATIC },
-  { id: 2, slug: '8-areas-one-battery', title: '8 areas. One battery.', type: SLIDE_TYPES.STATIC },
-  { id: 3, slug: 'start-check-in', title: 'Start your Battery Check', type: SLIDE_TYPES.DYNAMIC },
-  { id: 4, slug: 'take-a-moment', title: 'Take a moment', type: SLIDE_TYPES.STATIC },
-  { id: 5, slug: 'reflect-prompts', title: 'Before you move forward', type: SLIDE_TYPES.STATIC },
-  {
-    id: 6,
-    slug: 'energy-area',
-    title: 'Which battery area gives you the most energy?',
-    type: SLIDE_TYPES.STATIC,
-  },
-  {
-    id: 7,
-    slug: 'difference-area',
-    title: 'Which one area would make the biggest difference?',
-    type: SLIDE_TYPES.STATIC,
-  },
-  {
-    id: 8,
-    slug: 'small-action',
-    title: "What's one small action you will actually do?",
-    type: SLIDE_TYPES.STATIC,
-  },
-  { id: 9, slug: 'make-it-easy', title: 'Make it easy', type: SLIDE_TYPES.STATIC },
-  { id: 10, slug: 'my-promise', title: 'My promise', type: SLIDE_TYPES.STATIC },
-  { id: 11, slug: 'team-battery', title: 'Team Battery', type: SLIDE_TYPES.DYNAMIC },
-  { id: 12, slug: 'closing', title: 'Closing', type: SLIDE_TYPES.STATIC },
-];
-
-export const PRESENTATION_TOTAL_SLIDES = PRESENTATION_SLIDES.length;
+export const PRESENTATION_TOTAL_SLIDES = 12;
 
 export const QR_COUNTDOWN_SECONDS = 60;
 
 export const PRESENTATION_TITLE_SUFFIX = 'Monthly Coaching Check-in';
-
-export const FIXED_AREA_SEQUENCE = [
-  'Physical',
-  'Sleep',
-  'Nutrition',
-  'Fun',
-  'Mindset',
-  'Friendships',
-  'Relationships',
-  'Purpose',
-] as const;
 
 export const COVER_PILLS = [
   {

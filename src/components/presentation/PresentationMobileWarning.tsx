@@ -39,8 +39,6 @@ export interface PresentationMobileWarningProps {
   copiedFeedbackText?: string;
   /** Optional informational notice (e.g. viewport / device guidance) */
   helperNotice?: string;
-  /** Optional screen code (e.g. "AP/E9") shown at the bottom */
-  screenCode?: string;
   /** Extra container className */
   className?: string;
 }
@@ -61,7 +59,6 @@ export function PresentationMobileWarning({
   copyButtonText = 'Copy presentation link',
   copiedFeedbackText = 'Link copied. Open it on a desktop or laptop.',
   helperNotice,
-  screenCode,
   className,
 }: PresentationMobileWarningProps) {
   const [copied, setCopied] = useState(false);
@@ -179,14 +176,6 @@ export function PresentationMobileWarning({
           </>
         ) : null}
       </div>
-
-      {screenCode ? (
-        <div className="pb-4 text-xs font-medium text-neutral-grey-4">
-          Screen Code: <span className="font-semibold text-neutral-grey-3">{screenCode}</span>
-        </div>
-      ) : (
-        <div className="h-4" />
-      )}
     </div>
   );
 }

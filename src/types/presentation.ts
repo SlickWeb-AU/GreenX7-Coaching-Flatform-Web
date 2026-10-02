@@ -2,15 +2,6 @@ import type { ComponentType, ReactNode, SVGProps } from 'react';
 
 import type { DepartmentDashboardDto, DepartmentShareLinksDto, WellbeingArea } from './clients';
 
-export type SlideType = 'static' | 'dynamic';
-
-export interface SlideConfig {
-  id: number;
-  slug: string;
-  title: string;
-  type: SlideType;
-}
-
 export interface InsightBadgeItem {
   area: string;
   label: string;
