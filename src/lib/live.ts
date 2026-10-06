@@ -60,6 +60,26 @@ export function resolvePeriodLabel(data: BatteryCheckLiveResult | null | undefin
   return data?.period?.label ?? null;
 }
 
+/** Kỳ đã đóng: 'Closed on 25 July 2026' theo múi giờ của khách. */
+export function resolveClosedLabel(data: BatteryCheckLiveResult | null | undefined): string | null {
+  if (!data?.closedAt) return null;
+  const date = new Date(data.closedAt);
+  if (Number.isNaN(date.getTime())) return null;
+  const format = (timeZone?: string) =>
+    new Intl.DateTimeFormat('en-AU', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      timeZone,
+    }).format(date);
+  try {
+    return `Closed on ${format(data.timezone ?? undefined)}`;
+  } catch {
+    // Múi giờ lạ trình duyệt không hiểu thì in theo giờ máy
+    return `Closed on ${format()}`;
+  }
+}
+
 /** Previous month name as 'September'; wraps January -> December. */
 export function resolvePreviousMonthLabel(
   data: BatteryCheckLiveResult | null | undefined,

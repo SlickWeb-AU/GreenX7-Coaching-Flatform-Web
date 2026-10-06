@@ -48,6 +48,12 @@ export interface BatteryCheckLiveResult extends Omit<Partial<DepartmentDashboard
   branding?: BatteryBranding | null;
   period?: BatteryPeriod | null;
   shareLinks?: DepartmentShareLinksDto | null;
+  /** false khi kỳ đã đóng — dashboard hiện số liệu kỳ vừa đóng, không có badge LIVE */
+  isLive?: boolean;
+  /** ISO — thời điểm kỳ đóng, null khi đang live */
+  closedAt?: string | null;
+  /** Múi giờ của khách, dùng để in ngày đóng kỳ */
+  timezone?: string | null;
 }
 
 export type StaticSlideVariant = 'default' | 'cover';

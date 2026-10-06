@@ -13,6 +13,8 @@ export interface LiveSummaryPanelProps {
   changeVsPreviousMonth?: number | null;
   previousMonthLabel?: string | null;
   changeVsFirstCheck?: number | null;
+  /** Kỳ đã đóng thì truyền 'Closed on …' — thay cho chấm live + "Updated just now" */
+  closedLabel?: string | null;
   className?: string;
 }
 
@@ -26,6 +28,7 @@ export function LiveSummaryPanel({
   changeVsPreviousMonth,
   previousMonthLabel,
   changeVsFirstCheck,
+  closedLabel,
   className,
 }: LiveSummaryPanelProps) {
   const logoUrl = resolveImageUrl(clientLogoUrl);
@@ -78,10 +81,12 @@ export function LiveSummaryPanel({
       </div>
 
       <div className="flex items-center gap-2 pt-8">
-        <LiveIndicator />
+        {!closedLabel && <LiveIndicator />}
         <div className="flex items-center gap-1.5">
           <span className="body-14-bold text-white">{participantCount ?? '—'}</span>
-          <span className="body-14-medium text-white/80">Participants (Updated just now)</span>
+          <span className="body-14-medium text-white/80">
+            {closedLabel ? `Participants (${closedLabel})` : 'Participants (Updated just now)'}
+          </span>
         </div>
       </div>
     </div>
