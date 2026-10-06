@@ -6,16 +6,6 @@ import { Download, SlidersHorizontal, Tv } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 
 import { BaseButton, BaseLoading } from '@/components/base';
-import {
-  CloudIcon,
-  FriendshipsIcon,
-  FunIcon,
-  HeartIcon,
-  MindsetIcon,
-  NutritionIcon,
-  PurposeIcon,
-  RelationshipsIcon,
-} from '@/components/icons';
 import { ROUTES } from '@/config/routes';
 import { MONTH_NAMES } from '@/constants';
 import { CLIENT_STATUSES } from '@/constants/clients';
@@ -23,6 +13,7 @@ import { CHART_COLORS } from '@/constants/tokens';
 import { clientsApi, useDepartmentShareLinks } from '@/features/admin-clients';
 import { useExportPdf } from '@/hooks/useExportPdf';
 import { queryKeys } from '@/lib/query-client';
+import { toInsightItems } from '@/lib/insights';
 import { normalizeUrl } from '@/lib/utils';
 import {
   ClientBatteryCard,
@@ -34,29 +25,9 @@ import {
   ShareBatteryCheckPopover,
   useClient,
   useClientHeader,
-  type InsightItem,
 } from '@/components/clients';
 import { HistoricalTrendChart } from '@/components/dashboard';
 import type { AreaScoreDto, WellbeingItemData } from '@/types';
-
-const ICON_BY_AREA: Record<string, typeof HeartIcon> = {
-  PHYSICAL: HeartIcon,
-  Physical: HeartIcon,
-  SLEEP: CloudIcon,
-  Sleep: CloudIcon,
-  NUTRITION: NutritionIcon,
-  Nutrition: NutritionIcon,
-  FUN: FunIcon,
-  Fun: FunIcon,
-  MINDSET: MindsetIcon,
-  Mindset: MindsetIcon,
-  FRIENDSHIPS: FriendshipsIcon,
-  Friendships: FriendshipsIcon,
-  RELATIONSHIPS: RelationshipsIcon,
-  Relationships: RelationshipsIcon,
-  PURPOSE: PurposeIcon,
-  Purpose: PurposeIcon,
-};
 
 function mapWellbeingAreas(areas?: AreaScoreDto[]): WellbeingItemData[] | undefined {
   if (!areas || areas.length === 0) return undefined;
@@ -65,16 +36,6 @@ function mapWellbeingAreas(areas?: AreaScoreDto[]): WellbeingItemData[] | undefi
     score: a.score ?? 0,
     vsPreviousMonth: a.vsPrevious?.change ?? 0,
     vsFirstCheck: a.vsFirstCheck?.change ?? 0,
-  }));
-}
-
-function mapInsightItems(items?: AreaScoreDto[], fallback: InsightItem[] = []): InsightItem[] {
-  if (!items || items.length === 0) return fallback;
-  return items.map((it) => ({
-    key: it.area.toLowerCase(),
-    label: it.label || it.area,
-    score: it.score ?? 0,
-    icon: ICON_BY_AREA[it.area] ?? ICON_BY_AREA[it.label] ?? HeartIcon,
   }));
 }
 
@@ -212,8 +173,8 @@ export default function DepartmentDetailPage() {
   const effectiveZone = deptDashboard?.zone?.label ?? deptDashboard?.zone?.name ?? '';
   const effectiveParticipants =
     deptDashboard?.participantCount ?? department.participantCount ?? null;
-  const effectiveStrengths = mapInsightItems(deptDashboard?.strengths);
-  const effectiveFocus = mapInsightItems(deptDashboard?.focus);
+  const effectiveStrengths = toInsightItems(deptDashboard?.strengths);
+  const effectiveFocus = toInsightItems(deptDashboard?.focus);
   const effectiveWellbeing = mapWellbeingAreas(deptDashboard?.wellbeingAreas);
   const effectiveTrend =
     deptDashboard?.historicalTrend && deptDashboard.historicalTrend.length > 0

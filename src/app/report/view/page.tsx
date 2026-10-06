@@ -10,12 +10,14 @@ import { ClientBatteryCard } from '@/components/clients/ClientBatteryCard';
 import { ClientCurrentZoneCard } from '@/components/clients/ClientCurrentZoneCard';
 import { ClientPeriodFilter } from '@/components/clients/ClientPeriodFilter';
 import { ClientWellbeingCard } from '@/components/clients/ClientWellbeingCard';
+import { DepartmentInsightListCard } from '@/components/clients/DepartmentInsightListCard';
 import { HistoricalTrendChart } from '@/components/dashboard';
 import { MONTH_NAMES } from '@/constants';
 import { CHART_COLORS } from '@/constants/tokens';
 import { reportApi } from '@/features/report';
 import { useExportPdf } from '@/hooks/useExportPdf';
 import { toApiError } from '@/lib/api-error';
+import { toInsightItems } from '@/lib/insights';
 import { reportPasswordKey, reportSessionKey } from '@/lib/report-auth';
 import { cn, resolveImageUrl } from '@/lib/utils';
 import type { ClientDashboardDto, DepartmentDashboardDto } from '@/types';
@@ -29,6 +31,12 @@ import type { ReportContentDto } from '@/types/reports';
  * gọi lại /view với `period`; Export PDF xuất đúng tab + kỳ đang xem.
  *
  * Chênh lệch hiển thị theo % (changePercent), khớp với file PDF của màn này.
+ * Tab phòng ban có thêm "Strongest areas" / "Requires attention" (dùng lại thẻ
+ * Strengths/Focus của màn 08).
+ *
+ * Responsive: < 640px mọi thẻ xếp một cột, tab cuộn ngang, nút Export full-width;
+ * 640–1359px thẻ Battery chiếm trọn hàng, ba thẻ nhỏ chia 3; từ 1360px đúng bố
+ * cục design (6/2/2/2). Hàng dưới chia đôi từ 1024px.
  */
 
 const OVERALL = 'overall';
@@ -158,26 +166,61 @@ function ReportViewContent() {
   const trend = data.historicalTrend
     .filter((t) => t.score !== null)
     .map((t) => ({ year: t.year, month: t.month, label: t.label, score: t.score as number }));
+  const department =
+    activeTab === OVERALL
+      ? null
+      : (content.departments.find((d) => d.departmentId === activeTab) ?? null);
+  const strengths = toInsightItems(department?.strengths);
+  const focus = toInsightItems(department?.focus);
+
+  const trendCard = (
+    <HistoricalTrendChart
+      title="Historical trend"
+      data={trend}
+      lineColor={CHART_COLORS.trendLine}
+      dotColor={CHART_COLORS.trendLine}
+      className="h-full"
+      footerNote={
+        data.firstCheck ? (
+          <div className="body-14-medium flex items-center gap-2 text-neutral-grey-2">
+            <div className="h-2 w-2 shrink-0 rounded-full bg-brand-green-2" aria-hidden="true" />
+            First valid check: {MONTH_NAMES[data.firstCheck.month - 1].slice(0, 3)}{' '}
+            {data.firstCheck.year}
+          </div>
+        ) : undefined
+      }
+    />
+  );
 
   return (
     <div className="min-h-screen bg-neutral-grey-8">
-      <header className="flex h-[78px] items-center bg-brand-green-1 px-6 md:px-[167px]">
+      <header className="flex h-16 items-center bg-brand-green-1 px-4 sm:h-[78px] sm:px-8 xl:px-[167px]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/icons/greenx7-logo-light.svg" alt="GreenX7" className="h-10 w-auto" />
+        <img src="/icons/greenx7-logo-light.svg" alt="GreenX7" className="h-8 w-auto sm:h-10" />
       </header>
 
-      <main className="mx-auto max-w-[1666px] px-6 pb-16 pt-12 md:px-[167px]">
-        <div className="mb-10 flex items-center justify-center">
+      <main className="mx-auto max-w-[1666px] px-4 pb-12 pt-8 sm:px-8 sm:pb-16 sm:pt-12 xl:px-[167px]">
+        <div className="mb-6 flex items-center justify-center sm:mb-10">
           {logo ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={logo} alt={content.businessName} className="h-[72px] w-auto object-contain" />
+            <img
+              src={logo}
+              alt={content.businessName}
+              className="h-12 w-auto max-w-[240px] object-contain sm:h-[72px] sm:max-w-[320px]"
+            />
           ) : (
-            <h1 className="heading-48-bold text-neutral-grey-1">{content.businessName}</h1>
+            <h1 className="heading-32-bold sm:heading-48-bold break-words text-center text-neutral-grey-1">
+              {content.businessName}
+            </h1>
           )}
         </div>
 
-        <div className="mb-8 flex flex-wrap items-end justify-between gap-4 border-b border-neutral-grey-6">
-          <div className="flex gap-8" role="tablist">
+        <div className="mb-6 flex flex-col-reverse gap-4 border-b border-neutral-grey-6 sm:mb-8 sm:flex-row sm:items-end sm:justify-between">
+          {/* Nhiều phòng ban thì tab cuộn ngang thay vì xuống dòng làm vỡ gạch chân */}
+          <div
+            className="-mx-4 flex gap-6 overflow-x-auto px-4 [scrollbar-width:none] sm:mx-0 sm:gap-8 sm:px-0 [&::-webkit-scrollbar]:hidden"
+            role="tablist"
+          >
             {tabs.map((t) => (
               <button
                 key={t.key}
@@ -186,7 +229,7 @@ function ReportViewContent() {
                 aria-selected={t.key === activeTab}
                 onClick={() => setTab(t.key)}
                 className={cn(
-                  'body-16-bold -mb-px border-b-2 pb-3 transition-colors',
+                  'body-16-bold -mb-px shrink-0 whitespace-nowrap border-b-2 pb-3 transition-colors',
                   t.key === activeTab
                     ? 'border-brand-green-2 text-brand-green-2'
                     : 'border-transparent text-neutral-grey-2 hover:text-neutral-grey-1',
@@ -199,7 +242,7 @@ function ReportViewContent() {
           <BaseButton
             variant="secondary"
             pill
-            className="mb-2"
+            className="w-full shrink-0 sm:mb-2 sm:w-auto"
             startIcon={<Download size={16} aria-hidden />}
             loading={exporting}
             onClick={handleExport}
@@ -209,10 +252,11 @@ function ReportViewContent() {
         </div>
 
         <div
-          className={cn('flex flex-col gap-6 transition-opacity', loadingPeriod && 'opacity-60')}
+          className={cn('flex flex-col gap-4 transition-opacity', loadingPeriod && 'opacity-60')}
+          aria-busy={loadingPeriod}
         >
-          <div className="grid grid-cols-1 items-stretch gap-4 md:grid-cols-2 lg:grid-cols-12">
-            <div className="lg:col-span-12 min-[1360px]:col-span-6">
+          <div className="grid grid-cols-1 items-stretch gap-4 sm:grid-cols-3 min-[1360px]:grid-cols-12">
+            <div className="sm:col-span-3 min-[1360px]:col-span-6">
               <ClientBatteryCard
                 score={data.batteryScore}
                 periodLabel={`${MONTH_NAMES[month - 1]} ${year}`}
@@ -227,13 +271,13 @@ function ReportViewContent() {
                 className="h-full"
               />
             </div>
-            <div className="lg:col-span-4 min-[1360px]:col-span-2">
+            <div className="min-[1360px]:col-span-2">
               <ClientCurrentZoneCard
                 zoneName={data.zone?.label ?? data.zone?.name}
-                className="h-full"
+                className="h-full min-h-[160px]"
               />
             </div>
-            <div className="lg:col-span-4 min-[1360px]:col-span-2">
+            <div className="min-[1360px]:col-span-2">
               <ClientPeriodFilter
                 selectedMonth={String(month)}
                 onMonthChange={(m) => void changePeriod(m, String(year))}
@@ -242,45 +286,56 @@ function ReportViewContent() {
                 className="h-full"
               />
             </div>
-            <div className="flex h-full flex-col items-center justify-center gap-2 rounded-2xl bg-white p-4 lg:col-span-4 min-[1360px]:col-span-2">
+            <div className="flex h-full min-h-[120px] flex-col items-center justify-center gap-2 rounded-2xl bg-white p-4 min-[1360px]:col-span-2">
               <div className="body-32-bold text-brand-green-2">{data.participantCount}</div>
               <div className="body-14-medium text-neutral-grey-3">Participants</div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 items-stretch gap-4 lg:grid-cols-12">
-            <div className="lg:col-span-6">
-              <ClientWellbeingCard
-                items={wellbeingItems}
-                previousMonthLabel={MONTH_NAMES[prevMonth - 1]}
-                deltaVariant="pill"
-                className="h-full"
-              />
+          {department ? (
+            <>
+              <div className="grid grid-cols-1 items-stretch gap-4 lg:grid-cols-12">
+                <div className="min-w-0 lg:col-span-8">
+                  <ClientWellbeingCard
+                    items={wellbeingItems}
+                    previousMonthLabel={MONTH_NAMES[prevMonth - 1]}
+                    deltaVariant="pill"
+                    className="h-full"
+                  />
+                </div>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:col-span-4 lg:grid-cols-1">
+                  <DepartmentInsightListCard
+                    title="Strongest areas"
+                    titleColorClass="text-secondary-green-4"
+                    items={strengths}
+                    className="h-full"
+                  />
+                  <DepartmentInsightListCard
+                    title="Requires attention"
+                    titleColorClass="text-secondary-red-4"
+                    items={focus}
+                    className="h-full"
+                  />
+                </div>
+              </div>
+              <div className="min-w-0">{trendCard}</div>
+            </>
+          ) : (
+            <div className="grid grid-cols-1 items-stretch gap-4 lg:grid-cols-2">
+              <div className="min-w-0">
+                <ClientWellbeingCard
+                  items={wellbeingItems}
+                  previousMonthLabel={MONTH_NAMES[prevMonth - 1]}
+                  deltaVariant="pill"
+                  className="h-full"
+                />
+              </div>
+              <div className="min-w-0">{trendCard}</div>
             </div>
-            <div className="lg:col-span-6">
-              <HistoricalTrendChart
-                title="Historical trend"
-                data={trend}
-                lineColor={CHART_COLORS.trendLine}
-                dotColor={CHART_COLORS.trendLine}
-                footerNote={
-                  data.firstCheck ? (
-                    <div className="body-14-medium flex items-center gap-2 text-neutral-grey-2">
-                      <div
-                        className="h-2 w-2 shrink-0 rounded-full bg-brand-green-2"
-                        aria-hidden="true"
-                      />
-                      First valid check: {MONTH_NAMES[data.firstCheck.month - 1].slice(0, 3)}{' '}
-                      {data.firstCheck.year}
-                    </div>
-                  ) : undefined
-                }
-              />
-            </div>
-          </div>
+          )}
         </div>
 
-        <p className="body-14-medium mt-12 text-center text-neutral-grey-3">
+        <p className="body-14-medium mt-10 text-center text-neutral-grey-3 sm:mt-12">
           © {new Date().getFullYear()} GreenX7. Confidential wellbeing report.
         </p>
       </main>
