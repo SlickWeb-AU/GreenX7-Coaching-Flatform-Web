@@ -13,6 +13,11 @@ export interface ClientBatteryCardProps {
   lastMonthLabel?: string;
   changeVsFirstCheck?: number | null;
   firstCheckLabel?: string | null;
+  /**
+   * 'stacked' = bố cục "Current Battery Score" (chênh lệch nằm dưới điểm, như màn
+   * 08). Có `badgeText` thì tự dùng bố cục này; badge chỉ hiện khi có `badgeText`.
+   */
+  layout?: 'inline' | 'stacked';
   className?: string;
 }
 
@@ -25,6 +30,7 @@ export function ClientBatteryCard({
   lastMonthLabel = '',
   changeVsFirstCheck = null,
   firstCheckLabel = null,
+  layout = 'inline',
   className,
 }: ClientBatteryCardProps) {
   const displayScore = formatScoreToPercent(score);
@@ -36,7 +42,7 @@ export function ClientBatteryCard({
   const roundedFirstCheck = hasFirstCheck ? Math.round(changeVsFirstCheck) : null;
   const isFirstCheckPositive = (roundedFirstCheck ?? 0) >= 0;
 
-  if (badgeText) {
+  if (badgeText || layout === 'stacked') {
     return (
       <div
         className={cn(
@@ -47,7 +53,7 @@ export function ClientBatteryCard({
         {/* Top cluster: Title + Tag */}
         <div className="flex items-center justify-between gap-2">
           <div className="body-14-bold text-white">{title ?? 'Current Battery Score'}</div>
-          <BaseTag variant="green-neutral">{badgeText}</BaseTag>
+          {badgeText && <BaseTag variant="green-neutral">{badgeText}</BaseTag>}
         </div>
 
         {/* Bottom cluster: Battery Icon, Score & Comparisons */}

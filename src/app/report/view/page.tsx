@@ -171,6 +171,14 @@ function ReportViewContent() {
       ? null
       : (content.departments.find((d) => d.departmentId === activeTab) ?? null);
   const strengths = toInsightItems(department?.strengths);
+  // Chỉ kỳ còn mở mới có badge "Open until …" (design 17 tab phòng ban)
+  const openUntilLabel =
+    department?.isOpen && department.openUntil
+      ? `Open until ${new Date(department.openUntil).toLocaleDateString('en-GB', {
+          day: 'numeric',
+          month: 'long',
+        })}`
+      : undefined;
   const focus = toInsightItems(department?.focus);
 
   const trendCard = (
@@ -181,7 +189,8 @@ function ReportViewContent() {
       dotColor={CHART_COLORS.trendLine}
       className="h-full"
       footerNote={
-        data.firstCheck ? (
+        // Design tab phòng ban không có dòng "First valid check"
+        !department && data.firstCheck ? (
           <div className="body-14-medium flex items-center gap-2 text-neutral-grey-2">
             <div className="h-2 w-2 shrink-0 rounded-full bg-brand-green-2" aria-hidden="true" />
             First valid check: {MONTH_NAMES[data.firstCheck.month - 1].slice(0, 3)}{' '}
@@ -257,19 +266,32 @@ function ReportViewContent() {
         >
           <div className="grid grid-cols-1 items-stretch gap-4 sm:grid-cols-3 min-[1360px]:grid-cols-12">
             <div className="sm:col-span-3 min-[1360px]:col-span-6">
-              <ClientBatteryCard
-                score={data.batteryScore}
-                periodLabel={`${MONTH_NAMES[month - 1]} ${year}`}
-                changeVsLastMonth={data.vsPrevious?.changePercent ?? null}
-                lastMonthLabel={`${MONTH_NAMES[prevMonth - 1]} ${prevYear}`}
-                changeVsFirstCheck={data.vsFirstCheck?.changePercent ?? null}
-                firstCheckLabel={
-                  data.firstCheck
-                    ? `${MONTH_NAMES[data.firstCheck.month - 1]} ${data.firstCheck.year}`
-                    : null
-                }
-                className="h-full"
-              />
+              {department ? (
+                <ClientBatteryCard
+                  title="Current Battery Score"
+                  layout="stacked"
+                  badgeText={openUntilLabel}
+                  score={data.batteryScore}
+                  changeVsLastMonth={data.vsPrevious?.changePercent ?? null}
+                  lastMonthLabel={MONTH_NAMES[prevMonth - 1]}
+                  changeVsFirstCheck={data.vsFirstCheck?.changePercent ?? null}
+                  className="h-full"
+                />
+              ) : (
+                <ClientBatteryCard
+                  score={data.batteryScore}
+                  periodLabel={`${MONTH_NAMES[month - 1]} ${year}`}
+                  changeVsLastMonth={data.vsPrevious?.changePercent ?? null}
+                  lastMonthLabel={`${MONTH_NAMES[prevMonth - 1]} ${prevYear}`}
+                  changeVsFirstCheck={data.vsFirstCheck?.changePercent ?? null}
+                  firstCheckLabel={
+                    data.firstCheck
+                      ? `${MONTH_NAMES[data.firstCheck.month - 1]} ${data.firstCheck.year}`
+                      : null
+                  }
+                  className="h-full"
+                />
+              )}
             </div>
             <div className="min-[1360px]:col-span-2">
               <ClientCurrentZoneCard
@@ -294,8 +316,8 @@ function ReportViewContent() {
 
           {department ? (
             <>
-              <div className="grid grid-cols-1 items-stretch gap-4 lg:grid-cols-12">
-                <div className="min-w-0 lg:col-span-8">
+              <div className="grid grid-cols-1 items-stretch gap-4 lg:grid-cols-2">
+                <div className="min-w-0">
                   <ClientWellbeingCard
                     items={wellbeingItems}
                     previousMonthLabel={MONTH_NAMES[prevMonth - 1]}
@@ -303,7 +325,7 @@ function ReportViewContent() {
                     className="h-full"
                   />
                 </div>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:col-span-4 lg:grid-cols-1">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-1 lg:grid-rows-2">
                   <DepartmentInsightListCard
                     title="Strongest areas"
                     titleColorClass="text-secondary-green-4"
