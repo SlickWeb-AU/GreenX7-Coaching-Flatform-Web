@@ -2,14 +2,23 @@
 
 import { BaseCard, BaseTrend } from '@/components/base';
 import { BoltIcon } from '@/components/icons';
-import { AREA_BADGE, AREA_BAR_COLORS, AREA_COLOR, AREA_ICON_MAP } from '@/constants/dashboard';
+import {
+  AREA_BADGE,
+  AREA_BAR_COLORS,
+  AREA_COLOR,
+  AREA_ICON_MAP,
+  FIXED_WELLBEING_AREAS,
+} from '@/constants/dashboard';
 import { cn, formatScoreToPercent } from '@/lib/utils';
 
 import type { DashboardWellbeingAreaDto } from '@/types';
 
 function getAreaKey(area: string): string {
   const norm = area.toLowerCase();
-  return Object.keys(AREA_ICON_MAP).find((k) => k.toLowerCase() === norm) ?? 'Physical';
+  return (
+    Object.keys(AREA_ICON_MAP).find((k) => k.toLowerCase() === norm) ??
+    FIXED_WELLBEING_AREAS[0].area
+  );
 }
 
 export function WellbeingGrid({
@@ -35,7 +44,7 @@ export function WellbeingGrid({
             item.vsPrevious?.changePercent ?? item.vsPrevious?.change ?? item.change ?? null;
           const change =
             rawChange !== null && rawChange !== undefined ? Math.round(rawChange) : null;
-          const Icon = AREA_ICON_MAP[areaKey] ?? AREA_ICON_MAP.Physical;
+          const Icon = AREA_ICON_MAP[areaKey] ?? AREA_ICON_MAP[FIXED_WELLBEING_AREAS[0].area];
 
           return (
             <div key={item.area} className="flex flex-col bg-white p-3">

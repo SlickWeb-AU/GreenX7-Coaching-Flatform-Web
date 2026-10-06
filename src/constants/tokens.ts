@@ -31,6 +31,7 @@ export const DASHBOARD_COLORS = {
   },
   neutral: {
     whiteSolid: '#FFFFFF',
+    grey600: '#1F313D',
     grey1: '#12211C',
     grey2: '#53635C',
     grey3: '#6A7A72',
@@ -39,6 +40,9 @@ export const DASHBOARD_COLORS = {
     grey6: '#DFE5E1',
     grey7: '#EDF3EF',
     grey8: '#F6F8F5',
+  },
+  forest: {
+    light: '#E7F1E5',
   },
 } as const;
 

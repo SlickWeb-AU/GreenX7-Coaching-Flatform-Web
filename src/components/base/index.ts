@@ -3,6 +3,7 @@ export * from './BaseButton';
 export * from './BaseCard';
 export * from './BaseDatePicker';
 export * from './BaseDialog';
+export * from './BaseDivider';
 export * from './BaseHeader';
 export * from './BaseHelperText';
 export * from './BaseIconButton';

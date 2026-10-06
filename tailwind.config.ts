@@ -61,6 +61,7 @@ const config: Config = {
           },
         },
         neutral: {
+          600: '#1F313D',
           white: {
             solid: '#FFFFFF',
           },
@@ -75,6 +76,9 @@ const config: Config = {
             8: '#F6F8F5',
           },
         },
+        forest: {
+          light: '#E7F1E5',
+        },
         brand: {
           green: {
             1: '#004736',
@@ -82,6 +86,7 @@ const config: Config = {
             3: '#63D556',
             4: '#C7E3A9',
             5: '#CFE4CA',
+            dark: '#001F17',
           },
         },
       },

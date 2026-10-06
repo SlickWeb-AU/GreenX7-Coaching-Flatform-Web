@@ -5,6 +5,7 @@ import { Cell, Pie, PieChart, Sector, Tooltip } from 'recharts';
 import type { PieSectorShapeProps } from 'recharts';
 
 import { BadgeStarIcon } from '@/components/icons';
+import { AREA_COLOR, FIXED_WELLBEING_AREAS } from '@/constants/dashboard';
 import { DASHBOARD_COLORS } from '@/constants/tokens';
 import { cn, formatScoreToPercent } from '@/lib/utils';
 import type { WellbeingItemData } from '@/types';
@@ -23,16 +24,11 @@ export interface BatteryWheelChartProps {
  * 8 petals clockwise from the top, matching FIXED_WELLBEING_AREAS order:
  * Physical, Sleep, Nutrition, Fun, Mindset, Friendships, Relationships, Purpose.
  */
-const FLOWER_PETALS = [
-  { key: 'physical', label: 'Physical', color: DASHBOARD_COLORS.secondary.orange1 },
-  { key: 'sleep', label: 'Sleep', color: DASHBOARD_COLORS.secondary.cyan1 },
-  { key: 'nutrition', label: 'Nutrition', color: DASHBOARD_COLORS.secondary.green1 },
-  { key: 'fun', label: 'Fun', color: DASHBOARD_COLORS.secondary.yellow1 },
-  { key: 'mindset', label: 'Mindset', color: DASHBOARD_COLORS.secondary.violet1 },
-  { key: 'friendships', label: 'Friendships', color: DASHBOARD_COLORS.secondary.rose1 },
-  { key: 'relationships', label: 'Relationships', color: DASHBOARD_COLORS.secondary.red1 },
-  { key: 'purpose', label: 'Purpose', color: DASHBOARD_COLORS.secondary.teal1 },
-];
+const FLOWER_PETALS = FIXED_WELLBEING_AREAS.map((def) => ({
+  key: def.area.toLowerCase(),
+  label: def.label,
+  color: AREA_COLOR[def.area] ?? DASHBOARD_COLORS.secondary.teal1,
+}));
 
 interface PetalData {
   key: string;

@@ -3,8 +3,9 @@
 import { createContext, useContext, type ReactNode } from 'react';
 import Image from 'next/image';
 
+import { ClientDepartmentHeader } from '@/components/clients';
 import { HowsYourBatterySticker } from '@/components/icons';
-import { cn, resolveImageUrl } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import { useOptionalPresentation } from '@/components/presentation/PresentationContext';
 import type { BaseSlideProps, SlideLayoutContextValue } from '@/types';
 
@@ -52,20 +53,6 @@ export function StandardSlideLayout({
   const departmentName = propDeptName ?? ctx?.departmentName;
   const clientLogoUrl = propLogoUrl ?? ctx?.clientLogoUrl;
   const controls = propControls ?? ctx?.controls;
-  const logoContent = (
-    <div className="flex h-12 items-center justify-end">
-      {clientLogoUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={resolveImageUrl(clientLogoUrl)}
-          alt={clientName ? `${clientName} logo` : 'Client logo'}
-          className="h-12 w-auto object-contain brightness-0 invert"
-        />
-      ) : (
-        <span className="body-16-bold text-white">{clientName}</span>
-      )}
-    </div>
-  );
 
   return (
     <div
@@ -79,12 +66,12 @@ export function StandardSlideLayout({
       </div>
 
       <div className="pointer-events-auto absolute right-10 top-10 z-20 flex items-center">
-        <div className="flex flex-col items-end text-right">
-          {logoContent}
-          {departmentName && (
-            <span className="body-20-medium mt-0.5 text-white/90">{departmentName}</span>
-          )}
-        </div>
+        <ClientDepartmentHeader
+          clientName={clientName}
+          departmentName={departmentName}
+          clientLogoUrl={clientLogoUrl}
+          align="right"
+        />
       </div>
 
       <div className="pointer-events-auto absolute bottom-10 left-10 z-20 flex items-center">

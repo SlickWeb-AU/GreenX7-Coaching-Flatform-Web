@@ -38,6 +38,18 @@ export const WELLBEING_AREAS = {
 
 export type WellbeingArea = (typeof WELLBEING_AREAS)[keyof typeof WELLBEING_AREAS];
 
+/** Display names in canonical order — separate from API enum above. */
+export const WELLBEING_AREA_DISPLAY_ORDER = [
+  'Physical',
+  'Sleep',
+  'Nutrition',
+  'Fun',
+  'Mindset',
+  'Friendships',
+  'Relationships',
+  'Purpose',
+] as const;
+
 export const CHECKIN_STATUSES = {
   SCHEDULED: 'SCHEDULED',
   OPEN: 'OPEN',

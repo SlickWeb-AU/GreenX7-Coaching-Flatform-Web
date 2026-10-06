@@ -10,7 +10,7 @@ import {
   PurposeIcon,
   RelationshipsIcon,
 } from '@/components/icons';
-import { ALL_FILTER_VALUE } from './clients';
+import { ALL_FILTER_VALUE, WELLBEING_AREA_DISPLAY_ORDER } from './clients';
 import { DASHBOARD_COLORS } from './tokens';
 
 export const MONTH_NAMES = [
@@ -47,16 +47,10 @@ export const YEAR_OPTIONS = getYearOptions(10);
 
 export const DASHBOARD_INDUSTRY_OPTIONS = [{ value: ALL_FILTER_VALUE, label: 'All Industries' }];
 
-export const FIXED_WELLBEING_AREAS = [
-  { area: 'Physical', label: 'Physical' },
-  { area: 'Sleep', label: 'Sleep' },
-  { area: 'Nutrition', label: 'Nutrition' },
-  { area: 'Fun', label: 'Fun' },
-  { area: 'Mindset', label: 'Mindset' },
-  { area: 'Friendships', label: 'Friendships' },
-  { area: 'Relationships', label: 'Relationships' },
-  { area: 'Purpose', label: 'Purpose' },
-] as const;
+export const FIXED_WELLBEING_AREAS = WELLBEING_AREA_DISPLAY_ORDER.map((area) => ({
+  area,
+  label: area,
+}));
 
 export const FIXED_ZONES = [
   { key: 'Thrive', label: 'Thrive Zone' },

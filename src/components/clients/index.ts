@@ -21,3 +21,4 @@ export * from './ClientDepartmentsTable';
 export * from './ClientCheckInHistoryTable';
 export * from './ShareBatteryCheckPopover';
 export * from './ResendReportDialog';
+export * from './ClientDepartmentHeader';

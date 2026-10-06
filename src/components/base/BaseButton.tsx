@@ -15,7 +15,6 @@ export interface BaseButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>
   loading?: boolean;
   skeleton?: boolean;
   startIcon?: ReactNode;
-  /** Pill shape (corner radius 999) instead of the default 8. */
   pill?: boolean;
 }
 

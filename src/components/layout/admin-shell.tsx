@@ -12,7 +12,6 @@ export function AdminShell({ children }: { children: ReactNode }) {
         title="Desktop Screen Required"
         description="The GreenX7 Admin Portal is designed specifically for desktop viewports to give you the best experience for data analytics, client management, and reporting."
         helperNotice="Please access this page from a laptop, desktop computer, or expand your browser window."
-        screenCode="AP/E9"
         showCopyButton={false}
       />
       <div className="hidden min-h-screen bg-neutral-grey-8 lg:block">

@@ -49,11 +49,23 @@
   .heading-48-bold {
     @apply text-[3rem]/[3.25rem] font-bold tracking-tight-2;
   }
+  .heading-48-black {
+    @apply text-[3rem]/[3.25rem] font-black tracking-tight-2;
+  }
   .heading-48-medium {
     @apply text-[3rem]/[3.25rem] font-medium tracking-tight-2;
   }
+  .heading-40-black {
+    @apply text-[2.5rem]/[2.875rem] font-black tracking-tight-2;
+  }
+  .heading-36-bold {
+    @apply text-[2.25rem]/[2.625rem] font-bold tracking-tight-2;
+  }
   .heading-28-bold {
     @apply text-[1.75rem]/[2rem] font-bold tracking-tight-2;
+  }
+  .heading-24-bold {
+    @apply text-[1.5rem]/[1.875rem] font-bold tracking-tight-2;
   }
   .heading-20-bold {
     @apply text-xl/[1.625rem] font-bold tracking-tight-2;
@@ -70,8 +82,17 @@
   .body-28-bold {
     @apply text-[1.75rem]/[2.125rem] font-bold tracking-tight-2;
   }
+  .body-24-black {
+    @apply text-[1.5rem]/[1.875rem] font-black tracking-tight-2;
+  }
   .body-24-bold {
     @apply text-[1.5rem]/[1.875rem] font-bold tracking-tight-2;
+  }
+  .body-24-medium {
+    @apply text-[1.5rem]/[1.875rem] font-medium tracking-tight-2;
+  }
+  .body-24-regular {
+    @apply text-[1.5rem]/[1.875rem] font-normal tracking-tight-2;
   }
   .body-20-bold {
     @apply text-xl/[1.625rem] font-bold tracking-tight-2;

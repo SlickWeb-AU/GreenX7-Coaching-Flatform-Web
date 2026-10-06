@@ -77,7 +77,12 @@ export const queryKeys = {
       ['admin-dashboard', month, year, industry] as const,
   },
   batteryCheck: {
+    state: (client: string, dept: string, deviceId?: string) =>
+      deviceId
+        ? (['battery-check-state', client, dept, deviceId] as const)
+        : (['battery-check-state', client, dept] as const),
     live: (client: string, dept: string) => ['battery-check-live', client, dept] as const,
+    submit: (client: string, dept: string) => ['battery-check-submit', client, dept] as const,
   },
   reports: {
     all: ['reports'] as const,

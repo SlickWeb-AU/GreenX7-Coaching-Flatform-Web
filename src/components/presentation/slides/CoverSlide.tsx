@@ -1,8 +1,9 @@
 import Image from 'next/image';
 
+import { ClientDepartmentHeader } from '@/components/clients';
 import { StaticSlide } from '@/components/presentation/StaticSlide';
 import { useSlideLayout } from '@/components/presentation/StandardSlideLayout';
-import { cn, resolveImageUrl } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import type { BaseSlideProps } from '@/types';
 
 export function CoverSlide({
@@ -17,25 +18,6 @@ export function CoverSlide({
   const departmentName = propDeptName ?? ctx?.departmentName ?? '';
   const clientLogoUrl = propLogoUrl ?? ctx?.clientLogoUrl;
   const controls = propControls ?? ctx?.controls;
-  const renderClientLogo = () => {
-    return (
-      <div className="flex flex-col items-start gap-2 text-left">
-        <div className="flex h-12 items-center">
-          {clientLogoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={resolveImageUrl(clientLogoUrl)}
-              alt={clientName || 'Client logo'}
-              className="h-12 w-auto object-contain brightness-0 invert"
-            />
-          ) : clientName ? (
-            <span className="heading-20-bold text-white">{clientName}</span>
-          ) : null}
-        </div>
-        {departmentName && <span className="body-20-medium text-white/90">{departmentName}</span>}
-      </div>
-    );
-  };
 
   return (
     <div
@@ -45,7 +27,14 @@ export function CoverSlide({
       )}
     >
       <header className="z-20 flex w-full flex-shrink-0 items-start justify-between px-10 pt-10">
-        <div>{renderClientLogo()}</div>
+        <div>
+          <ClientDepartmentHeader
+            clientName={clientName}
+            departmentName={departmentName}
+            clientLogoUrl={clientLogoUrl}
+            align="left"
+          />
+        </div>
         <div>
           <Image
             src="/icons/greenx7-logo-light.svg"
