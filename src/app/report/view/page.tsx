@@ -12,6 +12,7 @@ import { ClientPeriodFilter } from '@/components/clients/ClientPeriodFilter';
 import { ClientWellbeingCard } from '@/components/clients/ClientWellbeingCard';
 import { DepartmentInsightListCard } from '@/components/clients/DepartmentInsightListCard';
 import { HistoricalTrendChart } from '@/components/dashboard';
+import { GreenX7LogoLight } from '@/components/icons';
 import { MONTH_NAMES } from '@/constants';
 import { CHART_COLORS } from '@/constants/tokens';
 import { reportApi } from '@/features/report';
@@ -204,8 +205,7 @@ function ReportViewContent() {
   return (
     <div className="min-h-screen bg-neutral-grey-8">
       <header className="flex h-16 items-center bg-brand-green-1 px-4 sm:h-[78px] sm:px-8 xl:px-[167px]">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/icons/greenx7-logo-light.svg" alt="GreenX7" className="h-8 w-auto sm:h-10" />
+        <GreenX7LogoLight className="h-8 w-auto sm:h-10" />
       </header>
 
       <main className="mx-auto max-w-[1666px] px-4 pb-12 pt-8 sm:px-8 sm:pb-16 sm:pt-12 xl:px-[167px]">

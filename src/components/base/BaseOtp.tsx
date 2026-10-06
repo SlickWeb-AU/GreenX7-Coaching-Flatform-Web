@@ -13,6 +13,8 @@ export interface BaseOtpProps {
   error?: boolean;
   helperText?: string;
   className?: string;
+  /** Extra classes merged onto each OTP <input> (e.g. border overrides) */
+  inputClassName?: string;
 }
 
 export function BaseOtp({
@@ -22,6 +24,7 @@ export function BaseOtp({
   error = false,
   helperText,
   className,
+  inputClassName,
 }: BaseOtpProps) {
   const refs = useRef<Array<HTMLInputElement | null>>([]);
 
@@ -104,7 +107,7 @@ export function BaseOtp({
   return (
     <div className={cn('w-full', className)}>
       {label && <p className="body-14-bold mb-2 text-neutral-grey-2">{label}</p>}
-      <div className="flex w-full gap-2 sm:gap-3">
+      <div className="flex w-full gap-1">
         {value.map((digit, i) => (
           <input
             key={i}
@@ -119,9 +122,11 @@ export function BaseOtp({
             autoComplete={i === 0 ? 'one-time-code' : 'off'}
             aria-label={`Digit ${i + 1}`}
             className={cn(
-              'h-12 min-w-0 flex-1 rounded-lg border text-center text-base font-medium',
+              'body-24-bold h-12 min-w-0 flex-1 rounded-lg border text-center',
               error ? 'border-secondary-red-4' : 'border-neutral-grey-5',
               'outline-none focus:outline-none focus:ring-0 focus:ring-transparent focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-transparent',
+              inputClassName,
+              error && 'border-secondary-red-4',
             )}
           />
         ))}

@@ -33,6 +33,8 @@ export interface BaseInputProps extends Omit<
   /** Icon / element rendered on the right inside the input */
   suffix?: ReactNode;
   loading?: boolean;
+  /** Extra classes merged onto the inner <input> (e.g. border overrides) */
+  inputClassName?: string;
 }
 
 export function BaseInput({
@@ -46,6 +48,7 @@ export function BaseInput({
   suffix,
   loading = false,
   className,
+  inputClassName,
   id,
   required,
   disabled,
@@ -96,6 +99,7 @@ export function BaseInput({
               ? 'cursor-default bg-white'
               : [variantBg[variant], 'hover:border-neutral-grey-4 focus:border-brand-green-2'],
             sizeClass[size],
+            inputClassName,
             error && 'border-secondary-red-4 focus:border-secondary-red-4',
             'outline-none focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0',
             'disabled:cursor-not-allowed disabled:opacity-50',

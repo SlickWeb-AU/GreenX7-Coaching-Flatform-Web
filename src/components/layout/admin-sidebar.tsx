@@ -2,12 +2,12 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { CircleUser, LogOut } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 import { BaseButton } from '@/components/base';
+import { GreenX7LogoDark } from '@/components/icons';
 import { NavLink } from '@/components/layout/nav-link';
 import { ADMIN_NAVIGATION } from '@/config/navigation';
 import { ROUTES } from '@/config/routes';
@@ -44,14 +44,7 @@ function SidebarContent({ onNavigate }: SidebarBodyProps) {
         {/* Logo */}
         <div className="mb-12">
           <Link href={ROUTES.admin.dashboard} className="inline-block">
-            <Image
-              src="/icons/greenx7-logo.svg"
-              alt="GreenX7"
-              width={140}
-              height={34}
-              className="h-7 w-auto"
-              priority
-            />
+            <GreenX7LogoDark className="h-7 w-auto" />
           </Link>
         </div>
 

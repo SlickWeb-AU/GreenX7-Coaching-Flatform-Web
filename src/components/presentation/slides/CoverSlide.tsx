@@ -1,6 +1,5 @@
-import Image from 'next/image';
-
 import { ClientDepartmentHeader } from '@/components/clients';
+import { GreenX7LogoLight } from '@/components/icons';
 import { StaticSlide } from '@/components/presentation/StaticSlide';
 import { useSlideLayout } from '@/components/presentation/StandardSlideLayout';
 import { cn } from '@/lib/utils';
@@ -36,14 +35,7 @@ export function CoverSlide({
           />
         </div>
         <div>
-          <Image
-            src="/icons/greenx7-logo-light.svg"
-            alt="GreenX7"
-            width={200}
-            height={48}
-            className="h-12 w-auto"
-            priority
-          />
+          <GreenX7LogoLight className="h-12 w-auto" />
         </div>
       </header>
 

@@ -1,12 +1,15 @@
 'use client';
 
 import { Eye, EyeOff } from 'lucide-react';
-import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, Suspense, type FormEvent } from 'react';
 
 import { BaseButton, BaseInput, BaseLoading } from '@/components/base';
-import { DecorativeWaveBottomRight, DecorativeWaveTopRight } from '@/components/icons';
+import {
+  DecorativeWaveBottomRight,
+  DecorativeWaveTopRight,
+  GreenX7LogoLight,
+} from '@/components/icons';
 import { reportApi } from '@/features/report';
 import { reportPasswordKey, reportSessionKey } from '@/lib/report-auth';
 
@@ -64,14 +67,7 @@ function ReportPasswordContent() {
           <DecorativeWaveBottomRight width={293} height={295} />
         </div>
         <div className="relative z-10">
-          <Image
-            src="/icons/greenx7-logo-light.svg"
-            alt="GreenX7 Logo"
-            width={160}
-            height={40}
-            className="h-10 w-auto"
-            priority
-          />
+          <GreenX7LogoLight className="h-10 w-auto" />
         </div>
         <div className="relative z-10 my-12 max-w-xl lg:my-0">
           <p className="body-18-bold mb-2 text-secondary-yellow-1">Report Access</p>
@@ -113,6 +109,7 @@ function ReportPasswordContent() {
                 error={Boolean(error)}
                 helperText={error}
                 required
+                inputClassName="border-neutral-grey-4"
                 suffix={
                   <button
                     type="button"
@@ -129,7 +126,7 @@ function ReportPasswordContent() {
                 }
               />
             </div>
-            <BaseButton type="submit" size="mediumPlus" fullWidth loading={loading}>
+            <BaseButton type="submit" size="mediumPlus" fullWidth pill loading={loading}>
               View report
             </BaseButton>
           </form>
