@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 
 import { BaseTable, BaseTag, type BaseColumn, type BaseTagVariant } from '@/components/base';
 import { ROUTES } from '@/config/routes';
+import { CLIENT_TABS } from '@/constants/clients';
 import { clientsApi } from '@/features/admin-clients';
 import { toApiError } from '@/lib/api-error';
 import { formatBatteryScore } from '@/lib/clients';
@@ -184,11 +185,10 @@ export function ClientCheckInHistoryTable({
             </button>
 
             <Link
-              href={
-                row.reportId
-                  ? `/report/view?token=${encodeURIComponent(row.reportId)}`
-                  : ROUTES.admin.clientDetail(clientId)
-              }
+              // Admin không có mã của người nhận (chỉ lưu bản băm) nên không mở trang
+              // báo cáo công khai được — mở tab Dashboard đúng kỳ đó, cùng số liệu với
+              // tab Overall của báo cáo.
+              href={`${ROUTES.admin.clientDetail(clientId)}?tab=${CLIENT_TABS.DASHBOARD}&month=${row.periodMonth}&year=${row.periodYear}`}
               className="body-14-bold text-brand-green-2 transition-colors hover:underline"
             >
               View
