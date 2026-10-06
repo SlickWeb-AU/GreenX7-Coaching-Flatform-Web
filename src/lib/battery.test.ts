@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import {
+  buildDraftKey,
   buildSubmissionMarkerKey,
   calculateBatteryScore,
   getBatteryZone,
+  getLowestAreas,
+  getOrCreateDeviceId,
   getStrongestAreas,
   isDraftFresh,
 } from './battery';
@@ -46,6 +49,22 @@ describe('getStrongestAreas', () => {
   });
 });
 
+describe('getLowestAreas', () => {
+  it('returns the 3 lowest areas, deterministic tie-break by fixed order', () => {
+    const items = [
+      { area: 'Purpose', score: 4 },
+      { area: 'Physical', score: 4 },
+      { area: 'Sleep', score: 4 },
+      { area: 'Nutrition', score: 4 },
+      { area: 'Fun', score: 9 },
+      { area: 'Mindset', score: 8 },
+      { area: 'Friendships', score: 7 },
+      { area: 'Relationships', score: 6 },
+    ];
+    expect(getLowestAreas(items).map((i) => i.area)).toEqual(['Physical', 'Sleep', 'Nutrition']);
+  });
+});
+
 describe('draft and marker helpers', () => {
   it('builds a period-scoped marker key', () => {
     expect(buildSubmissionMarkerKey('construction', '2026-10')).toBe('gx7-bc-construction-2026-10');
@@ -54,5 +73,16 @@ describe('draft and marker helpers', () => {
   it('treats drafts older than 60 minutes as stale', () => {
     expect(isDraftFresh(Date.now() - 59 * 60 * 1000)).toBe(true);
     expect(isDraftFresh(Date.now() - 61 * 60 * 1000)).toBe(false);
+  });
+
+  it('builds a period-scoped draft key', () => {
+    expect(buildDraftKey('acme', 'sales', '2026-10')).toBe('gx7-bc-draft-acme-sales-2026-10');
+  });
+
+  it('generates and persists device ID in localStorage', () => {
+    const id = getOrCreateDeviceId();
+    expect(typeof id).toBe('string');
+    expect(id.length).toBeGreaterThan(0);
+    expect(getOrCreateDeviceId()).toBe(id);
   });
 });

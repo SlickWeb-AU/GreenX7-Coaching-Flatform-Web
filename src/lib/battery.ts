@@ -28,10 +28,38 @@ export function getStrongestAreas(items: BatteryAreaScore[]): BatteryAreaScore[]
     .slice(0, 3);
 }
 
+export function getLowestAreas(items: BatteryAreaScore[]): BatteryAreaScore[] {
+  const order = new Map<string, number>(FIXED_WELLBEING_AREAS.map((d, i) => [d.area, i]));
+  return [...items]
+    .filter((i) => i.score !== null)
+    .sort((a, b) => {
+      if ((a.score ?? 99) !== (b.score ?? 99)) return (a.score ?? 99) - (b.score ?? 99);
+      return (order.get(a.area) ?? 99) - (order.get(b.area) ?? 99);
+    })
+    .slice(0, 3);
+}
+
 export function buildSubmissionMarkerKey(departmentSlug: string, period: string): string {
   return `${BATTERY_MARKER_KEY_PREFIX}-${departmentSlug}-${period}`;
 }
 
+export function buildDraftKey(clientSlug: string, departmentSlug: string, period: string): string {
+  return `${BATTERY_MARKER_KEY_PREFIX}-draft-${clientSlug}-${departmentSlug}-${period}`;
+}
+
 export function isDraftFresh(savedAt: number, now: number = Date.now()): boolean {
   return now - savedAt < 60 * 60 * 1000;
+}
+
+export function getOrCreateDeviceId(): string {
+  if (typeof window === 'undefined') return '';
+  let id = window.localStorage.getItem('gx7-device-id');
+  if (!id) {
+    id =
+      typeof crypto !== 'undefined' && crypto.randomUUID
+        ? crypto.randomUUID()
+        : `dev-${Date.now()}-${Math.random().toString(36).substring(2, 10)}`;
+    window.localStorage.setItem('gx7-device-id', id);
+  }
+  return id;
 }
