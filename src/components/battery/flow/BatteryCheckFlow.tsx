@@ -186,7 +186,7 @@ export function BatteryCheckFlow({ clientSlug, departmentSlug, stateData }: Batt
         departmentName={departmentName}
         clientLogoUrl={clientLogoUrl}
         nextOpensAt={stateData?.nextOpensAt}
-        timeZone={stateData?.timeZone}
+        timeZone={stateData?.timezone}
       />
     );
   }
@@ -239,11 +239,7 @@ export function BatteryCheckFlow({ clientSlug, departmentSlug, stateData }: Batt
     const filled = scores.filter((s): s is number => s !== null && s !== undefined);
     const preview =
       filled.length === total && total > 0
-        ? Math.round(
-            ((filled.reduce((a, b) => a + b, 0) / total - scoreMin) /
-              Math.max(1, scoreMax - scoreMin)) *
-              100,
-          )
+        ? Math.round((filled.reduce((a, b) => a + b, 0) / total) * 10)
         : (calculateBatteryScore(scores) ?? 0);
     return (
       <>

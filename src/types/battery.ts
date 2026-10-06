@@ -71,7 +71,7 @@ export interface BatteryCheckStateDto {
   periodMonth: number | null;
   closesAt: string | null;
   nextOpensAt: string | null;
-  timeZone?: string | null;
+  timezone?: string | null;
   areas: BatteryAreaPromptDto[];
   scoreMin: number;
   scoreMax: number;
