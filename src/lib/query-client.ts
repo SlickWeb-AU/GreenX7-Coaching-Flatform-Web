@@ -82,5 +82,6 @@ export const queryKeys = {
   reports: {
     all: ['reports'] as const,
     view: (token: string) => ['reports', 'view', token] as const,
+    recipients: (checkInId: string) => ['reports', 'recipients', checkInId] as const,
   },
 } as const;

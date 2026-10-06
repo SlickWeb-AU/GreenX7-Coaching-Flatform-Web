@@ -5,8 +5,31 @@ export interface SendReportResultDto {
   checkInId: string;
   status: ReportStatus;
   sentAt: string | null;
-  expiresAt?: string;
-  recipientsCount?: number;
+  expiresAt?: string | null;
+  recipientCount?: number;
+  failureReason?: string | null;
+  /** Kết quả của từng người được chọn trong lần gửi này */
+  recipients: SentRecipientDto[];
+  failedRecipients: string[];
+}
+
+export interface SentRecipientDto {
+  contactId: string;
+  email: string;
+  status: ReportStatus;
+  /** Mã mới — chỉ trả về một lần; null khi gửi lỗi */
+  password: string | null;
+}
+
+/** Một dòng trong dialog Resend: contact + trạng thái lần gửi gần nhất cho người đó */
+export interface ReportRecipientDto {
+  contactId: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  status: ReportStatus;
+  lastSentAt: string | null;
+  failureReason: string | null;
 }
 
 /** Kỳ có số liệu — đổ vào hai ô chọn Month / Year trên màn báo cáo */

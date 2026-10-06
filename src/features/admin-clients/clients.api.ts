@@ -15,6 +15,7 @@ import type {
   DepartmentListItemDto,
   DepartmentListQuery,
   DepartmentShareLinksDto,
+  ReportRecipientDto,
   SendReportResultDto,
   UpdateClientPayload,
   UpdateContactPayload,
@@ -87,6 +88,12 @@ export const clientsApi = {
     patch<DepartmentListItemDto>(`/clients/${clientId}/departments/${deptId}`, payload),
   deleteDepartment: (clientId: string, deptId: string) =>
     del<void>(`/clients/${clientId}/departments/${deptId}`),
-  sendReport: (checkInId: string) =>
-    post<SendReportResultDto>(`/check-ins/${checkInId}/reports/send`, {}),
+  /** Bỏ `contactIds` = gửi cho tất cả contact; có thì chỉ gửi cho người được chọn */
+  sendReport: (checkInId: string, contactIds?: string[]) =>
+    post<SendReportResultDto>(
+      `/check-ins/${checkInId}/reports/send`,
+      contactIds ? { contactIds } : {},
+    ),
+  getReportRecipients: (checkInId: string) =>
+    get<ReportRecipientDto[]>(`/check-ins/${checkInId}/reports/recipients`),
 };
