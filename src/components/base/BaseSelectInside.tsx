@@ -28,12 +28,15 @@ export function BaseSelectInside<T extends string>({
   readOnly = false,
   className,
   containerClassName,
+  compact = false,
 }: {
   label: string;
   value: T;
   options: SelectOption<T>[];
   onChange: (value: T) => void;
   placeholder?: string;
+  /** Ô hẹp (thẻ chọn kỳ 2/12 cột): bớt đệm ngang và khoảng cách tới mũi tên để chữ không bị cắt */
+  compact?: boolean;
   variant?: BaseSelectInsideVariant;
   disabled?: boolean;
   readOnly?: boolean;
@@ -96,7 +99,8 @@ export function BaseSelectInside<T extends string>({
         disabled={disabled}
         onClick={() => !disabled && !readOnly && setIsOpen((prev) => !prev)}
         className={cn(
-          'inline-flex min-h-11 w-auto min-w-[166px] flex-col items-stretch gap-0.5 rounded-lg border px-3 py-1 text-left shadow-none transition-colors',
+          'inline-flex min-h-11 w-auto flex-col items-stretch gap-0.5 rounded-lg border py-1 text-left shadow-none transition-colors',
+          compact ? 'min-w-0 px-2.5' : 'min-w-[166px] px-3',
           variantClasses[variant],
           isOpen && (variant === 'primary' ? 'border-brand-green-2' : 'bg-neutral-grey-7'),
           'outline-none focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0',
@@ -106,7 +110,7 @@ export function BaseSelectInside<T extends string>({
         )}
       >
         <span className="body-14-medium select-none leading-none text-neutral-grey-3">{label}</span>
-        <span className="flex items-center justify-between gap-3">
+        <span className={cn('flex items-center justify-between', compact ? 'gap-1.5' : 'gap-3')}>
           <span className="body-16-bold min-w-0 truncate text-neutral-grey-1">
             {selectedOption?.label ?? (value ? value : resolvedPlaceholder)}
           </span>

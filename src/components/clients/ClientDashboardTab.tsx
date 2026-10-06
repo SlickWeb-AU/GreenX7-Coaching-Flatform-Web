@@ -89,7 +89,7 @@ export function ClientDashboardTab({
   return (
     <div className={`flex flex-col gap-6 ${className ?? ''}`}>
       <div className="grid grid-cols-1 items-stretch gap-4 md:grid-cols-2 lg:grid-cols-12">
-        <div className="lg:col-span-6">
+        <div className="lg:col-span-12 min-[1360px]:col-span-6">
           <ClientBatteryCard
             score={effectiveScore}
             periodLabel={`${currentMonthName} ${selectedYear}`}
@@ -101,11 +101,11 @@ export function ClientDashboardTab({
           />
         </div>
 
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-4 min-[1360px]:col-span-2">
           <ClientCurrentZoneCard zoneName={effectiveZoneName} className="h-full" />
         </div>
 
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-4 min-[1360px]:col-span-2">
           <ClientPeriodFilter
             selectedMonth={selectedMonth}
             onMonthChange={setSelectedMonth}
@@ -115,7 +115,7 @@ export function ClientDashboardTab({
           />
         </div>
 
-        <div className="flex h-full flex-col items-center justify-center gap-2 rounded-2xl bg-white p-4 shadow-none lg:col-span-2">
+        <div className="flex h-full flex-col items-center justify-center gap-2 rounded-2xl bg-white p-4 shadow-none lg:col-span-4 min-[1360px]:col-span-2">
           <div className="body-32-bold text-brand-green-2">
             {effectiveParticipants !== null ? effectiveParticipants : '—'}
           </div>

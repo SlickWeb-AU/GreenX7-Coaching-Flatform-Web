@@ -22,7 +22,7 @@ export function ClientPeriodFilter({
   return (
     <div
       className={cn(
-        'flex flex-col justify-center gap-3 rounded-2xl bg-white p-4 shadow-none',
+        'flex flex-col justify-center gap-3 rounded-2xl bg-white p-3 shadow-none',
         className,
       )}
     >
@@ -33,8 +33,9 @@ export function ClientPeriodFilter({
         options={MONTH_OPTIONS}
         onChange={onMonthChange}
         variant="secondary"
+        compact
         containerClassName="w-full"
-        className="w-full min-w-0"
+        className="w-full"
       />
       <BaseSelectInside
         label="Year"
@@ -43,8 +44,9 @@ export function ClientPeriodFilter({
         options={YEAR_OPTIONS}
         onChange={onYearChange}
         variant="secondary"
+        compact
         containerClassName="w-full"
-        className="w-full min-w-0"
+        className="w-full"
       />
     </div>
   );

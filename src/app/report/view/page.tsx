@@ -212,7 +212,7 @@ function ReportViewContent() {
           className={cn('flex flex-col gap-6 transition-opacity', loadingPeriod && 'opacity-60')}
         >
           <div className="grid grid-cols-1 items-stretch gap-4 md:grid-cols-2 lg:grid-cols-12">
-            <div className="lg:col-span-6">
+            <div className="lg:col-span-12 min-[1360px]:col-span-6">
               <ClientBatteryCard
                 score={data.batteryScore}
                 periodLabel={`${MONTH_NAMES[month - 1]} ${year}`}
@@ -227,13 +227,13 @@ function ReportViewContent() {
                 className="h-full"
               />
             </div>
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-4 min-[1360px]:col-span-2">
               <ClientCurrentZoneCard
                 zoneName={data.zone?.label ?? data.zone?.name}
                 className="h-full"
               />
             </div>
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-4 min-[1360px]:col-span-2">
               <ClientPeriodFilter
                 selectedMonth={String(month)}
                 onMonthChange={(m) => void changePeriod(m, String(year))}
@@ -242,7 +242,7 @@ function ReportViewContent() {
                 className="h-full"
               />
             </div>
-            <div className="flex h-full flex-col items-center justify-center gap-2 rounded-2xl bg-white p-4 lg:col-span-2">
+            <div className="flex h-full flex-col items-center justify-center gap-2 rounded-2xl bg-white p-4 lg:col-span-4 min-[1360px]:col-span-2">
               <div className="body-32-bold text-brand-green-2">{data.participantCount}</div>
               <div className="body-14-medium text-neutral-grey-3">Participants</div>
             </div>
