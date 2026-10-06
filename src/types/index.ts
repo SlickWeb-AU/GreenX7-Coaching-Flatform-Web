@@ -6,3 +6,4 @@ export * from './dashboard';
 export * from './settings';
 export * from './reports';
 export * from './presentation';
+export * from './battery';

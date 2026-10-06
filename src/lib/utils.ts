@@ -44,6 +44,23 @@ export function formatDateTime(value: string | Date | null | undefined): string 
   }).format(new Date(value));
 }
 
+export function formatCheckInDate(value: string | Date | null | undefined): string {
+  if (!value) return '';
+  const d = new Date(value);
+  if (isNaN(d.getTime())) return '';
+  return new Intl.DateTimeFormat('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(d);
+}
+
+export function getMonthName(monthNumber: number | null | undefined): string {
+  if (!monthNumber || monthNumber < 1 || monthNumber > 12) return '';
+  const date = new Date(2000, monthNumber - 1, 1);
+  return new Intl.DateTimeFormat('en-US', { month: 'long' }).format(date);
+}
+
 export function getInitials(fullName: string): string {
   return fullName
     .trim()

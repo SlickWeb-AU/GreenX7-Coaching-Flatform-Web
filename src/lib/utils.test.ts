@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
-import { cleanParams, formatCurrency, formatNumber, getInitials } from './utils';
+import {
+  cleanParams,
+  formatCheckInDate,
+  formatCurrency,
+  formatNumber,
+  getInitials,
+  getMonthName,
+} from './utils';
 
 describe('formatCurrency', () => {
   it('định dạng theo chuẩn tiền Việt', () => {
@@ -29,5 +36,21 @@ describe('cleanParams', () => {
     expect(
       cleanParams({ page: 1, search: '', categoryId: undefined, status: 'ACTIVE', inStock: false }),
     ).toEqual({ page: 1, status: 'ACTIVE', inStock: false });
+  });
+});
+
+describe('formatCheckInDate', () => {
+  it('formats date to day month year', () => {
+    expect(formatCheckInDate('2026-08-01T00:00:00.000Z')).toMatch(/1 August 2026/);
+    expect(formatCheckInDate(null)).toBe('');
+  });
+});
+
+describe('getMonthName', () => {
+  it('returns month name from month number', () => {
+    expect(getMonthName(7)).toBe('July');
+    expect(getMonthName(1)).toBe('January');
+    expect(getMonthName(12)).toBe('December');
+    expect(getMonthName(null)).toBe('');
   });
 });

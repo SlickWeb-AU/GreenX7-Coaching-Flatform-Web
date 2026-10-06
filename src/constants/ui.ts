@@ -4,6 +4,8 @@ export const BASE_BUTTON_SIZE_CLASS: Record<BaseSize, string> = {
   small: 'h-9 px-3 body-14-bold',
   medium: 'h-11 px-4 body-14-bold',
   mediumPlus: 'h-12 px-5 body-16-bold',
+  large: 'h-14 px-6 body-20-bold',
+  xlarge: 'h-16 px-6 body-20-bold',
 };
 
 export const BASE_BUTTON_VARIANT_CLASS: Record<BaseVariant, string> = {
@@ -15,4 +17,5 @@ export const BASE_BUTTON_VARIANT_CLASS: Record<BaseVariant, string> = {
     'border border-transparent bg-transparent text-neutral-grey-2 hover:bg-neutral-grey-7 hover:text-neutral-grey-1 shadow-none',
   outline:
     'border border-brand-green-3 bg-brand-green-2 text-brand-green-3 hover:bg-brand-green-2/90 shadow-none',
+  custom: 'border border-transparent bg-transparent shadow-none',
 };
