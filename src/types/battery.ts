@@ -20,8 +20,33 @@ export interface BatterySubmitPayload {
   deviceId?: string;
 }
 
+export interface BatteryAreaResultDto {
+  area: string;
+  title?: string;
+  answer?: number;
+  score: number;
+}
+
+export interface BatteryRechargeTipDto {
+  id: string;
+  area: string;
+  areaLabel?: string;
+  title: string;
+  body?: string;
+  tags?: string[];
+}
+
 export interface BatterySubmitResult {
-  resultToken?: string;
+  batteryScore: number;
+  zoneKey: string;
+  zoneLabel: string;
+  introMessage: string;
+  zoneHeadline: string;
+  zoneDescription: string;
+  areaScores: BatteryAreaResultDto[];
+  strongestAreas: BatteryAreaResultDto[];
+  rechargeTips: BatteryRechargeTipDto[];
+  resultToken: string;
 }
 
 export interface BatteryBrandingDto {
@@ -46,6 +71,7 @@ export interface BatteryCheckStateDto {
   periodMonth: number | null;
   closesAt: string | null;
   nextOpensAt: string | null;
+  timeZone?: string | null;
   areas: BatteryAreaPromptDto[];
   scoreMin: number;
   scoreMax: number;

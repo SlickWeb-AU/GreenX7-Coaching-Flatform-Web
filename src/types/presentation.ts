@@ -38,7 +38,6 @@ export interface BatteryCheckLiveResult extends Omit<Partial<DepartmentDashboard
   clientName?: string;
   branding?: BatteryBranding | null;
   period?: BatteryPeriod | null;
-  isWindowOpen?: boolean | null;
   shareLinks?: DepartmentShareLinksDto | null;
   /** false khi kỳ đã đóng — dashboard hiện số liệu kỳ vừa đóng, không có badge LIVE */
   isLive?: boolean;

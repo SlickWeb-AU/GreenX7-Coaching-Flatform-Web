@@ -44,6 +44,13 @@ describe('formatCheckInDate', () => {
     expect(formatCheckInDate('2026-08-01T00:00:00.000Z')).toMatch(/1 August 2026/);
     expect(formatCheckInDate(null)).toBe('');
   });
+
+  it('formats in the given timeZone when provided', () => {
+    expect(formatCheckInDate('2026-07-31T15:00:00.000Z', 'Australia/Sydney')).toMatch(
+      /1 August 2026/,
+    );
+    expect(formatCheckInDate('2026-08-01T00:00:00.000Z', 'invalid-zone')).toMatch(/1 August 2026/);
+  });
 });
 
 describe('getMonthName', () => {

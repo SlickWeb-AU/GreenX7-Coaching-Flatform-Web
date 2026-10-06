@@ -7,15 +7,17 @@ import { batteryEmailSchema } from '@/validations/battery';
 export interface BatteryEmailCardProps {
   onSubmitEmail: (email: string) => Promise<void>;
   isPending: boolean;
+  disabled?: boolean;
 }
 
-export function BatteryEmailCard({ onSubmitEmail, isPending }: BatteryEmailCardProps) {
+export function BatteryEmailCard({ onSubmitEmail, isPending, disabled }: BatteryEmailCardProps) {
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState<string | null>(null);
   const [isSent, setIsSent] = useState(false);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (disabled) return;
     const parsed = batteryEmailSchema.safeParse({ email });
     if (!parsed.success) {
       setEmailError(parsed.error.issues[0]?.message ?? 'Enter a valid email address');
@@ -68,14 +70,14 @@ export function BatteryEmailCard({ onSubmitEmail, isPending }: BatteryEmailCardP
                     setEmail(e.target.value);
                     if (emailError) setEmailError(null);
                   }}
-                  disabled={isPending}
+                  disabled={isPending || disabled}
                   className="body-16-medium w-full bg-transparent leading-none text-white placeholder-white/30 outline-none"
                 />
               </div>
 
               <button
                 type="submit"
-                disabled={isPending || !email.trim()}
+                disabled={isPending || disabled || !email.trim()}
                 aria-label="Send results email"
                 className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-brand-green-2 text-white transition-opacity hover:opacity-90 disabled:opacity-40"
               >

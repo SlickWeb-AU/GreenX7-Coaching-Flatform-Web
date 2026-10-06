@@ -1,20 +1,18 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 
 import { BATTERY_QUESTION_AREAS, BATTERY_STEPS, type BatteryStep } from '@/constants/battery';
-import { useBatteryLive } from '@/features/battery-check';
 import { batteryCheckApi } from '@/features/battery-check/battery-check.api';
 import { toApiError } from '@/lib/api-error';
 import {
   buildDraftKey,
-  buildSubmissionMarkerKey,
   calculateBatteryScore,
   getOrCreateDeviceId,
   isDraftFresh,
 } from '@/lib/battery';
-import { resolveLiveLogoUrl, resolveLiveNames, resolvePeriodLabel } from '@/lib/live';
+import { formatSlugLabel } from '@/lib/utils';
 import {
   BatteryLanding,
   BatteryLoadingStep,
@@ -23,7 +21,7 @@ import {
 import { BatteryResultsView } from '@/components/battery/results';
 import { BatteryOnboardingModal } from '@/components/battery/flow/BatteryOnboardingModal';
 import { BatteryQuestionStep } from '@/components/battery/flow/BatteryQuestionStep';
-import type { BatteryCheckStateDto } from '@/types/battery';
+import type { BatteryCheckStateDto, BatterySubmitResult } from '@/types/battery';
 
 export interface BatteryCheckFlowProps {
   clientSlug: string;
@@ -32,27 +30,49 @@ export interface BatteryCheckFlowProps {
 }
 
 export function BatteryCheckFlow({ clientSlug, departmentSlug, stateData }: BatteryCheckFlowProps) {
-  const { data } = useBatteryLive(clientSlug, departmentSlug, { refetchInterval: false });
-  const names = resolveLiveNames(data, clientSlug, departmentSlug);
-  const clientName = stateData?.branding.clientName ?? names.clientName;
-  const departmentName = stateData?.branding.departmentName ?? names.departmentName;
-  const clientLogoUrl = stateData?.branding.darkLogoUrl ?? resolveLiveLogoUrl(data);
+  const clientName = stateData?.branding.clientName ?? formatSlugLabel(clientSlug);
+  const departmentName = stateData?.branding.departmentName ?? formatSlugLabel(departmentSlug);
+  const clientLogoUrl = stateData?.branding.darkLogoUrl ?? null;
+
+  const prompts = useMemo(
+    () =>
+      (stateData?.areas?.length
+        ? [...stateData.areas].sort((a, b) => a.order - b.order)
+        : BATTERY_QUESTION_AREAS.map((area, i) => ({
+            area,
+            label: area,
+            title: area,
+            question: '',
+            order: i,
+          }))
+      ).map((p) => ({ ...p, area: p.area })),
+    [stateData],
+  );
+  const total = prompts.length;
+  const scoreMin = stateData?.scoreMin ?? 1;
+  const scoreMax = stateData?.scoreMax ?? 10;
 
   const [step, setStep] = useState<BatteryStep>(BATTERY_STEPS.LANDING);
   const [index, setIndex] = useState(0);
-  const [scores, setScores] = useState<(number | null)[]>(Array(8).fill(null));
+  const [scores, setScores] = useState<(number | null)[]>(() => Array(total).fill(null));
   const [showHowItWorks, setShowHowItWorks] = useState(false);
   const [submissionState, setSubmissionState] = useState<'CLOSED' | 'ALREADY_SUBMITTED' | null>(
     null,
   );
-  const [resultToken, setResultToken] = useState<string | undefined>(undefined);
+  const [submitResult, setSubmitResult] = useState<BatterySubmitResult | null>(null);
   const [animDone, setAnimDone] = useState(false);
   const [submitFailed, setSubmitFailed] = useState(false);
 
   const periodLabel = stateData?.periodMonth
     ? `${stateData.periodYear ?? ''}-${stateData.periodMonth}`
-    : (resolvePeriodLabel(data) ?? 'current');
+    : 'current';
   const draftStorageKey = buildDraftKey(clientSlug, departmentSlug, periodLabel);
+
+  // Reset scores when the question set changes (e.g. different period)
+  useEffect(() => {
+    setScores(Array(total).fill(null));
+    setIndex(0);
+  }, [total, draftStorageKey]);
 
   // Initialize scores and draft on mount (60-minute resume window)
   useEffect(() => {
@@ -65,9 +85,9 @@ export function BatteryCheckFlow({ clientSlug, departmentSlug, stateData }: Batt
           window.localStorage.removeItem(draftStorageKey);
           return;
         }
-        if (Array.isArray(parsed.scores) && parsed.scores.length === 8) {
+        if (Array.isArray(parsed.scores) && parsed.scores.length === total) {
           setScores(parsed.scores);
-          if (typeof parsed.index === 'number' && parsed.index >= 0 && parsed.index < 8) {
+          if (typeof parsed.index === 'number' && parsed.index >= 0 && parsed.index < total) {
             setIndex(parsed.index);
           }
         }
@@ -75,7 +95,7 @@ export function BatteryCheckFlow({ clientSlug, departmentSlug, stateData }: Batt
     } catch {
       // Ignore storage errors
     }
-  }, [draftStorageKey]);
+  }, [draftStorageKey, total]);
 
   // Persist scores whenever they change
   const updateScoreAt = useCallback(
@@ -101,21 +121,16 @@ export function BatteryCheckFlow({ clientSlug, departmentSlug, stateData }: Batt
     mutationFn: () => {
       const deviceId = getOrCreateDeviceId();
       return batteryCheckApi.submit(clientSlug, departmentSlug, {
-        scores: BATTERY_QUESTION_AREAS.map((area, i) => ({
-          area: area.toUpperCase(),
+        scores: prompts.map((p, i) => ({
+          area: p.area.toUpperCase(),
           score: scores[i] as number,
         })),
         deviceId,
       });
     },
     onSuccess: (res) => {
-      if (res?.resultToken) {
-        setResultToken(res.resultToken);
-      }
-      const key = buildSubmissionMarkerKey(departmentSlug, periodLabel);
+      setSubmitResult(res);
       try {
-        window.localStorage.setItem(key, '1');
-        document.cookie = `${key}=1; path=/; max-age=31536000`;
         window.localStorage.removeItem(draftStorageKey);
       } catch {
         // Ignore storage errors
@@ -124,13 +139,9 @@ export function BatteryCheckFlow({ clientSlug, departmentSlug, stateData }: Batt
     },
     onError: (err: unknown) => {
       const apiErr = toApiError(err);
-      if (apiErr.statusCode === 409) {
+      if (apiErr.statusCode === 409 || apiErr.errorCode === 'CONFLICT') {
         setSubmissionState('ALREADY_SUBMITTED');
-      } else if (
-        apiErr.statusCode === 400 ||
-        apiErr.statusCode === 403 ||
-        apiErr.statusCode === 410
-      ) {
+      } else if (apiErr.errorCode === 'BAD_REQUEST') {
         setSubmissionState('CLOSED');
       } else {
         setSubmitFailed(true);
@@ -140,7 +151,7 @@ export function BatteryCheckFlow({ clientSlug, departmentSlug, stateData }: Batt
 
   const finishQuestions = useCallback(() => {
     if (submitMutation.isPending || submitMutation.isSuccess) return;
-    if (calculateBatteryScore(scores) === null) return;
+    if (scores.some((s) => s === null || s === undefined)) return;
     setAnimDone(false);
     setSubmitFailed(false);
     setStep(BATTERY_STEPS.LOADING);
@@ -175,6 +186,7 @@ export function BatteryCheckFlow({ clientSlug, departmentSlug, stateData }: Batt
         departmentName={departmentName}
         clientLogoUrl={clientLogoUrl}
         nextOpensAt={stateData?.nextOpensAt}
+        timeZone={stateData?.timeZone}
       />
     );
   }
@@ -205,21 +217,34 @@ export function BatteryCheckFlow({ clientSlug, departmentSlug, stateData }: Batt
   }
 
   if (step === BATTERY_STEPS.QUESTIONS) {
-    const area = BATTERY_QUESTION_AREAS[index];
+    const prompt = prompts[index];
+    if (!prompt) return null;
     return (
       <BatteryQuestionStep
         index={index}
-        area={area}
+        total={total}
+        prompt={prompt}
+        scoreMin={scoreMin}
+        scoreMax={scoreMax}
         value={scores[index]}
         onChange={(v) => updateScoreAt(index, v)}
         onBack={() => (index === 0 ? setStep(BATTERY_STEPS.LANDING) : setIndex(index - 1))}
-        onNext={() => (index === 7 ? finishQuestions() : setIndex(index + 1))}
+        onNext={() => (index === total - 1 ? finishQuestions() : setIndex(index + 1))}
       />
     );
   }
 
   if (step === BATTERY_STEPS.LOADING) {
-    const preview = calculateBatteryScore(scores) ?? 0;
+    // ponytail: preview-only average for animation; server score is source of truth
+    const filled = scores.filter((s): s is number => s !== null && s !== undefined);
+    const preview =
+      filled.length === total && total > 0
+        ? Math.round(
+            ((filled.reduce((a, b) => a + b, 0) / total - scoreMin) /
+              Math.max(1, scoreMax - scoreMin)) *
+              100,
+          )
+        : (calculateBatteryScore(scores) ?? 0);
     return (
       <>
         <BatteryLoadingStep
@@ -248,12 +273,11 @@ export function BatteryCheckFlow({ clientSlug, departmentSlug, stateData }: Batt
     );
   }
 
+  if (!submitResult) return null;
+
   return (
     <BatteryResultsView
-      clientSlug={clientSlug}
-      departmentSlug={departmentSlug}
-      areas={BATTERY_QUESTION_AREAS.map((area, i) => ({ area, score: scores[i] }))}
-      resultToken={resultToken}
+      result={submitResult}
       clientName={clientName}
       departmentName={departmentName}
       clientLogoUrl={clientLogoUrl}

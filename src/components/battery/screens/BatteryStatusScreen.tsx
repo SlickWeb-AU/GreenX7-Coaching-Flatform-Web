@@ -19,6 +19,7 @@ export interface BatteryStatusScreenProps {
   departmentName?: string | null;
   clientLogoUrl?: string | null;
   nextOpensAt?: string | Date | null;
+  timeZone?: string | null;
   periodMonth?: number | null;
   periodYear?: number | null;
   periodName?: string | null;
@@ -32,6 +33,7 @@ export function BatteryStatusScreen({
   departmentName,
   clientLogoUrl,
   nextOpensAt,
+  timeZone,
   periodMonth,
   periodYear,
   periodName,
@@ -49,7 +51,7 @@ export function BatteryStatusScreen({
     : 'Your anonymous response is included in this department’s check-in.';
 
   // Next opening date resolution for closed check-in
-  const formattedNextDate = formatCheckInDate(nextOpensAt);
+  const formattedNextDate = formatCheckInDate(nextOpensAt, timeZone);
 
   const handleReturn = () => {
     if (onReturn) {

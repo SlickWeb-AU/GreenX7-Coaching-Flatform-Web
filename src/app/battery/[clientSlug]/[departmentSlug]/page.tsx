@@ -62,6 +62,7 @@ function BatteryCheckPageContent() {
         departmentName={stateData.branding.departmentName}
         clientLogoUrl={stateData.branding.darkLogoUrl}
         nextOpensAt={stateData.nextOpensAt}
+        timeZone={stateData.timeZone}
       />
     );
   }

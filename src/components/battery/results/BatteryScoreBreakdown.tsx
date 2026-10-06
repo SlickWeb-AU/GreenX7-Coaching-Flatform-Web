@@ -1,6 +1,7 @@
 import { BatteryWheelChart } from '@/components/dashboard/BatteryWheelChart';
 import { BoltIcon, HeartIcon } from '@/components/icons';
 import { AREA_BADGE, AREA_BAR_COLORS, AREA_COLOR, AREA_ICON_MAP } from '@/constants/dashboard';
+import { normalizeAreaLabel } from '@/lib/battery';
 import { cn } from '@/lib/utils';
 import type { BatteryAreaScore } from '@/types/battery';
 
@@ -30,13 +31,14 @@ export function BatteryScoreBreakdown({ areas, average }: BatteryScoreBreakdownP
 
       <div className="flex flex-col gap-4 border-t border-neutral-grey-6/40 pt-4">
         {areas.map((item) => {
-          const Icon = AREA_ICON_MAP[item.area] ?? HeartIcon;
-          const barColor = AREA_BAR_COLORS[item.area] ?? 'bg-brand-green-2';
-          const badgeBg = AREA_BADGE[item.area] ?? 'bg-neutral-grey-7';
-          const iconColor = AREA_COLOR[item.area];
+          const area = normalizeAreaLabel(item.area);
+          const Icon = AREA_ICON_MAP[area] ?? HeartIcon;
+          const barColor = AREA_BAR_COLORS[area] ?? 'bg-brand-green-2';
+          const badgeBg = AREA_BADGE[area] ?? 'bg-neutral-grey-7';
+          const iconColor = AREA_COLOR[area];
           const itemScore =
             item.score === null || item.score === undefined ? null : Math.round(item.score);
-          const label = item.area === 'Physical' ? 'Physical health' : item.area;
+          const label = area === 'Physical' ? 'Physical health' : area;
 
           return (
             <div key={item.area} className="flex flex-col">

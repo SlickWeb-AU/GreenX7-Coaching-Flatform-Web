@@ -2,6 +2,8 @@ import { useId } from 'react';
 
 interface BatterySliderProps {
   value: number | null;
+  min?: number;
+  max?: number;
   color?: string;
   bgColor?: string;
   onChange: (value: number) => void;
@@ -10,6 +12,8 @@ interface BatterySliderProps {
 
 export function BatterySlider({
   value,
+  min = 1,
+  max = 10,
   color = '#F09E5D',
   bgColor = '#FBE7D7',
   onChange,
@@ -17,9 +21,12 @@ export function BatterySlider({
 }: BatterySliderProps) {
   const id = useId();
   const hasValue = value !== null;
-  const displayValue = value ?? 7;
-  // Calculate percentage: 1 -> 0%, 10 -> 100%
-  const percentage = ((displayValue - 1) / 9) * 100;
+  const displayValue = value ?? Math.round((min + max) / 2);
+  const span = Math.max(1, max - min);
+  // Calculate percentage: min -> 0%, max -> 100%
+  const percentage = ((displayValue - min) / span) * 100;
+  const ticks: number[] = [];
+  for (let s = min + 1; s <= max - 1; s += 1) ticks.push(s);
 
   return (
     <div className={`relative w-full select-none pt-12 ${className}`}>
@@ -39,12 +46,12 @@ export function BatterySlider({
 
       <div className="relative flex h-10 items-center rounded-full focus-within:ring-2 focus-within:ring-black/30">
         <div className="absolute inset-x-0 h-3 overflow-hidden rounded-full bg-white">
-          {[2, 3, 4, 5, 6, 7, 8, 9].map((stepNum) => (
+          {ticks.map((stepNum) => (
             <div
               key={stepNum}
               className="absolute top-0 h-full w-[3px] -translate-x-1/2"
               style={{
-                left: `${((stepNum - 1) / 9) * 100}%`,
+                left: `${((stepNum - min) / span) * 100}%`,
                 backgroundColor: color,
               }}
             />
@@ -75,12 +82,12 @@ export function BatterySlider({
         <input
           id={id}
           type="range"
-          min={1}
-          max={10}
+          min={min}
+          max={max}
           step={1}
           value={displayValue}
-          aria-label="Score from 1 to 10"
-          aria-valuetext={value === null ? 'No score selected' : `${value} out of 10`}
+          aria-label={`Score from ${min} to ${max}`}
+          aria-valuetext={value === null ? 'No score selected' : `${value} out of ${max}`}
           onChange={(e) => onChange(Number(e.target.value))}
           className="absolute inset-0 z-20 h-full w-full cursor-pointer opacity-0"
         />

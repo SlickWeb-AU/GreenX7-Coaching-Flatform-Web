@@ -2,24 +2,17 @@ import { ArrowLeft } from 'lucide-react';
 import { BaseButton, BaseIconButton } from '@/components/base';
 import { BATTERY_AREA_THEMES } from '@/constants/battery';
 import { AREA_ICON_MAP } from '@/constants/dashboard';
+import { normalizeAreaLabel } from '@/lib/battery';
 import { cn } from '@/lib/utils';
+import type { BatteryAreaPromptDto } from '@/types/battery';
 import { BatterySlider } from '../ui/BatterySlider';
-
-export const BATTERY_QUESTION_COPY: Record<string, string> = {
-  Physical: 'How is your energy, vitality and your enthusiasm to move?',
-  Sleep: 'How do you rate your quality of sleep? Do you feel rested or worn out?',
-  Nutrition: 'Are you fueling your body with food that supports your health, energy and mood?',
-  Fun: 'What’s your fun-factor like at the moment?',
-  Mindset: 'How positive is your outlook and attitude today?',
-  Friendships: 'How connected do you feel to your friends right now?',
-  Relationships:
-    'How strong and supportive are your closest relationships - romantic, family or otherwise?',
-  Purpose: 'How strong is your sense of purpose today, do you feel clear on your goals?',
-};
 
 interface BatteryQuestionStepProps {
   index: number;
-  area: string;
+  total: number;
+  prompt: BatteryAreaPromptDto;
+  scoreMin: number;
+  scoreMax: number;
   value: number | null;
   onChange: (value: number) => void;
   onNext: () => void;
@@ -28,15 +21,19 @@ interface BatteryQuestionStepProps {
 
 export function BatteryQuestionStep({
   index,
-  area,
+  total,
+  prompt,
+  scoreMin,
+  scoreMax,
   value,
   onChange,
   onNext,
   onBack,
 }: BatteryQuestionStepProps) {
+  const area = normalizeAreaLabel(prompt.area);
   const Icon = AREA_ICON_MAP[area];
   const theme = BATTERY_AREA_THEMES[area] ?? BATTERY_AREA_THEMES.Physical;
-  const title = area === 'Physical' ? 'Physical health' : area;
+  const title = prompt.title || (area === 'Physical' ? 'Physical health' : area);
 
   return (
     <main className={cn('relative flex min-h-screen w-full flex-col', theme.bodyBg)}>
@@ -56,7 +53,7 @@ export function BatteryQuestionStep({
           />
           <h1 className="body-16-medium md:body-20-bold text-black">Battery Check</h1>
           <div className="body-16-regular md:body-24-regular text-black">
-            <span className="md:body-24-black font-black text-black">{index + 1}</span> of 8
+            <span className="md:body-24-black font-black text-black">{index + 1}</span> of {total}
           </div>
         </div>
 
@@ -64,7 +61,7 @@ export function BatteryQuestionStep({
           <div className="absolute inset-x-0 h-[2px] bg-[#1A1A1A]/20" />
           <div
             className="relative h-2 rounded-r-[10px] bg-brand-green-2 transition-all duration-300"
-            style={{ width: `${((index + 1) / 8) * 100}%` }}
+            style={{ width: `${((index + 1) / total) * 100}%` }}
           />
         </div>
       </header>
@@ -81,13 +78,15 @@ export function BatteryQuestionStep({
             {title}
           </h2>
           <p className="body-18-medium md:body-24-medium min-h-[72px] text-black md:min-h-[90px]">
-            {BATTERY_QUESTION_COPY[area]}
+            {prompt.question}
           </p>
         </div>
 
         <div className="mx-auto mb-[180px] w-full max-w-[1256px] md:mb-[115px]">
           <BatterySlider
             value={value}
+            min={scoreMin}
+            max={scoreMax}
             color={theme.color}
             bgColor={theme.bgColor}
             onChange={onChange}

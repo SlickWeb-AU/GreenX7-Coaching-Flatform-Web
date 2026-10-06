@@ -15,11 +15,6 @@ export const batteryCheckApi = {
     get<BatteryCheckLiveResult>(`/battery-check/${clientSlug}/${deptSlug}/live`),
   submit: (clientSlug: string, deptSlug: string, payload: BatterySubmitPayload) =>
     post<BatterySubmitResult>(`/battery-check/${clientSlug}/${deptSlug}`, payload),
-  sendResultsEmail: (clientSlug: string, deptSlug: string, email: string, resultToken?: string) =>
-    post<void>(`/battery-check/results/email`, {
-      email,
-      clientSlug,
-      departmentSlug: deptSlug,
-      ...(resultToken ? { resultToken } : {}),
-    }),
+  sendResultsEmail: (email: string, resultToken: string) =>
+    post<void>(`/battery-check/results/email`, { resultToken, email }),
 };
