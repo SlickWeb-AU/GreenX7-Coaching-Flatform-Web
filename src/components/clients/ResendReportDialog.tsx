@@ -94,78 +94,90 @@ export function ResendReportDialog({
   const allSelected = total > 0 && selected.size === total;
 
   return (
-    <BaseDialog title="Resend report" onClose={onClose} className="max-w-xl">
-      <p className="body-14-medium mb-4 text-neutral-grey-2">
-        {periodLabel} report. Only the recipients you select get a new access code — everyone else
-        keeps theirs.
-      </p>
+    // Dialog không cao quá 90% màn hình: mô tả, thanh chọn và nút luôn hiện, chỉ
+    // danh sách người nhận cuộn (khách có thể có hàng chục contact).
+    <BaseDialog
+      title="Resend report"
+      onClose={onClose}
+      className="flex max-h-[90vh] max-w-xl flex-col"
+    >
+      <div className="flex min-h-0 flex-1 flex-col">
+        <p className="body-14-medium mb-4 shrink-0 text-neutral-grey-2">
+          {periodLabel} report. Only the recipients you select get a new access code — everyone else
+          keeps theirs.
+        </p>
 
-      {isLoading ? (
-        <div className="py-8">
-          <BaseLoading message="Loading recipients..." />
-        </div>
-      ) : isError ? (
-        <div className="flex flex-col items-center gap-2 py-8 text-center">
-          <p className="body-14-medium text-neutral-grey-2">Could not load recipients.</p>
-          <button
-            type="button"
-            onClick={() => refetch()}
-            className="body-14-bold text-brand-green-2 hover:underline"
-          >
-            Try again
-          </button>
-        </div>
-      ) : (
-        <>
-          <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-            <div className="flex items-center gap-4">
-              <button
-                type="button"
-                onClick={selectAll}
-                disabled={allSelected}
-                className="body-14-bold text-brand-green-2 hover:underline disabled:cursor-default disabled:no-underline disabled:opacity-50"
-              >
-                Select all
-              </button>
-              <button
-                type="button"
-                onClick={selectFailed}
-                disabled={failedIds.length === 0}
-                className="body-14-bold text-secondary-red-4 hover:underline disabled:cursor-not-allowed disabled:no-underline disabled:opacity-40"
-              >
-                Select failed only{failedIds.length ? ` (${failedIds.length})` : ''}
-              </button>
-            </div>
-            <span className="body-14-medium text-neutral-grey-3" aria-live="polite">
-              {selected.size} of {total} selected
-            </span>
+        {isLoading ? (
+          <div className="py-8">
+            <BaseLoading message="Loading recipients..." />
           </div>
+        ) : isError ? (
+          <div className="flex flex-col items-center gap-2 py-8 text-center">
+            <p className="body-14-medium text-neutral-grey-2">Could not load recipients.</p>
+            <button
+              type="button"
+              onClick={() => refetch()}
+              className="body-14-bold text-brand-green-2 hover:underline"
+            >
+              Try again
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className="mb-2 flex shrink-0 flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-4">
+                <button
+                  type="button"
+                  onClick={selectAll}
+                  disabled={allSelected}
+                  className="body-14-bold text-brand-green-2 hover:underline disabled:cursor-default disabled:no-underline disabled:opacity-50"
+                >
+                  Select all
+                </button>
+                <button
+                  type="button"
+                  onClick={selectFailed}
+                  disabled={failedIds.length === 0}
+                  className="body-14-bold text-secondary-red-4 hover:underline disabled:cursor-not-allowed disabled:no-underline disabled:opacity-40"
+                >
+                  Select failed only{failedIds.length ? ` (${failedIds.length})` : ''}
+                </button>
+              </div>
+              <span className="body-14-medium text-neutral-grey-3" aria-live="polite">
+                {selected.size} of {total} selected
+              </span>
+            </div>
 
-          <ul className="max-h-[50vh] divide-y divide-neutral-grey-6 overflow-y-auto rounded-xl border border-neutral-grey-6">
-            {(recipients ?? []).map((r) => (
-              <RecipientRow
-                key={r.contactId}
-                recipient={r}
-                checked={selected.has(r.contactId)}
-                onToggle={() => toggle(r.contactId)}
-              />
-            ))}
-          </ul>
-        </>
-      )}
+            {/* ~6 dòng rồi cuộn; thanh cuộn dùng style chung trong globals.css */}
+            <ul
+              className="max-h-[408px] min-h-0 flex-1 divide-y divide-neutral-grey-6 overflow-y-auto overscroll-contain rounded-xl border border-neutral-grey-6"
+              aria-label="Recipients"
+            >
+              {(recipients ?? []).map((r) => (
+                <RecipientRow
+                  key={r.contactId}
+                  recipient={r}
+                  checked={selected.has(r.contactId)}
+                  onToggle={() => toggle(r.contactId)}
+                />
+              ))}
+            </ul>
+          </>
+        )}
 
-      <div className="mt-6 flex justify-end gap-3">
-        <BaseButton variant="outline" pill onClick={onClose} disabled={sendMutation.isPending}>
-          Cancel
-        </BaseButton>
-        <BaseButton
-          pill
-          onClick={() => sendMutation.mutate()}
-          disabled={selected.size === 0 || isLoading || isError}
-          loading={sendMutation.isPending}
-        >
-          {selected.size > 0 ? `Resend to ${selected.size}` : 'Resend'}
-        </BaseButton>
+        <div className="mt-6 flex shrink-0 justify-end gap-3">
+          <BaseButton variant="outline" pill onClick={onClose} disabled={sendMutation.isPending}>
+            Cancel
+          </BaseButton>
+          <BaseButton
+            pill
+            onClick={() => sendMutation.mutate()}
+            disabled={selected.size === 0 || isLoading || isError}
+            loading={sendMutation.isPending}
+          >
+            {selected.size > 0 ? `Resend to ${selected.size}` : 'Resend'}
+          </BaseButton>
+        </div>
       </div>
     </BaseDialog>
   );

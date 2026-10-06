@@ -100,6 +100,10 @@ function ReportPasswordContent() {
                 label="Password"
                 type={showPassword ? 'text' : 'password'}
                 placeholder="Enter password"
+                // Mã mới là 6 chữ số: mở bàn phím số trên điện thoại. Không chặn chữ —
+                // mã chung kiểu cũ (chữ + số) của báo cáo gửi trước đó vẫn hợp lệ.
+                inputMode="numeric"
+                autoComplete="one-time-code"
                 size="mediumPlus"
                 value={password}
                 onChange={(e) => {
