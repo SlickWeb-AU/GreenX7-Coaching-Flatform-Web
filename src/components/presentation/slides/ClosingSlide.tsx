@@ -1,8 +1,9 @@
 import Image from 'next/image';
 
+import { ClientDepartmentHeader } from '@/components/clients';
 import { HowsYourBatterySticker } from '@/components/icons';
 import { useSlideLayout } from '@/components/presentation/StandardSlideLayout';
-import { cn, resolveImageUrl } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import type { BaseSlideProps } from '@/types';
 
 export function ClosingSlide({
@@ -17,28 +18,6 @@ export function ClosingSlide({
   const departmentName = propDeptName ?? ctx?.departmentName ?? '';
   const clientLogoUrl = propLogoUrl ?? ctx?.clientLogoUrl;
   const controls = propControls ?? ctx?.controls;
-  const renderClientLogo = () => {
-    if (!clientLogoUrl && !clientName && !departmentName) return null;
-    return (
-      <div className="flex flex-col items-center text-center">
-        <div className="flex h-12 items-center justify-center">
-          {clientLogoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={resolveImageUrl(clientLogoUrl)}
-              alt={clientName || 'Client logo'}
-              className="h-12 w-auto object-contain brightness-0 invert"
-            />
-          ) : clientName ? (
-            <span className="body-16-bold text-white">{clientName}</span>
-          ) : null}
-        </div>
-        {departmentName && (
-          <span className="body-20-medium mt-0.5 text-white/90">{departmentName}</span>
-        )}
-      </div>
-    );
-  };
 
   return (
     <div
@@ -62,7 +41,12 @@ export function ClosingSlide({
       </div>
 
       <div className="pointer-events-auto absolute left-1/2 top-10 z-20 flex -translate-x-1/2 items-center">
-        {renderClientLogo()}
+        <ClientDepartmentHeader
+          clientName={clientName}
+          departmentName={departmentName}
+          clientLogoUrl={clientLogoUrl}
+          align="center"
+        />
       </div>
 
       <div className="pointer-events-auto absolute bottom-10 left-1/2 z-20 flex -translate-x-1/2 items-center">
