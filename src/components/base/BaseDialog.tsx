@@ -28,7 +28,7 @@ export function BaseDialog({ title, onClose, children, className }: BaseDialogPr
       role="dialog"
       aria-modal="true"
       onClick={onClose}
-      className="fixed inset-0 z-50 m-0 flex items-center justify-center bg-black/50 duration-200 animate-in fade-in-0"
+      className="fixed inset-0 z-50 m-0 flex items-center justify-center bg-black/50 p-4 duration-200 animate-in fade-in-0"
     >
       <div
         onClick={(event) => event.stopPropagation()}

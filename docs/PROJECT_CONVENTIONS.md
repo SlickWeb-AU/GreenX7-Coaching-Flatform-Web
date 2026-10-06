@@ -1,356 +1,189 @@
 # GreenX7 Project Conventions
 
-Architecture, state management, and development guidelines for all developers and AI agents. Styling and UI design-system rules live in `UI_CONVENTIONS.md`.
+Architecture, API, state management, and routing guidelines for developers building the GreenX7 platform. Styling and UI design-system rules live in `UI_CONVENTIONS.md`.
+
+---
+
+## Core Engineering Principles
+
+Before contributing code, ensure your changes adhere to these invariants:
+
+1. **Self-Documenting Code**: Write clear TypeScript types and meaningful names. Comment the "why", never the "what".
+2. **Layer Separation**: Respect layer boundaries and use path aliases (`@/components/...`, `@/features/...`, `@/types`, `@/constants/...`, `@/config/routes`). Avoid relative imports (`../../`).
+3. **Data Fetching Consistency**: Always use pre-unwrapped helpers from `@/lib/axios` and centralized `queryKeys` from `@/lib/query-client`.
+4. **Type Safety**: Strictly avoid `any` and `@ts-ignore`. Let types flow from Zod schemas and API contracts.
+5. **Route Centralization**: Never construct navigation URLs with string concatenation; always use `ROUTES.*` from `@/config/routes`.
+6. **Continuous Verification**: Verify every change with `npm run typecheck` and `npm run lint:check`.
 
 ---
 
 ## 1. Code Style & TypeScript Standards
 
-- **Self-documenting**: Use precise domain names; TypeScript types are the source of truth. If the code is clear, write no comment.
-- **Comment the "why" only**: Non-obvious business rules, tradeoffs, or browser/library workarounds. If code is hard to read, rename variables or extract helper functions instead.
-- **English only**: Every comment (JSDoc, inline, `TODO`/`FIXME`) must be written in English.
-- **Forbidden**: ASCII dividers/banners, label comments (e.g. `{/* Header Row */}`), commented-out dead code (Git keeps history).
-- **No `React.FC` / `FC`**: Never type components with `React.FC` or `FC`. Use standard typed props directly on function parameters:
-  ```tsx
-  export function Component({ title, children }: ComponentProps) { ... }
-  export const Component = ({ title, children }: ComponentProps) => { ... };
-  ```
-  If children are needed, explicitly define `children?: ReactNode` in the props interface.
-- **Named React imports only**: Never use `React.*` namespace prefixes (e.g. ❌ `React.useState`, `React.useEffect`, `React.useCallback`, `React.useMemo`, `React.FormEvent`). Always import hooks and types directly from `'react'`:
-  ```tsx
-  import { useState, useEffect, useCallback, type ReactNode, type FormEvent } from 'react';
-  ```
-- **Next.js `<Suspense>` on pages with `useSearchParams()`**:
-  - In Next.js App Router, any client component reading `useSearchParams()` MUST be wrapped in a `<Suspense>` boundary to prevent build-time/runtime SSR de-optimization.
-  - Pattern: Keep `page.tsx` as a clean wrapper with `<Suspense fallback={<BaseLoading fullScreen />}>` around the inner content component (e.g. `<ClientsContent />`).
-  - Do NOT wrap arbitrary non-search-param components in `<Suspense>` without an architectural need.
-- **Flow & Step Constants**:
-  - Never hardcode string literals for multi-step flows, statuses, or page states inline (e.g. ❌ `'email' | 'otp'`).
-  - Always define them as constants with `as const` in `src/constants/{domain}.ts` and derive the type:
-  ```tsx
-  export const LOGIN_STEPS = {
-    EMAIL: 'email',
-    OTP: 'otp',
-  } as const;
-
-  export type LoginStep = (typeof LOGIN_STEPS)[keyof typeof LOGIN_STEPS];
-  ```
+- **Self-documenting**: TypeScript types and readable naming are the source of truth. If code is clear, write NO comments.
+- **Strict Comment Policy**:
+  - ❌ Forbidden: `// Set state`, `// Submit button`, `// Call API`, `// Loop through items`.
+  - ❌ Forbidden: Label/section markers (`{/* Header Row */}`, `{/* Content Section */}`). Let semantic JSX speak.
+  - ❌ Forbidden: Non-English comments, ASCII banners, commented-out dead code.
+  - ✅ Allowed: Explaining non-obvious business logic, browser workarounds, or security tradeoffs.
 - **Strict Typing (No `any` / `@ts-ignore`)**:
-  - Use `unknown` with narrowing or type guards.
-  - Generics must have explicit type parameters (`get<T>()`, `ApiSuccessResponse<T>`).
-  - In `catch (err: unknown)`, use `toApiError(err)` or `err instanceof ApiError` (or `axios.isAxiosError(err)` if handling raw Axios).
+  - Never use `as any` or `// @ts-ignore` to silence type errors. Narrow types using Zod, type guards, or `unknown`.
+  - Generic calls require explicit type arguments: `get<ClientDetail>(...)`, `ApiSuccessResponse<T>`.
+  - In `catch (err: unknown)`, use `toApiError(err)` or `err instanceof ApiError`.
+- **Flow & Step Constants**:
+  - Never hardcode string literals for multi-step flows or statuses inline (e.g. ❌ `'email' | 'otp'`).
+  - Always define in `src/constants/{domain}.ts` using `as const` and derive the union type:
+    ```ts
+    export const LOGIN_STEPS = { EMAIL: 'email', OTP: 'otp' } as const;
+    export type LoginStep = (typeof LOGIN_STEPS)[keyof typeof LOGIN_STEPS];
+    ```
 
 ---
 
-## 2. Directory & Layer Architecture
+## 2. Directory Architecture & Layer Responsibilities
 
 ```
 src/
-├── app/                 # Next.js App Router (pages, layouts, route handlers)
-│   ├── (admin)/         # Admin route group (dashboard, clients, settings)
-│   ├── (auth)/          # Authentication route group (login, verify)
-│   ├── api/             # BFF & Auth API route handlers
-│   │   ├── auth/        # /api/auth/login, /api/auth/refresh, /api/auth/logout
-│   │   └── bff/         # /api/bff/[...path] proxy to NestJS backend
-│   ├── report/          # Public/client report pages (password, view)
-│   ├── battery/         # Public battery routes: [clientSlug]/[departmentSlug]/{live, presentation}
-│   ├── forbidden/       # 403 Forbidden page
-│   ├── globals.css      # Tailwind base layers, typography utilities, scrollbar
-│   └── layout.tsx       # Root layout with server session fetching
-├── components/          # UI Presentation Components
-│   ├── base/            # Design-system atomic base components (BaseButton, BaseInput, BaseTable, BaseDialog, etc.)
-│   ├── icons/           # SVG icons & Lucide icon wrappers
-│   ├── layout/          # Layout components (AdminLayout, Sidebar, Navbar, Breadcrumbs)
-│   ├── providers/       # AppProviders, AuthProvider, QueryProvider, ConfirmProvider
-│   ├── clients/         # Clients domain components (table, forms, cards, tabs)
-│   ├── dashboard/       # Dashboard domain components (charts, score banners, grids)
-│   ├── presentation/    # Presentation deck components (DeckShell, slides/, layouts, contexts)
-│   └── settings/        # Settings domain components (admins table, forms)
-├── config/              # Central configuration
-│   ├── navigation.ts    # Sidebar menu items & role-based route matching
-│   ├── permissions.ts   # RBAC permissions & permission helper functions
-│   └── routes.ts        # Typed route path constants (ROUTES.admin.clients, etc.)
-├── constants/           # Business & UI constants, design tokens
-│   ├── auth.ts          # Auth flow steps, token keys
-│   ├── clients.ts       # Status options, timezones, check-in limits, sort mappings
-│   ├── dashboard.ts     # Month options, fixed zones, trend options, wellbeing areas
-│   ├── presentation.ts  # Slide configs, cover pills, area sequence, countdown
-│   ├── tokens.ts        # Dashboard color palettes, zone colors, pill tone styles
-│   └── ui.ts            # Base component size & variant class dictionaries
-├── features/            # Pure Business & API Service Layer
-│   ├── admin-auth/      # useAdminOtp hook
-│   ├── admin-clients/   # clientsApi service
-│   ├── admin-dashboard/ # dashboardApi service
-│   ├── admin-settings/  # settingsApi service
-│   ├── auth/            # authApi service
-│   ├── battery-check/   # batteryCheckApi + useBatteryLive hook
-│   └── report/         # reportApi service (password + view screens)
-├── lib/                 # Core utilities, helpers & HTTP client
-│   ├── api-error.ts     # ApiError class & error parser
-│   ├── axios.ts         # Axios BFF client with refresh-token mutex queue & typed helpers (get, post, patch, del)
-│   ├── backend.ts       # Server-side direct backend client
-│   ├── clients.ts       # Query builders & client data formatters
-│   ├── cookies.ts       # Secure cookie parser & setter for tokens
-│   ├── dashboard.ts     # Dashboard query builders
-│   ├── jwt.ts           # JWT decode & verification helpers
-│   ├── live.ts          # Strengths/focus calculation for live battery data
-│   ├── otp.ts           # OTP timer & email masking formatters
-│   ├── presentation-nav.ts # Hash-based slide navigation hook (fullscreen decks only)
-│   ├── query-client.ts  # TanStack QueryClient factory & query keys
-│   ├── search-params.ts # URL search param patch & merge utilities
-│   └── utils.ts         # cn (clsx + tailwind-merge) & common string helpers
-├── types/               # ALL TypeScript Definitions, DTOs & API Contracts
-│   ├── api.ts           # ApiSuccessResponse, ApiErrorResponse, PaginationMeta, PaginatedResult
-│   ├── auth.ts          # AuthUser, UserRole, UserStatus, AuthTokens, AccessTokenPayload
-│   ├── clients.ts       # ClientListItem, ClientDetail, CreateClientPayload, DepartmentDto
-│   ├── dashboard.ts     # ClientDashboardDto, DepartmentDashboardDto, BatteryScoreDto
-│   ├── presentation.ts  # SlideConfig, InsightBadgeItem, WellbeingItemData, BatteryCheckLiveResult
-│   ├── reports.ts       # Report DTOs & payloads
-│   ├── settings.ts      # AdminUserDto, IndustryDto
-│   ├── ui.ts            # BaseSize, BaseVariant, BaseButtonStyleOptions
-│   └── index.ts
-└── validations/         # Zod validation schemas
-    ├── clients.ts       # Client form & department schemas
-    ├── settings.ts      # Industry name & invite admin schemas
-    └── index.ts
+├── app/          # Next.js App Router (pages, layouts, route handlers)
+├── components/   # UI presentation (base/ for design-system, {domain}/ for domain views)
+├── config/       # navigation.ts, permissions.ts, routes.ts
+├── constants/    # Business options, design tokens, UI class mappings
+├── features/     # Pure API services (clientsApi, dashboardApi) and query hooks ONLY
+├── lib/          # axios.ts, query-client.ts, utils.ts (cn), formatters
+├── types/        # DTOs, API contracts, domain models (re-exported via index.ts)
+└── validations/  # Zod schemas (re-exported via index.ts)
 ```
 
-### Imports & Path Aliases
+### Layer Rules & Path Aliases
 
-Always use path aliases. Never use deep relative paths (`../../../`).
+Always use path aliases. Never write deep relative paths (`../../../`).
 
-| Alias                   | Example                                                                 |
-| :---------------------- | :---------------------------------------------------------------------- |
-| `@/components/base`     | `import { BaseButton, BaseInput, BaseTable } from '@/components/base';` |
-| `@/components/{domain}` | `import { ClientsTable } from '@/components/clients';`                  |
-| `@/features/{domain}`   | `import { clientsApi } from '@/features/admin-clients';`                |
-| `@/validations`         | `import { clientFormSchema } from '@/validations';`                     |
-| `@/types`               | `import type { ClientListItem, PaginationMeta } from '@/types';`        |
-| `@/constants`           | `import { CLIENT_STATUS_OPTIONS } from '@/constants/clients';`          |
-| `@/config/routes`       | `import { ROUTES } from '@/config/routes';`                             |
-| `@/lib/{util}`          | `import { buildClientsQuery } from '@/lib/clients';`                    |
+| Layer                   | Responsibility & Constraints                                                                                                  |
+| :---------------------- | :---------------------------------------------------------------------------------------------------------------------------- |
+| `@/features/{domain}`   | API service objects (`clientsApi`, `authApi`) and domain query/mutation hooks ONLY. **NO UI JSX, NO Zod schemas, NO types.**  |
+| `@/components/{domain}` | Domain-specific UI presentation. Composes `@/components/base` and Tailwind.                                                   |
+| `@/types`               | All DTOs, API responses, and domain entities live here. Component props interfaces remain colocated in their own `.tsx` file. |
+| `@/validations`         | All Zod validation schemas live here and export inferred types (`z.infer<typeof schema>`).                                    |
+| `@/config/routes`       | Centralized typed route definitions (`ROUTES`).                                                                               |
+| `@/lib/axios`           | HTTP client with mutex 401 refresh queue and pre-unwrapped helpers (`get`, `post`, etc.).                                     |
+| `@/lib/query-client`    | Centralized `queryKeys` and QueryClient factory.                                                                              |
 
-### Layer Responsibilities & Export Rules
-
-- **`src/features/`**:
-  - Contains ONLY API service objects (`clientsApi`, `settingsApi`, `authApi`, `dashboardApi`, `reportApi`) and domain query/mutation orchestration hooks.
-  - MUST NOT contain UI presentation components, Zod schemas, or domain types.
-- **`src/components/`**:
-  - Contains presentation UI components grouped by feature/domain.
-  - Colocate small helpers in the same file; split to a new file only when reused by a 2nd caller.
-- **`src/validations/`**:
-  - All Zod schemas and validation helper functions live here and are re-exported via `src/validations/index.ts`.
-- **`src/types/`**:
-  - All interfaces, DTOs, enums, payloads, and domain types live here and are re-exported via `src/types/index.ts`.
-  - Props interfaces for a component's own parameters (e.g. `XxxProps`) stay colocated in the component's tsx file (per `UI_CONVENTIONS.md`).
-  - Shared prop bases used by 2+ files (e.g. `BaseSlideProps`) and context value types (e.g. `SlideLayoutContextValue`, `PresentationContextValue`) must live in `src/types/` and be imported with `import type`.
-- **`src/constants/`**:
-  - All business constants, option lists, status definitions, and design tokens live here. Never define exported data constants inside tsx files.
-- **`src/lib/`**:
-  - HTTP clients (`axios.ts`), search params mergers, formatters, and reusable helper functions live here.
-- **Barrel `index.ts` files**:
-  - Use `export * from './...'` (wildcard re-exports).
-- **Thin `page.tsx`**:
-  - Only wires hooks, state, routing, and domain components. No raw Axios calls or hardcoded schemas.
+- **Thin `page.tsx`**: Route pages only wire hooks, route params, and top-level domain components. No raw HTTP calls or form schemas inside `page.tsx`.
+- **`<Suspense>` on pages reading search params**:
+  - In Next.js App Router, any client component reading `useSearchParams()` MUST be wrapped in `<Suspense fallback={<BaseLoading fullScreen />}>` in `page.tsx` to prevent SSR de-optimization.
 
 ---
 
-## 3. State Management
+## 3. State Management Tiers
 
-Classify each piece of state into the appropriate tier:
+Classify every piece of state into the correct tier:
 
-| Tier                         | Use When                                                                        | Mechanism                                                             | Rules                                                                                                                    |
-| :--------------------------- | :------------------------------------------------------------------------------ | :-------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------- |
-| **1. URL State**             | Search, filters, tabs, sorting, pagination (must survive reload & be shareable) | `useSearchParams`, `useRouter`, `usePathname`, `mergeSearchParams`    | Use `router.replace` with debounced input to keep browser history clean. Wrap component in `<Suspense>`.                 |
-| **2. Server / Async State**  | Data fetched from or mutated to the backend                                     | `@tanstack/react-query` (`useQuery`, `useMutation`, `useQueryClient`) | Centralized query keys (`queryKeys` in `@/lib/query-client`), default `staleTime: 60s`, automatic background refetching. |
-| **3. Global UI State**       | Pure client UI state across pages (sidebar collapsed, mobile drawer)            | Local `useState` in layout / React Context                            | Do NOT put server data here. Only client UI state. Add `zustand` only when 3+ distant components share the state.        |
-| **4. App Auth & RBAC**       | User session, permissions, role checking                                        | `AuthProvider` / `useAuth()` (`React Context`)                        | Populated from server-rendered layout session. Provides `can()`, `canAny()`, `hasRole()`.                                |
-| **5. Local Component State** | Modal/dialog visibility, draft form inputs, dropdown open state                 | `useState`, `useReducer`, `useRef`                                    | Keep as local and tightly scoped as possible.                                                                            |
+| Tier                         | Use Case                                          | Mechanism                                           | Rules                                                                                                        |
+| :--------------------------- | :------------------------------------------------ | :-------------------------------------------------- | :----------------------------------------------------------------------------------------------------------- |
+| **1. Page-level URL State**  | Search, filter, sorting, pagination on list pages | `useSearchParams`, `useRouter`, `mergeSearchParams` | Use `router.replace` with debounced input. Must survive page reload & be shareable.                          |
+| **2. Server / Async State**  | Backend data (fetched, cached, mutated)           | `@tanstack/react-query` (`useQuery`, `useMutation`) | ALWAYS use `queryKeys` from `@/lib/query-client`. Default `staleTime: 60s`. Refetch via `invalidateQueries`. |
+| **3. Global UI State**       | Cross-page UI state (sidebar collapsed)           | React Context / Layout `useState`                   | Client UI state only. Do NOT store server data here.                                                         |
+| **4. Auth & RBAC**           | User session, permissions, role checking          | `AuthProvider` / `useAuth()`                        | Provides `can()`, `canAny()`, `hasRole()`. Hydrated from root layout session.                                |
+| **5. Local Component State** | Modal open/close, draft inputs, in-modal tabs     | `useState`, `useReducer`, `useRef`                  | Keep as local and tightly scoped as possible. Do NOT push modal tab states to URL.                           |
 
 ---
 
-## 4. API, BFF & Data Fetching
+## 4. API & Data Fetching Conventions
 
 ### Backend-for-Frontend (BFF) Architecture
 
-1. **Client requests** hit Next.js BFF at `/api/bff/[...path]` or `/api/auth/*` (same origin, no CORS, no preflight).
-2. **Access & Refresh tokens** are stored in secure, `httpOnly` cookies managed by Next.js route handlers. JavaScript in the browser cannot and should not access tokens directly.
-3. **Automatic 401 Refresh Queue**:
-   - `src/lib/axios.ts` implements a mutex queue for token refresh.
-   - If multiple parallel requests receive a `401 Unauthorized`, only the first request triggers `/api/auth/refresh`. Subsequent requests queue and retry once refresh succeeds.
-   - If refresh fails, `setSessionExpiredHandler` clears the React Query cache, resets `AuthContext`, and redirects to `/login`.
+- Client requests hit Next.js BFF at `/api/bff/[...path]` or `/api/auth/*` (same-origin, no CORS, credentials included).
+- Access & Refresh tokens are stored in secure `httpOnly` cookies managed by Next.js route handlers. Browser JS never reads tokens directly.
+- `src/lib/axios.ts` automatically manages 401 token refresh queue with mutex locking.
 
-### API Envelope Contracts (`src/types/api.ts`)
+### Typed HTTP Helpers (`@/lib/axios`)
 
-```typescript
-export interface PaginationMeta {
-  page: number;
-  pageSize: number;
-  total: number;
-  totalPages: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
-}
+> [!IMPORTANT]
+> The helpers `get`, `post`, `patch`, and `del` **ALREADY return `res.data.data`**.
+> `getPaginated` **ALREADY returns `{ items: T[], meta: PaginationMeta }`**.
+> **NEVER write `.data.data` on the returned result.**
 
-export interface ApiSuccessResponse<T> {
-  success: true;
-  statusCode: number;
-  message: string;
-  data: T;
-  meta?: PaginationMeta;
-  timestamp: string;
-  path: string;
-}
-
-export interface PaginatedResult<T> {
-  items: T[];
-  meta: PaginationMeta;
-}
-```
-
-### Typed HTTP Helpers (`src/lib/axios.ts`)
-
-Use the unwrapped helper functions directly in API feature services:
-
-```typescript
+```ts
 import { get, getPaginated, post, patch, del } from '@/lib/axios';
+import type { ClientListItem, ClientDetail, CreateClientPayload, PaginatedResult } from '@/types';
 
 export const clientsApi = {
-  listPaginated: (query: string) => getPaginated<ClientListItem>(`/clients?${query}`),
-  getById: (id: string) => get<ClientDetail>(`/clients/${id}`),
-  create: (payload: CreateClientPayload) => post<ClientDetail>('/clients', payload),
-  update: (id: string, payload: UpdateClientPayload) =>
+  listPaginated: (query: string): Promise<PaginatedResult<ClientListItem>> =>
+    getPaginated<ClientListItem>(`/clients?${query}`),
+  getById: (id: string): Promise<ClientDetail> => get<ClientDetail>(`/clients/${id}`),
+  create: (payload: CreateClientPayload): Promise<ClientDetail> =>
+    post<ClientDetail>('/clients', payload),
+  update: (id: string, payload: Partial<CreateClientPayload>): Promise<ClientDetail> =>
     patch<ClientDetail>(`/clients/${id}`, payload),
-  delete: (id: string) => del<void>(`/clients/${id}`),
+  delete: (id: string): Promise<void> => del<void>(`/clients/${id}`),
 };
 ```
 
-### TanStack Query Usage Pattern
+### TanStack Query Conventions
 
-```tsx
-// Query: fetching list or detail data
-const { data, isLoading, isFetching, error } = useQuery({
-  queryKey: queryKeys.adminClients.list(query),
-  queryFn: () => clientsApi.listPaginated(query),
-  retry: false,
-});
+- **Always use centralized `queryKeys`**:
+  ```tsx
+  import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+  import { queryKeys } from '@/lib/query-client';
+  import { clientsApi } from '@/features/admin-clients';
+  import { toast } from 'sonner';
 
-// Mutation: creating, updating, or deleting data
-const queryClient = useQueryClient();
-const createMutation = useMutation({
-  mutationFn: (payload: CreateClientPayload) => clientsApi.create(payload),
-  onSuccess: () => {
-    queryClient.invalidateQueries({ queryKey: queryKeys.adminClients.all });
-    toast.success('Client created successfully');
-    router.push(ROUTES.admin.clients);
-  },
-  onError: (err) => {
-    toast.error(err instanceof Error ? err.message : 'Failed to create client');
-  },
-});
-```
+  // Query
+  const { data, isLoading, error } = useQuery({
+    queryKey: queryKeys.adminClients.list(query),
+    queryFn: () => clientsApi.listPaginated(query),
+  });
 
-- `isLoading`: initial load when no cache exists → render skeleton or `<BaseLoading fullScreen />`.
-- `isFetching`: background refetch → keep existing layout without jarring full-screen loaders.
+  // Mutation
+  const queryClient = useQueryClient();
+  const createMutation = useMutation({
+    mutationFn: (payload: CreateClientPayload) => clientsApi.create(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.adminClients.all });
+      toast.success('Client created successfully');
+    },
+    onError: (err) => {
+      toast.error(err instanceof Error ? err.message : 'Failed to create client');
+    },
+  });
+  ```
+- If a new feature requires new query keys, add them to `queryKeys` in `src/lib/query-client.ts`. Never write inline string arrays like `queryKey: ['random-key']`.
 
 ---
 
 ## 5. Forms & Validations
 
-- **Simple forms** (1–2 flat fields, e.g. rename industry modal): Local React state (`useState` for values and errors).
-- **Complex forms** (multi-section, nested arrays, check-in settings, client creation): `react-hook-form` + `zod` schema (`@hookform/resolvers/zod`).
-- **Validation Schemas**: All schemas reside in `src/validations/` and export inferred types (e.g. `type ClientFormValues = z.infer<typeof clientFormSchema>;`).
-
-### Form Rules:
-
-1. **Form element**: Always use `<form noValidate onSubmit={handleSubmit(onSubmit)}>`.
-2. **Field error clearing**: Clear field errors upon user input change.
-3. **Submit button**: Always bind `loading={isSubmitting || isPending}` and `disabled={isSubmitting || isPending}` on `BaseButton`.
-4. **Server validation errors**: Map 400/422 validation errors to corresponding form field `error` and `helperText`.
+- **Simple Forms** (1–2 fields, e.g. rename modal): Local React `useState`.
+- **Complex / Domain Forms** (Client creation, department forms, multi-section): `react-hook-form` + `@hookform/resolvers/zod`.
+- **Rules**:
+  1. Always add `noValidate` to `<form onSubmit={handleSubmit(onSubmit)} noValidate>`.
+  2. Map field errors to `error={Boolean(errors.fieldName)}` and `helperText={errors.fieldName?.message}` on `BaseInput`.
+  3. Form submit buttons must bind `loading={isSubmitting || isPending}` and `disabled={isSubmitting || isPending}`.
 
 ---
 
-## 6. Feedback & Notifications
+## 6. Routing & Navigation Conventions
 
-| Scenario                                       | Handled By                                      | UI Component / Action                                               |
-| :--------------------------------------------- | :---------------------------------------------- | :------------------------------------------------------------------ |
-| **Mutation success / write alert**             | `useMutation` `onSuccess`                       | `toast.success(...)` (`sonner`)                                     |
-| **Mutation failure / write error**             | `useMutation` `onError`                         | `toast.error(...)` (`sonner`)                                       |
-| **Destructive / critical action confirmation** | `useConfirm()`                                  | `<ConfirmProvider>` dialog modal                                    |
-| **Initial page load**                          | `isLoading && !data`                            | `<BaseLoading message="..." fullScreen />`                          |
-| **Aggregate dashboard fetch failure**          | Query `error` (single query drives many blocks) | `toast.error(...)` (`sonner`), keep cached UI, no full-screen error |
-| **Table / list fetch failure**                 | Query `error`                                   | Inline error card with **Retry** button                             |
-| **Empty list (200 OK, `[]`)**                  | `data.length === 0`                             | Dashed border empty container with CTA button                       |
-| **Field validation error**                     | Client Zod / API 422                            | Field `error` + `helperText` below input                            |
-| **Session expired (401)**                      | Axios response interceptor                      | Auto refresh; if failed, reset auth & redirect `/login`             |
-
----
-
-## 7. Authentication, RBAC & Security
-
-- **Tokens in `httpOnly` Cookies**: Access and refresh tokens are stored securely in cookies.
-- **Server Session Hydration**: The root layout fetches the current authenticated user at request time and hydrates `AuthProvider` via `initialUser`, preventing UI flash.
-- **RBAC & Permissions**:
-  - Permissions are defined in `src/config/permissions.ts`.
-  - Use `useAuth()` in components to check access:
+- **Use Centralized `ROUTES`**:
+  - Always import `ROUTES` from `@/config/routes`.
+  - ❌ Never write: `router.push('/admin/clients/' + id)`.
+  - ✅ Always write: `router.push(ROUTES.admin.clientDetail(id))`.
+- **SPA Transitions vs New Tab**:
+  - Admin and in-app navigation MUST use Next.js primitives (`router.push` or `<Link href="...">`).
+  - Standalone fullscreen views (Live Battery, Presentation Decks) opened from admin should open in a new tab:
     ```tsx
-    const { user, isAdmin, can, canAny, hasRole } = useAuth();
-    if (can(PERMISSIONS.CLIENT_CREATE)) { ... }
+    window.open(ROUTES.live(clientSlug, departmentSlug), '_blank', 'noopener,noreferrer');
     ```
-- **Route Guards**: Next.js middleware and layout-level guards protect admin and authenticated routes.
+- **Semantic Slugs vs UUIDs**:
+  - Public & Presentation routes strictly use semantic slugs (`/battery/:clientSlug/:departmentSlug/live`).
+  - Admin management views use entity UUIDs (`/admin/clients/:clientId/departments/:deptId`).
 
 ---
 
-## 8. Verification & Development Commands
+## 7. Verification & Quality Commands
 
-- **Type Check**: Run `npm run typecheck` (`tsc --noEmit`) for fast, low-memory type validation.
-- **Lint Check**: Run `npm run lint:check` (or `npm run lint` for auto-fixing).
-- **Unit Tests**: Run `npm test` (`vitest run`).
-- **Forbidden in Dev Verification**: Do NOT run `npm run build` just to verify code or type changes. Next.js build prerenders all static routes, consuming excessive time and memory. Always use `npm run typecheck` and `npm run lint:check`.
+Always verify changes with fast checks:
 
----
-
-## 9. URL Design & Routing Conventions
-
-To ensure URLs are unambiguous, self-documenting, and consistent across the platform, follow these Next.js routing conventions:
-
-### 1. Prohibition of Adjacent Dynamic Route Parameters
-
-- **Never** place two dynamic parameter segments adjacent to each other without resource qualifiers (e.g., ❌ `/:clientId/:deptId` or ❌ `/live/:clientId/:deptId`).
-- Adjacent IDs create routing ambiguities, degrade analytics/logging readability, and make nested routing fragile.
-
-### 2. Explicit Resource Scoping & Slug-Based Routes
-
-- Every dynamic identifier segment **must** be prefixed with its explicit plural resource noun:
-  - ❌ `/live/:clientId/:deptId`
-  - ✅ `/battery/[clientSlug]/[departmentSlug]/live`
-  - ✅ `/battery/[clientSlug]/[departmentSlug]/presentation`
-  - ✅ `/admin/clients/[clientId]/departments/[deptId]`
-- **Slug-only for Public/Live/Presentation Routes**:
-  - Public-facing views (Live Dashboard, Presentation Decks) strictly use semantic slugs (`[clientSlug]`, `[departmentSlug]`) to align with API design and ensure clean branding without UUID fallbacks.
-  - Admin management views use entity UUIDs (`[clientId]`, `[deptId]`).
-
-### 3. Symmetrical Route Structure Across Functional Areas
-
-- Keep resource hierarchies consistent whether in the Admin portal, Live Dashboard, or Presentation views:
-  - **Admin**: `/admin/clients/:clientId/departments/:deptId`
-  - **Live Dashboard**: `/battery/:clientSlug/:departmentSlug/live`
-  - **Presentation Mode**: `/battery/:clientSlug/:departmentSlug/presentation`
-- Centralize all route paths in `src/config/routes.ts` (`ROUTES.live(...)`, `ROUTES.presentation(...)`, `ROUTES.admin.departmentDetail(...)`). Never construct dynamic route paths with inline string interpolation.
-
-### 4. Navigation & Link Opening Conventions
-
-- **Internal SPA Navigation**:
-  - Always use Next.js primitives (`router.push(...)` from `useRouter()` or `<Link href="...">`).
-  - Do NOT use vanilla JS `window.location.href` or plain `<a href>` for internal admin/app transitions.
-- **Standalone Live & Presentation Views (New Tab)**:
-  - When launching presentation decks, live dashboards, or public check-in forms from the admin interface, open them in a new tab to preserve the administrator's active workspace and state:
-    ```tsx
-    const fullUrl = normalizeUrl(ROUTES.live(clientSlug, departmentSlug));
-    window.open(fullUrl, '_blank', 'noopener,noreferrer');
-    ```
-  - Use `normalizeUrl(...)` only when the URL may be relative or a bare domain; skip it for already-absolute `https://` URLs.
-
-### 5. URL Refactoring & Obsolete Route Cleanup
-
-- When retiring non-compliant routes (e.g. adjacent `/:clientId/:deptId` or old `[clientId]` folders), remove the obsolete directories completely and migrate all callers to canonical resource-scoped URLs (`/clients/:clientSlug/departments/:departmentSlug`).
+- **Type Check**: `npm run typecheck` (`tsc --noEmit`).
+- **Lint Check**: `npm run lint:check` (or `npm run lint` for auto-fixing).
+- **Unit Tests**: `npm test` (`vitest run`).
+- ❌ **Forbidden in verification**: Do NOT run `npm run build` just to verify types or linting. Use `npm run typecheck`.
