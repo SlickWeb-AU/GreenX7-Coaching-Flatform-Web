@@ -7,6 +7,7 @@ import { Suspense, useEffect, useMemo } from 'react';
 import { toast } from 'sonner';
 
 import { BaseButton, BaseHeader, BaseLoading, BaseSelectInside } from '@/components/base';
+import { useExportPdf } from '@/hooks/useExportPdf';
 import { toApiError } from '@/lib/api-error';
 import { calculateAverageBatteryScore, cn } from '@/lib/utils';
 
@@ -62,6 +63,7 @@ function DashboardContent() {
   }, [industry, industryOptions]);
 
   const query = buildDashboardQuery({ month, year, industry });
+  const { exporting, exportPdf } = useExportPdf();
   const { data, isLoading, isFetching, error } = useQuery({
     queryKey: queryKeys.adminDashboard.metrics(month, year, industry),
     queryFn: () => dashboardApi.getDashboard(query),
@@ -186,7 +188,12 @@ function DashboardContent() {
               variant="secondary"
               pill
               startIcon={<Download size={16} aria-hidden />}
-              onClick={() => window.print()}
+              loading={exporting}
+              onClick={() =>
+                exportPdf(`/exports/dashboard.pdf?${query}`, {
+                  fallbackName: `GreenX7 Dashboard ${month}-${year}.pdf`,
+                })
+              }
             >
               Export PDF
             </BaseButton>

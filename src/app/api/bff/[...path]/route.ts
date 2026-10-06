@@ -52,14 +52,17 @@ async function proxy(request: NextRequest, params: Promise<{ path: string[] }>) 
       cache: 'no-store',
     });
 
-    const responseBody = await upstream.text();
+    // Đọc dạng nhị phân, KHÔNG dùng .text(): file PDF (Export PDF) đi qua đây mà
+    // đọc thành chuỗi UTF-8 là hỏng file. JSON thì nhị phân hay chuỗi cũng như nhau.
+    const responseBody = await upstream.arrayBuffer();
 
-    return new NextResponse(responseBody, {
-      status: upstream.status,
-      headers: {
-        'Content-Type': upstream.headers.get('Content-Type') ?? 'application/json',
-      },
-    });
+    const responseHeaders: Record<string, string> = {
+      'Content-Type': upstream.headers.get('Content-Type') ?? 'application/json',
+    };
+    const disposition = upstream.headers.get('Content-Disposition');
+    if (disposition) responseHeaders['Content-Disposition'] = disposition;
+
+    return new NextResponse(responseBody, { status: upstream.status, headers: responseHeaders });
   } catch {
     return NextResponse.json(
       {

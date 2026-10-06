@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import { MONTH_NAMES } from '@/constants';
 import { CHART_COLORS } from '@/constants/tokens';
@@ -39,8 +39,20 @@ export function ClientDashboardTab({
   className,
 }: ClientDashboardTabProps) {
   const now = new Date();
-  const [selectedMonth, setSelectedMonth] = useState(String(now.getMonth() + 1));
-  const [selectedYear, setSelectedYear] = useState(String(now.getFullYear()));
+  // Kỳ đang xem nằm trên URL (?month=&year=) chứ không trong state: nút Export PDF
+  // ở header (ClientLayoutContent) đọc cùng chỗ này để xuất đúng kỳ đang hiện.
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const selectedMonth = searchParams.get('month') || String(now.getMonth() + 1);
+  const selectedYear = searchParams.get('year') || String(now.getFullYear());
+  const setPeriod = (key: 'month' | 'year', value: string) => {
+    const next = new URLSearchParams(searchParams.toString());
+    next.set(key, value);
+    router.replace(`${pathname}?${next.toString()}`, { scroll: false });
+  };
+  const setSelectedMonth = (v: string) => setPeriod('month', v);
+  const setSelectedYear = (v: string) => setPeriod('year', v);
 
   const { data } = useQuery({
     queryKey: queryKeys.adminClients.dashboard(clientId, selectedYear, selectedMonth),

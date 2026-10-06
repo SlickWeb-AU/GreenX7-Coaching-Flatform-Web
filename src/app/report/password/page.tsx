@@ -8,7 +8,7 @@ import { useState, Suspense, type FormEvent } from 'react';
 import { BaseButton, BaseInput, BaseLoading } from '@/components/base';
 import { DecorativeWaveBottomRight, DecorativeWaveTopRight } from '@/components/icons';
 import { reportApi } from '@/features/report';
-import { reportSessionKey } from '@/lib/report-auth';
+import { reportPasswordKey, reportSessionKey } from '@/lib/report-auth';
 
 export default function ReportPasswordPage() {
   return (
@@ -45,6 +45,7 @@ function ReportPasswordContent() {
     try {
       const reportData = await reportApi.viewReport(token, password.trim());
       sessionStorage.setItem(reportSessionKey(token), JSON.stringify(reportData));
+      sessionStorage.setItem(reportPasswordKey(token), password.trim());
       router.push(`/report/view?token=${encodeURIComponent(token)}`);
     } catch (err: unknown) {
       setLoading(false);

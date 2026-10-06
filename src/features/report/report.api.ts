@@ -1,9 +1,10 @@
 'use client';
 
 import { post } from '@/lib/axios';
-import type { ReportViewDto } from '@/types/reports';
+import type { ReportContentDto } from '@/types/reports';
 
 export const reportApi = {
-  viewReport: (token: string, password: string) =>
-    post<ReportViewDto>(`/reports/${token}/view`, { password }),
+  /** `period` = "YYYY-MM" để xem kỳ khác trong `availablePeriods`; bỏ trống = kỳ của báo cáo */
+  viewReport: (token: string, password: string, period?: string) =>
+    post<ReportContentDto>(`/reports/${token}/view`, period ? { password, period } : { password }),
 };

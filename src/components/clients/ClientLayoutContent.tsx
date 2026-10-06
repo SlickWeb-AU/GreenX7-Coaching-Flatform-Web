@@ -16,6 +16,7 @@ import {
 import { ROUTES } from '@/config/routes';
 import { CLIENT_STATUSES, CLIENT_TABS } from '@/constants/clients';
 import { useDepartmentShareLinks } from '@/features/admin-clients';
+import { useExportPdf } from '@/hooks/useExportPdf';
 import { normalizeUrl } from '@/lib/utils';
 import { ShareBatteryCheckPopover } from './ShareBatteryCheckPopover';
 import { useClient } from './ClientContext';
@@ -36,6 +37,11 @@ export function ClientLayoutContent({ children }: { children: ReactNode }) {
 
   const isEdit = pathname?.endsWith('/edit');
   const isDeptDetail = pathname?.includes('/departments/');
+  const { exporting, exportPdf } = useExportPdf();
+  const now = new Date();
+  // Cùng kỳ với tab Dashboard đang hiện (ClientDashboardTab ghi lên URL)
+  const exportMonth = searchParams.get('month') || String(now.getMonth() + 1);
+  const exportYear = searchParams.get('year') || String(now.getFullYear());
   const companyWideDeptId = client?.departments?.find((d) => d.isCompanyWide)?.id ?? '';
 
   // Hook first — before any early return (Rules of Hooks).
@@ -91,9 +97,13 @@ export function ClientLayoutContent({ children }: { children: ReactNode }) {
         size="medium"
         pill
         startIcon={<Download size={16} aria-hidden />}
-        onClick={() => {
-          window.print();
-        }}
+        loading={exporting}
+        onClick={() =>
+          exportPdf(`/exports/clients/${clientId}/dashboard.pdf`, {
+            params: { month: exportMonth, year: exportYear, trendMonths: 6 },
+            fallbackName: `${client?.businessName ?? 'Client'} ${exportMonth}-${exportYear}.pdf`,
+          })
+        }
       >
         Export PDF
       </BaseButton>

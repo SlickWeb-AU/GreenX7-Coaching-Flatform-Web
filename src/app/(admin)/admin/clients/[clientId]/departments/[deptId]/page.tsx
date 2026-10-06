@@ -21,6 +21,7 @@ import { MONTH_NAMES } from '@/constants';
 import { CLIENT_STATUSES } from '@/constants/clients';
 import { CHART_COLORS } from '@/constants/tokens';
 import { clientsApi, useDepartmentShareLinks } from '@/features/admin-clients';
+import { useExportPdf } from '@/hooks/useExportPdf';
 import { queryKeys } from '@/lib/query-client';
 import { normalizeUrl } from '@/lib/utils';
 import {
@@ -86,6 +87,7 @@ export default function DepartmentDetailPage() {
   const now = new Date();
   const [selectedMonth, setSelectedMonth] = useState(String(now.getMonth() + 1));
   const [selectedYear, setSelectedYear] = useState(String(now.getFullYear()));
+  const { exporting, exportPdf } = useExportPdf();
 
   // Consume client from layout context
   const { client, isLoading: isClientLoading } = useClient();
@@ -146,9 +148,13 @@ export default function DepartmentDetailPage() {
           size="medium"
           pill
           startIcon={<Download size={16} aria-hidden />}
-          onClick={() => {
-            window.print();
-          }}
+          loading={exporting}
+          onClick={() =>
+            exportPdf(`/exports/clients/${clientId}/departments/${deptId}/dashboard.pdf`, {
+              params: { month: selectedMonth, year: selectedYear, trendMonths: 6 },
+              fallbackName: `${departmentName} ${selectedMonth}-${selectedYear}.pdf`,
+            })
+          }
         >
           Export PDF
         </BaseButton>
@@ -173,7 +179,19 @@ export default function DepartmentDetailPage() {
         />
       </>
     ),
-    [clientId, departmentName, presentationUrl, router, shareLinks, isShareLinksLoading],
+    [
+      clientId,
+      deptId,
+      departmentName,
+      presentationUrl,
+      router,
+      shareLinks,
+      isShareLinksLoading,
+      exporting,
+      exportPdf,
+      selectedMonth,
+      selectedYear,
+    ],
   );
 
   useClientHeader({

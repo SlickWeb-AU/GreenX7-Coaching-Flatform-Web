@@ -10,13 +10,34 @@ export interface ClientWellbeingCardProps {
   items?: WellbeingItemData[];
   previousMonthLabel?: string;
   className?: string;
+  /** `pill`: viên đặc "+2%" như màn báo cáo gửi khách (17); mặc định mũi tên như màn quản trị */
+  deltaVariant?: 'arrow' | 'pill';
+}
+
+function DeltaPill({ value }: { value: number | null | undefined }) {
+  if (value === null || value === undefined) {
+    return <span className="body-12-bold text-neutral-grey-3">—</span>;
+  }
+  return (
+    <span
+      className={cn(
+        'body-12-bold rounded-pill px-1.5 py-0.5 text-white',
+        value < 0 ? 'bg-secondary-red-4' : 'bg-secondary-green-4',
+      )}
+    >
+      {value > 0 ? '+' : ''}
+      {value}%
+    </span>
+  );
 }
 
 export function ClientWellbeingCard({
   items,
   previousMonthLabel = '',
   className,
+  deltaVariant = 'arrow',
 }: ClientWellbeingCardProps) {
+  const Delta = deltaVariant === 'pill' ? DeltaPill : BaseTrend;
   if (!items || items.length === 0) {
     return <BaseCard title="Wellbeing areas" isEmpty className={cn('flex flex-col', className)} />;
   }
@@ -89,11 +110,11 @@ export function ClientWellbeingCard({
               {/* Comparison columns (gap 12px) */}
               <div className="flex items-center gap-3">
                 <div className="flex w-20 items-center justify-center">
-                  <BaseTrend value={item.vsPreviousMonth} />
+                  <Delta value={item.vsPreviousMonth} />
                 </div>
 
                 <div className="flex w-24 items-center justify-center">
-                  <BaseTrend value={item.vsFirstCheck} />
+                  <Delta value={item.vsFirstCheck} />
                 </div>
               </div>
             </div>

@@ -1,9 +1,4 @@
-import type { AreaScoreDto, PeriodDto, ReportStatus } from './clients';
-import type {
-  DashboardTrendPointDto,
-  DashboardWellbeingAreaDto,
-  DashboardZoneDistributionDto,
-} from './dashboard';
+import type { ClientDashboardDto, DepartmentDashboardDto, ReportStatus } from './clients';
 
 export interface SendReportResultDto {
   id: string;
@@ -14,29 +9,28 @@ export interface SendReportResultDto {
   recipientsCount?: number;
 }
 
-export interface ReportViewDto {
-  token: string;
-  clientId: string;
-  clientName: string;
-  clientLogo?: string | null;
-  departmentName?: string | null;
-  period: PeriodDto;
-  averageBatteryScore: number;
-  change?: number | null;
-  vsPrevious?: {
-    change: number | null;
-    changePercent: number | null;
-  } | null;
-  vsFirstCheck?: {
-    change: number | null;
-    changePercent: number | null;
-  } | null;
-  wellbeingAreas: (DashboardWellbeingAreaDto | AreaScoreDto)[];
-  zoneDistribution?: DashboardZoneDistributionDto[];
-  historicalTrend?: DashboardTrendPointDto[];
-  strengths?: AreaScoreDto[];
-  focus?: AreaScoreDto[];
-  expiredAt?: string;
+/** Kỳ có số liệu — đổ vào hai ô chọn Month / Year trên màn báo cáo */
+export interface ReportPeriodOptionDto {
+  year: number;
+  month: number;
+  label: string;
+}
+
+/**
+ * Response của POST /reports/{token}/view (màn 17).
+ * `overall` = tab Overall (null với báo cáo gửi riêng một phòng ban);
+ * `departments` = một tab cho mỗi phòng ban.
+ */
+export interface ReportContentDto {
+  businessName: string;
+  darkLogoUrl: string | null;
+  whiteLogoUrl: string | null;
+  periodLabel: string;
+  periodYear: number;
+  periodMonth: number;
+  overall: ClientDashboardDto | null;
+  departments: DepartmentDashboardDto[];
+  availablePeriods: ReportPeriodOptionDto[];
 }
 
 export interface ReportPasswordPayload {
