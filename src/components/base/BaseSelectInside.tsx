@@ -110,7 +110,7 @@ export function BaseSelectInside<T extends string>({
         )}
       >
         <span className="body-14-medium select-none leading-none text-neutral-grey-3">{label}</span>
-        <span className={cn('flex items-center justify-between', compact ? 'gap-1.5' : 'gap-3')}>
+        <span className={cn('flex items-center justify-between', compact ? 'gap-1.5' : 'gap-2')}>
           <span className="body-16-bold min-w-0 truncate text-neutral-grey-1">
             {selectedOption?.label ?? (value ? value : resolvedPlaceholder)}
           </span>

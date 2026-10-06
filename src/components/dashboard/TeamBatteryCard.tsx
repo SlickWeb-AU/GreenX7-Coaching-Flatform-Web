@@ -22,8 +22,8 @@ export function TeamBatteryCard({
   const { strengths, focus } = calculateStrengthsAndFocus(items);
 
   return (
-    <BaseCard className={cn('flex flex-col gap-y-6 p-6 md:p-8', className)}>
-      <div className="grid grid-cols-1 items-center gap-x-6 gap-y-6 md:grid-cols-[1fr_1fr]">
+    <BaseCard className={cn('flex flex-col gap-y-6 p-6 lg:p-8', className)}>
+      <div className="grid grid-cols-1 items-center gap-x-6 gap-y-6 lg:grid-cols-[1fr_1fr] xl:gap-x-10">
         <div className="w-full max-w-[280px]">
           <BatteryWheelChart score={score} items={items} size={280} />
         </div>

@@ -81,7 +81,7 @@ export function WellbeingAreaProgressGrid({
   }
 
   return (
-    <div className={cn('grid w-full grid-cols-1 gap-x-6 gap-y-1 md:grid-cols-2', className)}>
+    <div className={cn('grid w-full grid-cols-1 gap-x-6 gap-y-1 lg:grid-cols-2', className)}>
       {items.map((item) => (
         <AreaProgressRow key={item.area} item={item} previousMonthLabel={previousMonthLabel} />
       ))}

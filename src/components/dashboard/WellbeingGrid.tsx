@@ -36,7 +36,7 @@ export function WellbeingGrid({
 
   return (
     <BaseCard title={title} className={className}>
-      <div className="grid grid-cols-1 gap-px bg-neutral-grey-7 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-px bg-neutral-grey-7 lg:grid-cols-2 xl:grid-cols-4">
         {areas.map((item) => {
           const areaKey = getAreaKey(item.area);
           const score = formatScoreToPercent(item.score);
