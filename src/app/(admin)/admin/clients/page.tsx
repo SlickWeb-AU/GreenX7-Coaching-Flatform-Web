@@ -127,7 +127,7 @@ function ClientsContent() {
   return (
     <>
       <BaseHeader title="Clients" actions={addBtn} />
-      <div className="mb-6 flex flex-col items-stretch gap-4 rounded-2xl bg-white p-3 md:flex-row md:items-center">
+      <div className="mb-6 flex flex-row items-center gap-4 rounded-2xl bg-white p-3">
         <div className="min-w-[240px] max-w-[380px] flex-1">
           <BaseInput
             placeholder="Search clients"
@@ -137,8 +137,8 @@ function ClientsContent() {
             prefix={<Search size={18} className="text-neutral-grey-3" aria-hidden />}
           />
         </div>
-        <div className="flex flex-wrap items-center gap-2 md:ml-auto">
-          <div className="w-full sm:w-[180px]">
+        <div className="ml-auto flex flex-wrap items-center gap-2">
+          <div className="w-[180px]">
             <BaseSelect
               startIcon={<Factory size={16} aria-hidden />}
               placeholder="Select industry"
@@ -149,7 +149,7 @@ function ClientsContent() {
               }
             />
           </div>
-          <div className="w-full sm:w-[160px]">
+          <div className="w-[160px]">
             <BaseSelect
               startIcon={<SlidersHorizontal size={16} aria-hidden />}
               placeholder="Select status"

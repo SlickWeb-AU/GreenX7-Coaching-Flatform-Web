@@ -22,7 +22,7 @@ export function TableHeader<T>({
 }: TableHeaderProps<T>) {
   return (
     <thead>
-      <tr className="bg-neutral-grey-7">
+      <tr className="h-14 border-b border-neutral-grey-6 bg-neutral-grey-7">
         {columns.map((column) => {
           const sortKey = getSortKey(column);
           const sortable = sortKey !== null && onSortChange;
@@ -44,7 +44,7 @@ export function TableHeader<T>({
                   : undefined
               }
               className={cn(
-                'px-4 py-3',
+                'px-4',
                 column.align && alignClass[column.align],
                 column.headerClassName,
               )}

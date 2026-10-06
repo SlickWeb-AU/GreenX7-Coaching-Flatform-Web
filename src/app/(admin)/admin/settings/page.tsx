@@ -17,6 +17,7 @@ import { toApiError } from '@/lib/api-error';
 import { queryKeys } from '@/lib/query-client';
 import type { AdminUser } from '@/types';
 import {
+  INDUSTRY_NAME_MAX_LENGTH,
   industryFormSchema,
   inviteSchema,
   type IndustryFormValues,
@@ -220,9 +221,9 @@ export default function SettingsPage() {
   return (
     <>
       <BaseHeader title="Settings" />
-      <div className="space-y-6">
-        <div className="rounded-2xl border border-neutral-grey-7 bg-white p-6">
-          <div className="mb-4 flex items-center justify-between">
+      <div className="space-y-4">
+        <div className="rounded-2xl bg-white p-6">
+          <div className="mb-6 flex items-center justify-between">
             <h2 className="heading-20-bold text-neutral-grey-1">Industry management</h2>
             {canManage && (
               <BaseButton
@@ -241,7 +242,7 @@ export default function SettingsPage() {
             )}
           </div>
           {industriesQuery.isLoading && industries.length === 0 ? (
-            <div className="grid grid-cols-1 gap-x-4 gap-y-3 md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-x-6 gap-y-2 lg:grid-cols-2">
               {Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} className="h-10 animate-pulse rounded-lg bg-neutral-grey-7" />
               ))}
@@ -249,7 +250,7 @@ export default function SettingsPage() {
           ) : industries.length === 0 ? (
             <p className="body-14-medium text-neutral-grey-3">No industries yet.</p>
           ) : (
-            <div className="grid grid-cols-1 gap-x-4 gap-y-3 md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-x-6 gap-y-2 lg:grid-cols-2">
               {industries.map((ind) => (
                 <div key={ind.id} className="flex items-center gap-2">
                   <BaseInput
@@ -297,10 +298,10 @@ export default function SettingsPage() {
           )}
         </div>
 
-        <div className="space-y-6 rounded-2xl border border-neutral-grey-7 bg-white p-6">
-          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+        <div className="space-y-6 rounded-2xl bg-white p-6">
+          <div className="flex flex-row items-center justify-between gap-4">
             <div>
-              <h2 className="text-xl font-bold text-neutral-grey-1">Access &amp; roles</h2>
+              <h2 className="body-20-bold text-neutral-grey-1">Access &amp; roles</h2>
               <p className="body-14-medium mt-0.5 text-neutral-grey-2">
                 Manage administrators and account permissions.
               </p>
@@ -345,6 +346,7 @@ export default function SettingsPage() {
             <BaseInput
               label="Industry name"
               placeholder="Enter industry name"
+              maxLength={INDUSTRY_NAME_MAX_LENGTH}
               error={Boolean(industryForm.formState.errors.name)}
               helperText={industryForm.formState.errors.name?.message}
               {...industryForm.register('name')}

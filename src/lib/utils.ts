@@ -1,8 +1,6 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
-import { USER_ROLES } from '@/types/auth';
-
 /** Merge Tailwind classes, later classes override earlier ones correctly */
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -75,13 +73,6 @@ export function getInitials(fullName: string): string {
     .slice(-2)
     .map((part) => part[0]?.toUpperCase() ?? '')
     .join('');
-}
-
-export function formatRoleLabel(role?: string | null): string {
-  if (!role) return '—';
-  if (role === USER_ROLES.SUPER_ADMIN) return 'Super Admin';
-  if (role === USER_ROLES.ADMINISTRATOR) return 'Administrator';
-  return role.charAt(0) + role.slice(1).toLowerCase();
 }
 
 /** Drop empty keys from query params to keep URLs clean and cache keys stable */

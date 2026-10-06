@@ -88,7 +88,7 @@ export function ClientDashboardTab({
 
   return (
     <div className={`flex flex-col gap-6 ${className ?? ''}`}>
-      <div className="grid grid-cols-1 items-stretch gap-4 md:grid-cols-2 lg:grid-cols-12">
+      <div className="grid grid-cols-1 items-stretch gap-4 lg:grid-cols-12">
         <div className="lg:col-span-12 min-[1360px]:col-span-6">
           <ClientBatteryCard
             score={effectiveScore}

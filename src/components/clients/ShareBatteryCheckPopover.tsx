@@ -101,7 +101,7 @@ export function ShareBatteryCheckPopover({
             </div>
 
             <div className="divide-y divide-neutral-grey-6 overflow-hidden rounded-xl border border-neutral-grey-6">
-              <div className="grid grid-cols-1 divide-y divide-neutral-grey-6 sm:grid-cols-2 sm:divide-x sm:divide-y-0">
+              <div className="grid grid-cols-2 divide-x divide-neutral-grey-6">
                 <div className="flex flex-col items-start p-4">
                   <span className="body-14-bold text-brand-green-2">Battery Check link</span>
                   <span
@@ -142,7 +142,7 @@ export function ShareBatteryCheckPopover({
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 divide-y divide-neutral-grey-6 sm:grid-cols-2 sm:divide-x sm:divide-y-0">
+              <div className="grid grid-cols-2 divide-x divide-neutral-grey-6">
                 <div className="flex flex-col items-start p-4">
                   <span className="body-14-bold text-brand-green-2">Live dashboard</span>
                   <span className="body-12-medium mt-0.5 text-neutral-grey-3">

@@ -1,9 +1,16 @@
 import { z } from 'zod';
 
-export const industryNameSchema = z.string().trim().min(1, 'Please enter an industry name.');
+export const INDUSTRY_NAME_MAX_LENGTH = 120;
 
 export const industryFormSchema = z.object({
-  name: industryNameSchema,
+  name: z
+    .string()
+    .trim()
+    .min(1, 'Please enter an industry name.')
+    .max(
+      INDUSTRY_NAME_MAX_LENGTH,
+      `Industry name must be at most ${INDUSTRY_NAME_MAX_LENGTH} characters.`,
+    ),
 });
 
 export type IndustryFormValues = z.infer<typeof industryFormSchema>;

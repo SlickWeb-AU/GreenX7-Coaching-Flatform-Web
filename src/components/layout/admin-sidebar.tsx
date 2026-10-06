@@ -11,9 +11,9 @@ import { GreenX7LogoDark } from '@/components/icons';
 import { NavLink } from '@/components/layout/nav-link';
 import { ADMIN_NAVIGATION } from '@/config/navigation';
 import { ROUTES } from '@/config/routes';
+import { USER_ROLE_LABELS } from '@/constants';
 import { authApi } from '@/features/auth';
 import { toApiError } from '@/lib/api-error';
-import { formatRoleLabel } from '@/lib/utils';
 import { useAuth } from '@/components/providers';
 
 interface SidebarBodyProps {
@@ -86,7 +86,7 @@ function SidebarContent({ onNavigate }: SidebarBodyProps) {
                   {displayName}
                 </p>
                 <p className="truncate text-xs text-neutral-grey-3">
-                  {formatRoleLabel(user?.role)}
+                  {(user?.role && USER_ROLE_LABELS[user.role]) || user?.role || '—'}
                 </p>
               </div>
             </div>
