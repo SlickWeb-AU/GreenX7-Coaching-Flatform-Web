@@ -1,5 +1,6 @@
 import { BATTERY_MARKER_KEY_PREFIX } from '@/constants/battery';
 import { WELLBEING_AREA_DISPLAY_ORDER } from '@/constants/clients';
+import { ZONE_COLORS } from '@/constants/tokens';
 import type { BatteryZone } from '@/types/battery';
 
 /** Map API area keys (usually UPPER_CASE) to canonical Title-case display labels. */
@@ -24,6 +25,16 @@ export function getBatteryZone(percent: number | null): BatteryZone | null {
   if (percent >= 70) return 'Momentum';
   if (percent >= 50) return 'Function';
   return 'Survive';
+}
+
+/** Normalize any zone key or label string to a canonical ZONE_COLORS key, or null if unrecognised. */
+export function resolveZoneKey(input: string): keyof typeof ZONE_COLORS | null {
+  const raw = input.trim().toLowerCase();
+  if (raw.includes('thrive')) return 'Thrive';
+  if (raw.includes('momentum')) return 'Momentum';
+  if (raw.includes('function')) return 'Function';
+  if (raw.includes('survive')) return 'Survive';
+  return null;
 }
 
 export function buildDraftKey(clientSlug: string, departmentSlug: string, period: string): string {

@@ -53,11 +53,37 @@ export const PILL_TONE_STYLES = {
   down: { background: '#FBE3E7', color: '#B43E47' },
 } as const;
 
+export const ZONE_BADGE_TEXT_COLOR = '#5D5000';
+
 export const ZONE_COLORS = {
-  Thrive: { label: 'Thrive Zone', range: '(80-100%)', color: '#005943', bg: '#E6F2D8' },
-  Momentum: { label: 'Momentum Zone', range: '(70-79%)', color: '#087452', bg: '#E6F2D8' },
-  Function: { label: 'Function Zone', range: '(50-69%)', color: '#53635C', bg: '#FAF4D0' },
-  Survive: { label: 'Survive Zone', range: '(0-49%)', color: '#B43E47', bg: '#FBE3E7' },
+  Thrive: {
+    label: 'Thrive Zone',
+    range: '(80-100%)',
+    color: '#9ACC63',
+    bg: '#E6F2D8',
+    bgClass: 'bg-secondary-green-1',
+  },
+  Momentum: {
+    label: 'Momentum Zone',
+    range: '(70-79%)',
+    color: '#EBD343',
+    bg: '#E6F2D8',
+    bgClass: 'bg-secondary-yellow-1',
+  },
+  Function: {
+    label: 'Function Zone',
+    range: '(50-69%)',
+    color: '#F09E5D',
+    bg: '#FAF4D0',
+    bgClass: 'bg-secondary-orange-1',
+  },
+  Survive: {
+    label: 'Survive Zone',
+    range: '(0-49%)',
+    color: '#F56C77',
+    bg: '#FBE3E7',
+    bgClass: 'bg-secondary-red-1',
+  },
 } as const;
 
 export const CHART_COLORS = {
