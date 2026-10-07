@@ -3,7 +3,6 @@
 import { ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 
-import { BaseTag } from '@/components/base';
 import { LiveIndicator } from '@/components/dashboard';
 import { cn } from '@/lib/utils';
 
@@ -27,11 +26,9 @@ export function DepartmentLiveDataCard({
     >
       {/* Top cluster: Live data badge + Participant count */}
       <div className="flex flex-col items-center">
-        <div className="mb-[14px]">
-          <BaseTag variant="green" className="gap-2 px-2.5 py-1 text-secondary-green-4">
-            <LiveIndicator />
-            <span>LIVE DATA</span>
-          </BaseTag>
+        <div className="body-12-bold mb-[14px] inline-flex h-[18px] items-center gap-1 rounded-full bg-brand-green-4 px-1">
+          <LiveIndicator />
+          <span className="text-brand-green-2">LIVE DATA</span>
         </div>
 
         <div className="body-14-bold flex flex-col items-center justify-center text-center text-neutral-grey-1">

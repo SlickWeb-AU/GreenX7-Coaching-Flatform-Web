@@ -1,6 +1,7 @@
 'use client';
 
-import { useId, type InputHTMLAttributes, type ReactNode } from 'react';
+import { useId, useRef, type InputHTMLAttributes, type ReactNode } from 'react';
+import { X } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { BaseHelperText } from './BaseHelperText';
@@ -32,6 +33,10 @@ export interface BaseInputProps extends Omit<
   prefix?: ReactNode;
   /** Icon / element rendered on the right inside the input */
   suffix?: ReactNode;
+  /** Shows a clear button on the right when the input has a value */
+  clearable?: boolean;
+  /** Callback fired when the clear button is clicked */
+  onClear?: () => void;
   loading?: boolean;
   /** Extra classes merged onto the inner <input> (e.g. border overrides) */
   inputClassName?: string;
@@ -46,6 +51,8 @@ export function BaseInput({
   helperText,
   prefix,
   suffix,
+  clearable = false,
+  onClear,
   loading = false,
   className,
   inputClassName,
@@ -53,8 +60,12 @@ export function BaseInput({
   required,
   disabled,
   readOnly,
+  value,
+  defaultValue,
+  onChange,
   ...props
 }: BaseInputProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
   const inputId = useId();
   const resolvedId = id ?? inputId;
   const resolvedPlaceholder =
@@ -73,6 +84,30 @@ export function BaseInput({
     );
   }
 
+  const hasValue = value !== undefined ? Boolean(value) : Boolean(defaultValue);
+  const showClear = clearable && hasValue && !disabled && !readOnly;
+
+  const handleClear = () => {
+    onClear?.();
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  };
+
+  const renderedSuffix =
+    suffix ??
+    (showClear ? (
+      <button
+        type="button"
+        aria-label="Clear input"
+        tabIndex={-1}
+        onClick={handleClear}
+        className="flex cursor-pointer select-none items-center justify-center text-neutral-grey-3 transition-colors hover:text-neutral-grey-1"
+      >
+        <X size={16} aria-hidden />
+      </button>
+    ) : null);
+
   return (
     <div className={cn('w-full', className)}>
       {label && (
@@ -87,12 +122,16 @@ export function BaseInput({
           </div>
         )}
         <input
+          ref={inputRef}
           id={resolvedId}
           required={required}
           disabled={disabled}
           readOnly={readOnly}
           aria-invalid={error}
           placeholder={resolvedPlaceholder}
+          value={value}
+          defaultValue={defaultValue}
+          onChange={onChange}
           className={cn(
             'flex w-full rounded-lg border border-neutral-grey-6 px-3 py-2 text-neutral-grey-1 shadow-none transition-colors placeholder:text-neutral-grey-3',
             readOnly
@@ -104,13 +143,13 @@ export function BaseInput({
             'outline-none focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0',
             'disabled:cursor-not-allowed disabled:opacity-50',
             prefix && 'pl-9',
-            suffix && 'pr-10',
+            renderedSuffix && 'pr-10',
           )}
           {...props}
         />
-        {suffix && (
+        {renderedSuffix && (
           <div className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-grey-3">
-            {suffix}
+            {renderedSuffix}
           </div>
         )}
       </div>

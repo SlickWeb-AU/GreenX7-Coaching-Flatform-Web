@@ -64,7 +64,7 @@ export function TableBody<T>({
               <td
                 key={column.key}
                 className={cn(
-                  'body-16-medium px-4 text-neutral-grey-2',
+                  'body-16-medium whitespace-nowrap px-4 text-neutral-grey-2',
                   column.align && alignClass[column.align],
                   column.className,
                 )}

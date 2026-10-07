@@ -17,6 +17,7 @@ export function baseButtonClass({
     'inline-flex items-center justify-center gap-2 rounded-lg transition-colors outline-none focus-visible:ring-1 focus-visible:ring-brand-green-2 disabled:cursor-not-allowed disabled:opacity-50 select-none shadow-none',
     BASE_BUTTON_SIZE_CLASS[size],
     BASE_BUTTON_VARIANT_CLASS[variant],
+    variant === 'primary' && size === 'medium' && 'body-16-bold',
     pill && 'rounded-full',
     fullWidth && 'w-full',
     className,

@@ -60,9 +60,9 @@ export function ClientHistoryTab({
   });
 
   return (
-    <div className={cn('flex flex-col gap-6', className)}>
+    <div className={cn('flex flex-col gap-10', className)}>
       {/* Sub-tab Department Selector */}
-      <div>
+      <div className="overflow-x-auto">
         <BasePillTabs
           items={departmentTabs}
           activeKey={selectedDepartment}

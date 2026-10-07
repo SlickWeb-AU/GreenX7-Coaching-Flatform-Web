@@ -109,11 +109,11 @@ export function ClientWellbeingCard({
 
               {/* Comparison columns (gap 12px) */}
               <div className="flex items-center gap-3">
-                <div className="flex w-20 items-center justify-center">
+                <div className="flex w-20 items-center justify-end">
                   <Delta value={item.vsPreviousMonth} />
                 </div>
 
-                <div className="flex w-24 items-center justify-center">
+                <div className="flex w-24 items-center justify-end">
                   <Delta value={item.vsFirstCheck} />
                 </div>
               </div>

@@ -41,14 +41,14 @@ export function ClientDepartmentsTable({
       key: 'name',
       title: 'Department',
       sorter: 'name',
-      render: (_, row) => <span className="body-14-bold text-neutral-grey-1">{row.name}</span>,
+      render: (_, row) => <span className="body-16-bold text-neutral-grey-1">{row.name}</span>,
     },
     {
       key: 'participantCount',
       title: 'Participants',
       sorter: 'participantCount',
       render: (_, row) => (
-        <span className="body-14-medium text-neutral-grey-2">
+        <span className="body-16-medium text-neutral-grey-2">
           {row.participantCount && row.participantCount > 0 ? row.participantCount : '—'}
         </span>
       ),

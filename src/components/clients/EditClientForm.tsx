@@ -2,6 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 
 import {
@@ -62,6 +63,8 @@ export interface EditClientFormProps {
   formId?: string;
   showSubmitAction?: boolean;
   submitLabel?: string;
+  /** When true, append one draft department row and scroll to it on mount. */
+  autoAddDepartment?: boolean;
 }
 
 export function EditClientForm({
@@ -76,6 +79,7 @@ export function EditClientForm({
   formId = 'edit-client-form',
   showSubmitAction = false,
   submitLabel = 'Save changes',
+  autoAddDepartment = false,
 }: EditClientFormProps) {
   const persist = useClientRowPersistence(clientId);
 
@@ -253,6 +257,57 @@ export function EditClientForm({
   const handleAddDeptClick = () => {
     appendDepartment({ ...DEFAULT_DEPARTMENT_ROW });
   };
+
+  // Pin to top before first paint so the page never flashes mid-content
+  // from scroll restoration. Runs before the steady-poll scroll below.
+  useLayoutEffect(() => {
+    if (!autoAddDepartment) return;
+    const prev = history.scrollRestoration;
+    history.scrollRestoration = 'manual';
+    window.scrollTo(0, 0);
+    return () => {
+      history.scrollRestoration = prev;
+    };
+  }, [autoAddDepartment]);
+
+  // Deep-link from the Departments tab: ?addDepartment=1 pre-appends one
+  // draft row and scrolls to it. Guarded to run once (StrictMode safe).
+  const autoAddDone = useRef(false);
+  useEffect(() => {
+    if (!autoAddDepartment || autoAddDone.current) return;
+    autoAddDone.current = true;
+    appendDepartment({ ...DEFAULT_DEPARTMENT_ROW });
+    // Wait until the card position is stable (layout/fonts/images settled)
+    // instead of a fixed delay, then ease-scroll over 1s.
+    const startedAt = Date.now();
+    let lastTop: number | null = null;
+    let steady = 0;
+    const poll = window.setInterval(() => {
+      const el = document.getElementById('departments');
+      const top = el ? el.getBoundingClientRect().top + window.scrollY : null;
+      steady = top !== null && lastTop !== null && Math.abs(top - lastTop) <= 2 ? steady + 1 : 0;
+      lastTop = top;
+      const timedOut = Date.now() - startedAt > 5000;
+      if ((steady >= 3 && document.readyState === 'complete') || timedOut) {
+        window.clearInterval(poll);
+        const target = document.getElementById('departments');
+        if (!target) return;
+        const startY = window.scrollY;
+        const targetY = target.getBoundingClientRect().top + startY - 96; // match scroll-mt-24
+        const distance = targetY - startY;
+        if (distance <= 0) return;
+        const duration = 1000;
+        const start = performance.now();
+        const step = (now: number) => {
+          const t = Math.min((now - start) / duration, 1);
+          const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+          window.scrollTo(0, startY + distance * eased);
+          if (t < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+      }
+    }, 100);
+  }, [autoAddDepartment, appendDepartment]);
 
   return (
     <form id={formId} onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-6">
@@ -476,132 +531,134 @@ export function EditClientForm({
       </BaseCard>
 
       {/* 4. Departments */}
-      <BaseCard
-        title="Departments"
-        prefixIcon={<DepartmentsIcon label="Departments icon" />}
-        actions={
-          <BaseButton
-            type="button"
-            variant="secondary"
-            pill
-            startIcon={<Plus size={16} aria-hidden />}
-            onClick={handleAddDeptClick}
-          >
-            Add Department
-          </BaseButton>
-        }
-      >
-        <div className="flex flex-col gap-3">
-          {departmentFields.map((field, index) => {
-            const isDraft = !departmentsEdit.isSaved(field.id);
-            const currentName = getValues(`departments.${index}.name`) || field.name;
-            const currentStatus =
-              (getValues(`departments.${index}.status`) || field.status)?.toUpperCase() ||
-              CLIENT_STATUSES.ACTIVE;
-            const deptErrorMessage = errors.departments?.[index]?.name?.message;
+      <div id="departments" className="scroll-mt-24">
+        <BaseCard
+          title="Departments"
+          prefixIcon={<DepartmentsIcon label="Departments icon" />}
+          actions={
+            <BaseButton
+              type="button"
+              variant="secondary"
+              pill
+              startIcon={<Plus size={24} aria-hidden />}
+              onClick={handleAddDeptClick}
+            >
+              Add Department
+            </BaseButton>
+          }
+        >
+          <div className="flex flex-col gap-3">
+            {departmentFields.map((field, index) => {
+              const isDraft = !departmentsEdit.isSaved(field.id);
+              const currentName = getValues(`departments.${index}.name`) || field.name;
+              const currentStatus =
+                (getValues(`departments.${index}.status`) || field.status)?.toUpperCase() ||
+                CLIENT_STATUSES.ACTIVE;
+              const deptErrorMessage = errors.departments?.[index]?.name?.message;
 
-            return (
-              <div key={field.id} className="flex flex-col gap-3 xl:flex-row xl:items-start">
-                {!isDraft ? (
-                  <div className="min-w-0 flex-1">
-                    <div
-                      className={cn(
-                        'flex h-12 min-w-0 flex-1 items-center gap-3 rounded-lg border border-neutral-grey-6 bg-white px-3',
-                        deptErrorMessage && 'border-secondary-red-4',
-                      )}
-                    >
-                      <span className="body-16-medium text-neutral-grey-1">{currentName}</span>
-                      <BaseTag
-                        variant={
-                          currentStatus === CLIENT_STATUSES.ACTIVE ? 'green' : 'green-neutral'
-                        }
-                      >
-                        {currentStatus === CLIENT_STATUSES.ACTIVE ? 'Active' : 'Inactive'}
-                      </BaseTag>
-                    </div>
-                    <BaseHelperText
-                      error={Boolean(deptErrorMessage)}
-                      helperText={deptErrorMessage}
-                    />
-                  </div>
-                ) : (
-                  <div className="grid min-w-0 flex-1 grid-cols-1 gap-2 lg:grid-cols-2">
-                    <BaseInput
-                      size="mediumPlus"
-                      variant="secondary"
-                      required
-                      placeholder="Enter Department"
-                      error={Boolean(errors.departments?.[index]?.name)}
-                      helperText={errors.departments?.[index]?.name?.message}
-                      {...register(`departments.${index}.name`)}
-                    />
-                    <Controller
-                      name={`departments.${index}.status`}
-                      control={control}
-                      render={({ field: selectField }) => (
-                        <BaseSelect
-                          size="mediumPlus"
-                          variant="secondary"
-                          value={selectField.value}
-                          options={CLIENT_FORM_STATUS_OPTIONS}
-                          onChange={selectField.onChange}
-                          placeholder="Select status"
-                        />
-                      )}
-                    />
-                  </div>
-                )}
-                <div className="flex h-12 w-[160px] shrink-0 items-center justify-evenly">
+              return (
+                <div key={field.id} className="flex flex-col gap-3 xl:flex-row xl:items-start">
                   {!isDraft ? (
-                    <>
-                      <BaseIconButton
-                        aria-label="Edit department"
-                        size={40}
-                        icon={<Pencil size={20} aria-hidden />}
-                        className="text-neutral-grey-3 hover:text-neutral-grey-1"
-                        onClick={() => handleStartEditDept(index, field.id)}
+                    <div className="min-w-0 flex-1">
+                      <div
+                        className={cn(
+                          'flex h-12 min-w-0 flex-1 items-center gap-3 rounded-lg border border-neutral-grey-6 bg-white px-3',
+                          deptErrorMessage && 'border-secondary-red-4',
+                        )}
+                      >
+                        <span className="body-16-medium text-neutral-grey-1">{currentName}</span>
+                        <BaseTag
+                          variant={
+                            currentStatus === CLIENT_STATUSES.ACTIVE ? 'green' : 'green-neutral'
+                          }
+                        >
+                          {currentStatus === CLIENT_STATUSES.ACTIVE ? 'Active' : 'Inactive'}
+                        </BaseTag>
+                      </div>
+                      <BaseHelperText
+                        error={Boolean(deptErrorMessage)}
+                        helperText={deptErrorMessage}
                       />
-                      <BaseIconButton
-                        aria-label="Delete department"
-                        size={40}
-                        icon={<Trash2 size={20} aria-hidden />}
-                        disabled={
-                          departmentFields.length <= 1 ||
-                          Boolean((field as { isCompanyWide?: boolean }).isCompanyWide) ||
-                          persist.busyKey === deptDeleteKey(field.id)
-                        }
-                        className="text-neutral-grey-3 hover:text-secondary-red-4"
-                        onClick={() => handleRemoveDept(index, field.id)}
-                      />
-                    </>
+                    </div>
                   ) : (
-                    <>
-                      <BaseButton
-                        type="button"
-                        pill
-                        loading={persist.busyKey === deptSaveKey(field.id)}
-                        disabled={persist.busyKey === deptSaveKey(field.id)}
-                        onClick={() => handleSaveDept(index, field.id)}
-                      >
-                        Save
-                      </BaseButton>
-                      <BaseButton
-                        type="button"
+                    <div className="grid min-w-0 flex-1 grid-cols-1 gap-2 lg:grid-cols-2">
+                      <BaseInput
+                        size="mediumPlus"
                         variant="secondary"
-                        pill
-                        disabled={persist.busyKey === deptSaveKey(field.id)}
-                        onClick={() => handleCancelDept(index, field.id)}
-                      >
-                        Cancel
-                      </BaseButton>
-                    </>
+                        required
+                        placeholder="Enter Department"
+                        error={Boolean(errors.departments?.[index]?.name)}
+                        helperText={errors.departments?.[index]?.name?.message}
+                        {...register(`departments.${index}.name`)}
+                      />
+                      <Controller
+                        name={`departments.${index}.status`}
+                        control={control}
+                        render={({ field: selectField }) => (
+                          <BaseSelect
+                            size="mediumPlus"
+                            variant="secondary"
+                            value={selectField.value}
+                            options={CLIENT_FORM_STATUS_OPTIONS}
+                            onChange={selectField.onChange}
+                            placeholder="Select status"
+                          />
+                        )}
+                      />
+                    </div>
                   )}
+                  <div className="flex h-12 w-[160px] shrink-0 items-center justify-evenly">
+                    {!isDraft ? (
+                      <>
+                        <BaseIconButton
+                          aria-label="Edit department"
+                          size={40}
+                          icon={<Pencil size={20} aria-hidden />}
+                          className="text-neutral-grey-3 hover:text-neutral-grey-1"
+                          onClick={() => handleStartEditDept(index, field.id)}
+                        />
+                        <BaseIconButton
+                          aria-label="Delete department"
+                          size={40}
+                          icon={<Trash2 size={20} aria-hidden />}
+                          disabled={
+                            departmentFields.length <= 1 ||
+                            Boolean((field as { isCompanyWide?: boolean }).isCompanyWide) ||
+                            persist.busyKey === deptDeleteKey(field.id)
+                          }
+                          className="text-neutral-grey-3 hover:text-secondary-red-4"
+                          onClick={() => handleRemoveDept(index, field.id)}
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <BaseButton
+                          type="button"
+                          pill
+                          loading={persist.busyKey === deptSaveKey(field.id)}
+                          disabled={persist.busyKey === deptSaveKey(field.id)}
+                          onClick={() => handleSaveDept(index, field.id)}
+                        >
+                          Save
+                        </BaseButton>
+                        <BaseButton
+                          type="button"
+                          variant="secondary"
+                          pill
+                          disabled={persist.busyKey === deptSaveKey(field.id)}
+                          onClick={() => handleCancelDept(index, field.id)}
+                        >
+                          Cancel
+                        </BaseButton>
+                      </>
+                    )}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
-      </BaseCard>
+              );
+            })}
+          </div>
+        </BaseCard>
+      </div>
 
       {/* 5. Monthly schedule */}
       <BaseCard

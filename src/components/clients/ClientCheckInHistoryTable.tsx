@@ -25,8 +25,14 @@ import { ResendReportDialog } from './ResendReportDialog';
 
 const CHECKIN_STATUS_TAG_MAP: Record<CheckinStatus, BaseTagVariant> = {
   SCHEDULED: 'yellow',
-  OPEN: 'green',
-  CLOSED: 'cyan',
+  OPEN: 'cyan',
+  CLOSED: 'green',
+};
+
+const CHECKIN_STATUS_LABELS: Record<CheckinStatus, string> = {
+  SCHEDULED: 'Scheduled',
+  OPEN: 'Open',
+  CLOSED: 'Complete',
 };
 
 const REPORT_STATUS_TAG_MAP: Record<ReportStatus, { variant: BaseTagVariant; label: string }> = {
@@ -117,14 +123,14 @@ export function ClientCheckInHistoryTable({
       key: 'timeFrame',
       title: 'Time frame',
       render: (_, row) => (
-        <span className="body-14-medium text-neutral-grey-2">{row.timeFrame || '—'}</span>
+        <span className="body-16-medium text-neutral-grey-2">{row.timeFrame || '—'}</span>
       ),
     },
     {
       key: 'participants',
       title: 'Participants',
       render: (_, row) => (
-        <span className="body-14-medium text-neutral-grey-2">
+        <span className="body-16-medium text-neutral-grey-2">
           {row.participants && row.participants > 0 ? row.participants : '—'}
         </span>
       ),
@@ -156,7 +162,9 @@ export function ClientCheckInHistoryTable({
 
         return (
           <div className="flex flex-wrap items-center gap-2">
-            <BaseTag variant={checkinVariant}>{row.checkInStatus}</BaseTag>
+            <BaseTag variant={checkinVariant}>
+              {CHECKIN_STATUS_LABELS[row.checkInStatus] ?? row.checkInStatus}
+            </BaseTag>
             <BaseTag variant={reportConfig.variant}>{deliveryLabel}</BaseTag>
           </div>
         );

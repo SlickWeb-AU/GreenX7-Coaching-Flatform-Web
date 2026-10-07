@@ -63,7 +63,7 @@ export function ClientBatteryCard({
             <div className="flex items-stretch gap-1">
               <span className="heading-48-bold leading-none text-white">{displayScore ?? '—'}</span>
               <span className="self-start text-3xl font-bold leading-none text-white">%</span>
-              <span className="body-16-medium self-end leading-none text-white/80">/100</span>
+              <span className="body-16-medium self-end leading-none text-white">/100</span>
             </div>
           </div>
 
@@ -140,7 +140,7 @@ export function ClientBatteryCard({
           <div className="flex items-stretch gap-1">
             <span className="heading-48-bold leading-none text-white">{displayScore ?? '—'}</span>
             <span className="self-start text-3xl font-bold leading-none text-white">%</span>
-            <span className="body-16-medium self-end leading-none text-white/80">/100</span>
+            <span className="body-16-medium self-end leading-none text-white">/100</span>
           </div>
         </div>
 

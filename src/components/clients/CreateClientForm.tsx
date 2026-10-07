@@ -458,7 +458,7 @@ export function CreateClientForm({
             type="button"
             variant="secondary"
             pill
-            startIcon={<Plus size={16} aria-hidden />}
+            startIcon={<Plus size={24} aria-hidden />}
             onClick={handleAddDeptClick}
           >
             Add Department

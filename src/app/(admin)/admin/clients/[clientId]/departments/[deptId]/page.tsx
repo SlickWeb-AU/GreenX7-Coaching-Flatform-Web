@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Download, SlidersHorizontal, Tv } from 'lucide-react';
+import { Download, Presentation, SlidersHorizontal } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 
 import { BaseButton, BaseLoading } from '@/components/base';
@@ -125,7 +125,7 @@ export default function DepartmentDetailPage() {
           size="medium"
           pill
           disabled={!presentationUrl}
-          startIcon={<Tv size={16} />}
+          startIcon={<Presentation size={16} />}
           onClick={() => {
             window.open(normalizeUrl(presentationUrl), '_blank', 'noopener,noreferrer');
           }}
@@ -192,9 +192,9 @@ export default function DepartmentDetailPage() {
     : undefined;
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="grid grid-cols-1 items-stretch gap-4 lg:grid-cols-12">
-        <div className="lg:col-span-5">
+    <div className="flex flex-col gap-4">
+      <div className="grid grid-cols-12 items-stretch gap-2">
+        <div className="col-span-12 2xl:col-span-5">
           <ClientBatteryCard
             title="Current Battery Score"
             badgeText={openUntilLabel}
@@ -208,11 +208,11 @@ export default function DepartmentDetailPage() {
           />
         </div>
 
-        <div className="lg:col-span-2">
+        <div className="col-span-4 2xl:col-span-2">
           <ClientCurrentZoneCard zoneName={effectiveZone} className="h-full" />
         </div>
 
-        <div className="lg:col-span-2">
+        <div className="col-span-4 2xl:col-span-2">
           <DepartmentLiveDataCard
             participantCount={effectiveParticipants}
             dashboardHref={liveUrl}
@@ -220,7 +220,7 @@ export default function DepartmentDetailPage() {
           />
         </div>
 
-        <div className="lg:col-span-3">
+        <div className="col-span-4 2xl:col-span-3">
           <ClientPeriodFilter
             selectedMonth={selectedMonth}
             onMonthChange={setSelectedMonth}
@@ -231,7 +231,7 @@ export default function DepartmentDetailPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 items-stretch gap-4 lg:grid-cols-12">
+      <div className="grid grid-cols-1 items-stretch gap-2 lg:grid-cols-12">
         <div className="lg:col-span-8">
           <ClientWellbeingCard
             items={effectiveWellbeing}

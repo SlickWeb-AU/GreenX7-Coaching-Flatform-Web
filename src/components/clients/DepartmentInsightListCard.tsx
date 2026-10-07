@@ -31,8 +31,8 @@ export function DepartmentInsightListCard({
         <h3 className={cn('body-20-bold', titleColorClass)}>{title}</h3>
       </div>
 
-      {/* Items list */}
-      <div className="flex flex-col gap-3 pt-4">
+      {/* Items list — pinned to card bottom */}
+      <div className="flex flex-1 flex-col justify-end gap-3 pt-4">
         {items.map((item) => {
           const Icon = item.icon;
           const displayScore = formatScoreToPercent(item.score);

@@ -36,6 +36,7 @@ export function BaseTable<T>({
   onRowClick,
   showFooter = true,
   className,
+  tableClassName,
 }: BaseTableProps<T>) {
   if (!loading && data.length === 0) {
     return (
@@ -56,7 +57,10 @@ export function BaseTable<T>({
         {loading && data.length > 0 && <TableLoadingOverlay />}
 
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[640px] text-left" aria-busy={loading || undefined}>
+          <table
+            className={cn('w-full min-w-[800px] text-left', tableClassName)}
+            aria-busy={loading || undefined}
+          >
             <TableHeader
               columns={columns}
               sortField={sortField}

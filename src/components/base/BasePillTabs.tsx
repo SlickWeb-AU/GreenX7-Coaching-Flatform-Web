@@ -38,10 +38,10 @@ export function BasePillTabs({ items, activeKey, onChange, className }: BasePill
             disabled={tab.disabled}
             onClick={() => onChange(tab.key)}
             className={cn(
-              'inline-flex h-8 select-none items-center justify-center rounded-lg px-3 outline-none transition-all focus-visible:ring-1 focus-visible:ring-brand-green-2 disabled:cursor-not-allowed disabled:opacity-40',
+              'inline-flex h-8 shrink-0 select-none items-center justify-center whitespace-nowrap rounded-lg px-3 outline-none transition-all focus-visible:ring-1 focus-visible:ring-brand-green-2 disabled:cursor-not-allowed disabled:opacity-40',
               isActive
                 ? 'body-14-bold bg-neutral-white-solid text-brand-green-2 shadow-pill-tab'
-                : 'body-14-medium text-neutral-grey-2 hover:text-neutral-grey-1',
+                : 'body-14-medium text-neutral-grey-3 hover:text-neutral-grey-1',
             )}
           >
             <span>{tab.label}</span>
