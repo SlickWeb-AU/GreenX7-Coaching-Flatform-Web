@@ -6,7 +6,7 @@ export const industryFormSchema = z.object({
   name: z
     .string()
     .trim()
-    .min(1, 'Please enter an industry name.')
+    .min(2, 'Industry name must be at least 2 characters.')
     .max(
       INDUSTRY_NAME_MAX_LENGTH,
       `Industry name must be at most ${INDUSTRY_NAME_MAX_LENGTH} characters.`,
