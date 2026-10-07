@@ -163,10 +163,15 @@ function ReportViewContent() {
     vsPreviousMonth: a.vsPrevious?.changePercent ?? null,
     vsFirstCheck: a.vsFirstCheck?.changePercent ?? null,
   }));
-  // Tháng chưa có bài nộp (score null) bỏ khỏi biểu đồ — vẽ thành 0% là sai số liệu
-  const trend = data.historicalTrend
-    .filter((t) => t.score !== null)
-    .map((t) => ({ year: t.year, month: t.month, label: t.label, score: t.score as number }));
+  // Giữ đủ các tháng trên trục (design: Jan → Jun), tháng chưa có bài nộp để
+  // score null — biểu đồ bỏ trống điểm đó chứ không vẽ thành 0%. Bỏ hẳn tháng
+  // trống thì kỳ đầu tiên chỉ còn một chấm lẻ loi giữa khung (bug 380).
+  const trend = data.historicalTrend.map((t) => ({
+    year: t.year,
+    month: t.month,
+    label: t.label,
+    score: t.score,
+  }));
   const department =
     activeTab === OVERALL
       ? null
@@ -225,11 +230,9 @@ function ReportViewContent() {
         </div>
 
         <div className="mb-6 flex flex-col-reverse gap-4 border-b border-neutral-grey-6 sm:mb-8 sm:flex-row sm:items-end sm:justify-between">
-          {/* Nhiều phòng ban thì tab cuộn ngang thay vì xuống dòng làm vỡ gạch chân */}
-          <div
-            className="-mx-4 flex gap-6 overflow-x-auto px-4 [scrollbar-width:none] sm:mx-0 sm:gap-8 sm:px-0 [&::-webkit-scrollbar]:hidden"
-            role="tablist"
-          >
+          {/* Nhiều phòng ban thì tab XUỐNG DÒNG — cuộn ngang ẩn thanh cuộn khiến người
+              xem không biết còn phòng ban phía sau (bug 380) */}
+          <div className="flex min-w-0 flex-1 flex-wrap gap-x-6 gap-y-1 sm:gap-x-8" role="tablist">
             {tabs.map((t) => (
               <button
                 key={t.key}
@@ -238,7 +241,7 @@ function ReportViewContent() {
                 aria-selected={t.key === activeTab}
                 onClick={() => setTab(t.key)}
                 className={cn(
-                  'body-16-bold -mb-px shrink-0 whitespace-nowrap border-b-2 pb-3 transition-colors',
+                  'body-16-bold -mb-px shrink-0 whitespace-nowrap border-b-2 pb-3 pt-2 transition-colors',
                   t.key === activeTab
                     ? 'border-brand-green-2 text-brand-green-2'
                     : 'border-transparent text-neutral-grey-2 hover:text-neutral-grey-1',

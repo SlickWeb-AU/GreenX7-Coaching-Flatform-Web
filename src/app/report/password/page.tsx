@@ -2,7 +2,7 @@
 
 import { Eye, EyeOff } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useState, Suspense, type FormEvent } from 'react';
+import { useEffect, useState, Suspense, type FormEvent } from 'react';
 
 import { BaseButton, BaseInput, BaseLoading } from '@/components/base';
 import {
@@ -11,7 +11,16 @@ import {
   GreenX7LogoLight,
 } from '@/components/icons';
 import { reportApi } from '@/features/report';
+import { toApiError } from '@/lib/api-error';
 import { reportPasswordKey, reportSessionKey } from '@/lib/report-auth';
+import { resolveImageUrl } from '@/lib/utils';
+import type { ReportGateDto } from '@/types/reports';
+
+/** Design 16 (Failed): câu ngắn cho sai mật khẩu */
+const WRONG_PASSWORD = 'The password is incorrect. Please check and try again.';
+/** Link sai / hết hạn (RE/E3) — biết được nhờ GET /reports/:token lúc mở trang */
+const INVALID_LINK =
+  'This link is invalid or has expired. Please contact your GreenX7 account manager to receive a new report.';
 
 export default function ReportPasswordPage() {
   return (
@@ -30,6 +39,27 @@ function ReportPasswordContent() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [gate, setGate] = useState<ReportGateDto | null>(null);
+  const [linkInvalid, setLinkInvalid] = useState(false);
+
+  // Logo công ty ở góc khối xanh (design 16 - Logo); link hỏng thì báo ngay,
+  // khỏi để người nhận gõ mật khẩu rồi mới biết
+  useEffect(() => {
+    if (!token) return;
+    let cancelled = false;
+    reportApi
+      .gate(token)
+      .then((g) => !cancelled && setGate(g))
+      .catch((e: unknown) => {
+        if (!cancelled && toApiError(e).statusCode === 401) {
+          setLinkInvalid(true);
+          setError(INVALID_LINK);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [token]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -52,10 +82,15 @@ function ReportPasswordContent() {
       router.push(`/report/view?token=${encodeURIComponent(token)}`);
     } catch (err: unknown) {
       setLoading(false);
+      const apiError = toApiError(err);
+      // API trả một câu dài chung cho cả link hỏng lẫn sai mật khẩu (RE/E3). Link
+      // đã kiểm tra lúc mở trang, nên 401 ở đây là sai mật khẩu -> câu ngắn của design.
       setError(
-        err instanceof Error
-          ? err.message
-          : 'The password is incorrect. Please check and try again.',
+        apiError.statusCode === 401
+          ? linkInvalid
+            ? INVALID_LINK
+            : WRONG_PASSWORD
+          : apiError.message || WRONG_PASSWORD,
       );
     }
   };
@@ -66,12 +101,29 @@ function ReportPasswordContent() {
         <div className="pointer-events-none absolute bottom-0 right-0">
           <DecorativeWaveBottomRight width={293} height={295} />
         </div>
-        <div className="relative z-10">
-          <GreenX7LogoLight className="h-10 w-auto" />
+        <div className="relative z-10 flex items-center justify-between gap-6">
+          <GreenX7LogoLight className="h-10 w-auto shrink-0" />
+          {/* Logo trắng của công ty (design 16 - Logo); chưa upload thì in tên */}
+          {gate &&
+            (resolveImageUrl(gate.whiteLogoUrl) ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={resolveImageUrl(gate.whiteLogoUrl) as string}
+                alt={gate.businessName}
+                className="h-10 w-auto max-w-[160px] object-contain"
+              />
+            ) : (
+              <span className="body-18-bold truncate uppercase text-neutral-white-solid">
+                {gate.businessName}
+              </span>
+            ))}
         </div>
-        <div className="relative z-10 my-12 max-w-xl lg:my-0">
-          <p className="body-18-bold mb-2 text-secondary-yellow-1">Report Access</p>
-          <h1 className="heading-64-bold mb-10 text-neutral-white-solid">Your wellbeing report</h1>
+        <div className="relative z-10 my-12 lg:my-0">
+          <p className="body-18-bold mb-2 text-secondary-yellow-1">Report access</p>
+          {/* Một dòng như design (từ 1280px; màn hẹp hơn thì xuống dòng thay vì tràn) */}
+          <h1 className="heading-48-bold mb-4 text-neutral-white-solid xl:whitespace-nowrap xl:text-[56px] xl:leading-[68px]">
+            Your wellbeing report
+          </h1>
           <p className="body-16-medium text-neutral-grey-4">
             Enter the password from your email to view your monthly report.
           </p>
@@ -85,7 +137,7 @@ function ReportPasswordContent() {
         </div>
         <div className="relative z-10 my-auto w-full max-w-[480px]">
           <h1 className="heading-28-bold text-neutral-grey-1">Enter report password</h1>
-          <p className="body-16-medium mb-10 mt-2 leading-relaxed text-neutral-grey-2">
+          <p className="body-16-medium mb-10 mt-2 text-neutral-grey-2">
             This report is protected.
             <br />
             Enter the password from your email to continue.
@@ -109,7 +161,9 @@ function ReportPasswordContent() {
                 error={Boolean(error)}
                 helperText={error}
                 required
-                inputClassName="border-neutral-grey-4"
+                // Sai mật khẩu: chữ trong ô cũng đỏ như viền (design 16 Failed)
+                inputClassName={error ? 'text-secondary-red-4' : 'border-neutral-grey-4'}
+                disabled={linkInvalid}
                 suffix={
                   <button
                     type="button"
@@ -126,7 +180,14 @@ function ReportPasswordContent() {
                 }
               />
             </div>
-            <BaseButton type="submit" size="mediumPlus" fullWidth pill loading={loading}>
+            <BaseButton
+              type="submit"
+              size="mediumPlus"
+              fullWidth
+              pill
+              loading={loading}
+              disabled={linkInvalid}
+            >
               View report
             </BaseButton>
           </form>
