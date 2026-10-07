@@ -74,9 +74,8 @@ export function TakeAMomentSlide({ ...slideProps }: BaseSlideProps = {}) {
                 <div className="mt-[85px] flex flex-col gap-2.5">
                   <div className="text-[32px] font-black leading-[1.15]">
                     <span className="block">You are in the</span>
-                    <span className="block" style={{ color: copy?.color }}>
-                      {copy?.zone ?? '—'}
-                    </span>
+                    {/* Màu chữ giữ như cũ (cam) — chỉ nội dung đổi theo zone (bug 371) */}
+                    <span className="block text-secondary-orange-1">{copy?.zone ?? '—'}</span>
                   </div>
                   <p className="body-14-medium text-brand-green-5">{copy?.description}</p>
                 </div>
