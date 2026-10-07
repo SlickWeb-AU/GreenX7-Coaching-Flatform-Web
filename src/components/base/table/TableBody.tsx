@@ -28,10 +28,10 @@ export function TableBody<T>({
         {Array.from({ length: loadingRows }).map((_, rowIndex) => (
           <tr
             key={`skeleton-${rowIndex}`}
-            className="border-b-2 border-neutral-grey-8 last:border-0"
+            className="h-14 border-b border-neutral-grey-6 last:border-0"
           >
             {columns.map((column) => (
-              <td key={column.key} className="px-4 py-3">
+              <td key={column.key} className="px-4">
                 <div aria-hidden className="h-4 w-3/4 animate-pulse rounded bg-neutral-grey-7" />
               </td>
             ))}
@@ -54,7 +54,7 @@ export function TableBody<T>({
           key={getRowKey(rowKey, record, index)}
           onClick={onRowClick ? () => onRowClick(record, index) : undefined}
           className={cn(
-            'border-b-2 border-neutral-grey-8 last:border-0',
+            'h-14 border-b border-neutral-grey-6 last:border-0',
             onRowClick && 'cursor-pointer hover:bg-neutral-grey-8',
           )}
         >
@@ -64,7 +64,7 @@ export function TableBody<T>({
               <td
                 key={column.key}
                 className={cn(
-                  'body-16-medium px-4 py-3 text-neutral-grey-2',
+                  'body-16-medium px-4 text-neutral-grey-2',
                   column.align && alignClass[column.align],
                   column.className,
                 )}

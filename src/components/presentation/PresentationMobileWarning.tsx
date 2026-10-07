@@ -1,11 +1,10 @@
 'use client';
 
 import { useState, type ReactNode } from 'react';
-import Image from 'next/image';
 import { Check, Presentation } from 'lucide-react';
 import { BaseButton } from '@/components/base';
 import { PRESENTATION_TITLE_SUFFIX } from '@/constants/presentation';
-import { DesktopWarningIllustration } from '@/components/icons';
+import { DesktopWarningIllustration, GreenX7LogoDark } from '@/components/icons';
 import { useOptionalPresentation } from './PresentationContext';
 
 import { cn, resolveImageUrl } from '@/lib/utils';
@@ -99,14 +98,7 @@ export function PresentationMobileWarning({
       )}
     >
       <div className="flex w-full items-center justify-between pt-2">
-        <Image
-          src="/icons/greenx7-logo.svg"
-          alt="GreenX7"
-          width={160}
-          height={32}
-          className="h-[32px] w-auto"
-          priority
-        />
+        <GreenX7LogoDark className="h-[32px] w-auto" />
         <div className="flex flex-col items-end text-right">
           <div className="flex h-[26px] items-center justify-end">
             {clientLogoUrl ? (

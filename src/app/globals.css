@@ -158,3 +158,9 @@
     display: none !important;
   }
 }
+
+/* Bỏ viền đen khi click chart */
+.recharts-wrapper:focus,
+.recharts-wrapper *:focus {
+  outline: none;
+}

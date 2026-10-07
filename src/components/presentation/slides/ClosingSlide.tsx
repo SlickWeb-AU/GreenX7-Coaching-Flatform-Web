@@ -1,7 +1,7 @@
 import Image from 'next/image';
 
 import { ClientDepartmentHeader } from '@/components/clients';
-import { HowsYourBatterySticker } from '@/components/icons';
+import { GreenX7LogoLight, HowsYourBatterySticker } from '@/components/icons';
 import { useSlideLayout } from '@/components/presentation/StandardSlideLayout';
 import { cn } from '@/lib/utils';
 import type { BaseSlideProps } from '@/types';
@@ -50,14 +50,7 @@ export function ClosingSlide({
       </div>
 
       <div className="pointer-events-auto absolute bottom-10 left-1/2 z-20 flex -translate-x-1/2 items-center">
-        <Image
-          src="/icons/greenx7-logo-light.svg"
-          alt="GreenX7"
-          width={200}
-          height={40}
-          className="h-10 w-auto"
-          priority
-        />
+        <GreenX7LogoLight className="h-10 w-auto" />
       </div>
 
       {controls && (

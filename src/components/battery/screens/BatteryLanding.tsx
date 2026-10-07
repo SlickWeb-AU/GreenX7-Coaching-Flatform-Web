@@ -91,7 +91,7 @@ export function BatteryLanding({
       <div className="pointer-events-none absolute bottom-0 left-0 right-0 z-20 mx-auto hidden h-0 max-w-1600 lg:block">
         <div className="absolute bottom-0 right-14 translate-y-1/4 2xl:right-28">
           <Image
-            src="/icons/phone.webp"
+            src="/images/phone.webp"
             alt="GreenX7 App Mockup"
             width={420}
             height={880}

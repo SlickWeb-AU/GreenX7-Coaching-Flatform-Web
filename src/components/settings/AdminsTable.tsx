@@ -1,5 +1,6 @@
 import { BaseTable, type BaseColumn } from '@/components/base';
-import { cn, formatRoleLabel } from '@/lib/utils';
+import { USER_ROLE_LABELS, USER_STATUS_LABELS } from '@/constants';
+import { cn } from '@/lib/utils';
 import { USER_ROLES, USER_STATUSES } from '@/types/auth';
 import type { AdminUser } from '@/types';
 
@@ -12,8 +13,6 @@ export interface AdminsTableProps {
   onDelete?: (admin: AdminUser) => void;
   busyId?: string | null;
 }
-
-const titleCase = (value: string) => value.charAt(0) + value.slice(1).toLowerCase();
 
 export function AdminsTable({
   admins,
@@ -29,14 +28,15 @@ export function AdminsTable({
       key: 'name',
       title: 'Name',
       render: (_value, record) => (
-        <span className="body-14-bold text-neutral-grey-1">{record.name || record.email}</span>
+        <span className="body-16-bold text-neutral-grey-1">{record.name || record.email}</span>
       ),
     },
     { key: 'email', title: 'Email', dataIndex: 'email' },
     {
       key: 'role',
       title: 'Role',
-      render: (_value, record) => formatRoleLabel(record.role),
+      render: (_value, record) =>
+        !record.role ? '' : (USER_ROLE_LABELS[record.role] ?? record.role),
     },
     {
       key: 'status',
@@ -45,13 +45,13 @@ export function AdminsTable({
         record.status ? (
           <span
             className={cn(
-              'body-12-medium inline-flex items-center rounded-full px-2 py-0.5',
+              'body-12-bold inline-flex items-center rounded-full px-2 py-0.5',
               record.status === USER_STATUSES.ACTIVE
-                ? 'bg-secondary-green-2 text-secondary-green-4'
+                ? 'bg-brand-green-5 text-brand-green-2'
                 : 'bg-neutral-grey-7 text-neutral-grey-2',
             )}
           >
-            {titleCase(record.status)}
+            {USER_STATUS_LABELS[record.status] ?? record.status}
           </span>
         ) : (
           '—'

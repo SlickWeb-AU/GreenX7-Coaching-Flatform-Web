@@ -1,6 +1,6 @@
-import Image from 'next/image';
 import Link from 'next/link';
 import { ROUTES } from '@/config/routes';
+import { GreenX7LogoLight } from '@/components/icons';
 import { LiveIndicator } from './LiveIndicator';
 
 export interface LiveDashboardHeaderProps {
@@ -18,14 +18,7 @@ export function LiveDashboardHeader({ periodLabel, isLive = true }: LiveDashboar
           aria-label="Back to admin dashboard"
           className="inline-block"
         >
-          <Image
-            src="/icons/greenx7-logo-light.svg"
-            alt="GreenX7"
-            width={130}
-            height={32}
-            className="h-8 w-auto"
-            priority
-          />
+          <GreenX7LogoLight className="h-8 w-auto" />
         </Link>
       </div>
 

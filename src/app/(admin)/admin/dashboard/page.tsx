@@ -206,7 +206,7 @@ function DashboardContent() {
           isFetching && 'pointer-events-none opacity-60',
         )}
       >
-        <div className="mb-8">
+        <div className="mb-10">
           <BatteryScoreBanner
             overview={overview}
             industryName={selectedIndustryLabel}

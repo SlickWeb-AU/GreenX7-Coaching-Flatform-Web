@@ -261,7 +261,7 @@ export function EditClientForm({
         title="Client details"
         prefixIcon={<ClientDetailsIcon label="Client details icon" />}
       >
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <BaseInput
             label="Business name"
             size="mediumPlus"
@@ -359,7 +359,7 @@ export function EditClientForm({
 
             return (
               <div key={field.id} className="flex flex-col gap-3 xl:flex-row xl:items-start">
-                <div className="grid min-w-0 flex-1 grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="grid min-w-0 flex-1 grid-cols-1 gap-2 lg:grid-cols-4">
                   <BaseInput
                     label={index === 0 ? 'First name' : undefined}
                     size="mediumPlus"
@@ -525,7 +525,7 @@ export function EditClientForm({
                     />
                   </div>
                 ) : (
-                  <div className="grid min-w-0 flex-1 grid-cols-1 gap-2 md:grid-cols-2">
+                  <div className="grid min-w-0 flex-1 grid-cols-1 gap-2 lg:grid-cols-2">
                     <BaseInput
                       size="mediumPlus"
                       variant="secondary"
@@ -617,7 +617,7 @@ export function EditClientForm({
             </div>
           )}
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
             <Controller
               name="checkInStartDay"
               control={control}
