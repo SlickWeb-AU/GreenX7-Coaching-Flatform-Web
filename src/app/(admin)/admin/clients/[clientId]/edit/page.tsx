@@ -1,8 +1,8 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useParams, useRouter } from 'next/navigation';
-import { useMemo } from 'react';
+import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useMemo, useRef } from 'react';
 
 import { toast } from 'sonner';
 
@@ -19,8 +19,21 @@ import type { ClientFormValues } from '@/validations';
 export default function EditClientPage() {
   const params = useParams<{ clientId: string }>();
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const queryClient = useQueryClient();
   const clientId = params.clientId;
+
+  // One-shot deep-link from Departments tab: ?addDepartment=1.
+  // Child form effect (runs first) appends the draft row; this cleanup
+  // (parent effect, runs after) drops the query so refresh won't re-append.
+  const autoAddDepartment = searchParams.get('addDepartment') === '1';
+  const cleanedUrl = useRef(false);
+  useEffect(() => {
+    if (!autoAddDepartment || cleanedUrl.current) return;
+    cleanedUrl.current = true;
+    router.replace(pathname);
+  }, [autoAddDepartment, pathname, router]);
 
   const { data, isLoading } = useQuery({
     queryKey: queryKeys.adminClients.detail(clientId),
@@ -138,6 +151,7 @@ export default function EditClientPage() {
         whiteLogoUrl={data.whiteLogoUrl}
         industryOptions={industryOptions}
         showSubmitAction={false}
+        autoAddDepartment={autoAddDepartment}
         onCancel={() => router.push(ROUTES.admin.clientDetail(clientId))}
         isSubmitting={update.isPending}
         onSubmit={(values) => {

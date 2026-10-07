@@ -33,13 +33,17 @@ export function formatDate(value: string | Date | null | undefined): string {
 
 export function formatDateTime(value: string | Date | null | undefined): string {
   if (!value) return '—';
-  return new Intl.DateTimeFormat('vi-VN', {
-    day: '2-digit',
-    month: '2-digit',
+  const d = new Date(value);
+  const date = new Intl.DateTimeFormat('en-GB', {
+    day: 'numeric',
+    month: 'long',
     year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(new Date(value));
+  }).format(d);
+  const hours24 = d.getHours();
+  const period = hours24 >= 12 ? 'PM' : 'AM';
+  const hours12 = String(hours24 % 12 || 12).padStart(2, '0');
+  const minutes = String(d.getMinutes()).padStart(2, '0');
+  return `${date}, ${hours12}:${minutes} ${period}`;
 }
 
 export function formatCheckInDate(

@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronLeft, Download, Pencil, Tv } from 'lucide-react';
+import { ChevronLeft, Download, Pencil, Presentation } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import type { ReactNode } from 'react';
 
@@ -123,7 +123,7 @@ export function ClientLayoutContent({ children }: { children: ReactNode }) {
         size="medium"
         pill
         disabled={!presentationUrl}
-        startIcon={<Tv size={16} />}
+        startIcon={<Presentation size={16} />}
         onClick={() => {
           window.open(normalizeUrl(presentationUrl), '_blank', 'noopener,noreferrer');
         }}

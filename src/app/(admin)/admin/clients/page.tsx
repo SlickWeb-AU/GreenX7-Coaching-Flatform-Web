@@ -11,6 +11,7 @@ import { ROUTES } from '@/config/routes';
 import { ClientsTable } from '@/components/clients';
 import { clientsApi } from '@/features/admin-clients';
 import { settingsApi } from '@/features/admin-settings';
+import { useDebounced } from '@/hooks/useDebounced';
 import { buildClientsQuery } from '@/lib/clients';
 import { queryKeys } from '@/lib/query-client';
 import { mergeSearchParams } from '@/lib/search-params';
@@ -22,15 +23,6 @@ import {
   SORT_FIELD_TO_API,
   SORT_ORDERS,
 } from '@/constants/clients';
-
-function useDebounced(value: string, delay = 400): string {
-  const [debounced, setDebounced] = useState(value);
-  useEffect(() => {
-    const t = setTimeout(() => setDebounced(value), delay);
-    return () => clearTimeout(t);
-  }, [value, delay]);
-  return debounced;
-}
 
 function ClientsContent() {
   const router = useRouter();
@@ -135,6 +127,8 @@ function ClientsContent() {
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             prefix={<Search size={18} className="text-neutral-grey-3" aria-hidden />}
+            clearable
+            onClear={() => setSearchInput('')}
           />
         </div>
         <div className="ml-auto flex flex-wrap items-center gap-2">
