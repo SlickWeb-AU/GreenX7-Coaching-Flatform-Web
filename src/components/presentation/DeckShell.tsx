@@ -7,9 +7,11 @@ import { usePresentationNav } from '@/lib/presentation-nav';
 import { cn } from '@/lib/utils';
 
 /**
- * Khung thiết kế của bộ slide (Figma frame 1600×900). Slide luôn dựng ở đúng
- * kích thước này rồi co giãn cả khung cho vừa màn hình — màn 1024–1500px nhìn
- * giống hệt design thay vì chữ tràn, xuống dòng, chồng lên nhau (bug 372, 374).
+ * Khung thiết kế của bộ slide (Figma frame 1600×900). Nội dung co giãn theo tỉ lệ
+ * này cho vừa màn hình — màn 1024–1500px nhìn giống hệt design thay vì chữ tràn,
+ * xuống dòng, chồng lên nhau (bug 372, 374). Màn không đúng 16:9 thì slide được nới
+ * thêm bề ngang/chiều cao để nền phủ kín màn hình (không còn dải đen hai bên); nội
+ * dung giữa vẫn giữ khung 1600 (max-w-1600 mx-auto), nút ở góc bám theo góc màn hình.
  */
 const DECK_WIDTH = 1600;
 const DECK_HEIGHT = 900;
@@ -34,12 +36,20 @@ export function DeckShell({
   const content = children;
 
   const frameRef = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(1);
+  const [canvas, setCanvas] = useState({ scale: 1, width: DECK_WIDTH, height: DECK_HEIGHT });
   useLayoutEffect(() => {
     const el = frameRef.current;
     if (!el) return;
-    const update = () =>
-      setScale(Math.min(el.clientWidth / DECK_WIDTH, el.clientHeight / DECK_HEIGHT) || 1);
+    const update = () => {
+      const w = el.clientWidth;
+      const h = el.clientHeight;
+      const scale = Math.min(w / DECK_WIDTH, h / DECK_HEIGHT) || 1;
+      setCanvas({
+        scale,
+        width: Math.max(DECK_WIDTH, w / scale),
+        height: Math.max(DECK_HEIGHT, h / scale),
+      });
+    };
     update();
     const ro = new ResizeObserver(update);
     ro.observe(el);
@@ -63,19 +73,21 @@ export function DeckShell({
   }, []);
 
   return (
-    <div className="hidden h-screen w-full items-center justify-center overflow-hidden bg-black p-0 lg:flex">
+    <div className="hidden h-screen w-full overflow-hidden bg-brand-green-2 p-0 lg:flex">
       <div
         ref={frameRef}
         className={cn(
-          'relative aspect-[16/9] select-none overflow-hidden bg-brand-green-2 shadow-2xl',
+          'relative h-full w-full select-none overflow-hidden bg-brand-green-2',
           className,
         )}
-        // Khung 16:9 lớn nhất vừa màn hình (theo bề ngang hoặc chiều cao)
-        style={{ width: 'min(100vw, calc(100vh * 16 / 9))' }}
       >
         <div
           className="absolute left-0 top-0 origin-top-left"
-          style={{ width: DECK_WIDTH, height: DECK_HEIGHT, transform: `scale(${scale})` }}
+          style={{
+            width: canvas.width,
+            height: canvas.height,
+            transform: `scale(${canvas.scale})`,
+          }}
         >
           <div
             key={currentSlide}
