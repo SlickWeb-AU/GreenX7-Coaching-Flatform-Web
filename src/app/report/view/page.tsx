@@ -214,16 +214,19 @@ function ReportViewContent() {
       </header>
 
       <main className="mx-auto max-w-[1666px] px-4 pb-12 pt-8 sm:px-8 sm:pb-16 sm:pt-12 xl:px-[167px]">
-        <div className="mb-6 flex items-center justify-center sm:mb-10">
-          {logo ? (
+        {/* Có logo thì hiện logo rồi tới tên công ty; chưa upload logo thì chỉ hiện tên */}
+        <div className="mb-6 flex flex-col items-center justify-center gap-3 sm:mb-10 sm:gap-4">
+          {logo && (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={logo}
               alt={content.businessName}
               className="h-12 w-auto max-w-[240px] object-contain sm:h-[72px] sm:max-w-[320px]"
             />
-          ) : null}
-          {/* Chưa upload logo thì để trống — không in tên công ty thay logo */}
+          )}
+          <h1 className="heading-32-bold sm:heading-48-bold break-words text-center text-neutral-grey-1">
+            {content.businessName}
+          </h1>
         </div>
 
         <div className="mb-6 flex flex-col-reverse gap-4 border-b border-neutral-grey-6 sm:mb-8 sm:flex-row sm:items-end sm:justify-between">

@@ -48,6 +48,7 @@ export function BatteryResultsHero({
             align="right"
             logoWrapperClassName="h-8"
             logoClassName="h-[32px] w-auto object-contain"
+            nameClassName="body-14-medium text-white"
             departmentClassName="body-14-medium text-white/90"
           />
         </div>

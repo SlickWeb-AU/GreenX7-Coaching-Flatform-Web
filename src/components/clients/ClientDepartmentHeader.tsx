@@ -8,6 +8,7 @@ export interface ClientDepartmentHeaderProps {
   className?: string;
   logoWrapperClassName?: string;
   logoClassName?: string;
+  nameClassName?: string;
   departmentClassName?: string;
 }
 
@@ -19,9 +20,10 @@ export function ClientDepartmentHeader({
   className,
   logoWrapperClassName,
   logoClassName,
+  nameClassName,
   departmentClassName,
 }: ClientDepartmentHeaderProps) {
-  if (!clientLogoUrl && !departmentName) return null;
+  if (!clientLogoUrl && !clientName && !departmentName) return null;
 
   const alignClasses = {
     left: 'items-start text-left',
@@ -31,24 +33,29 @@ export function ClientDepartmentHeader({
 
   return (
     <div className={cn('flex flex-col', alignClasses[align], className)}>
-      <div
-        className={cn(
-          'flex h-12 items-center',
-          align === 'center' && 'justify-center',
-          align === 'right' && 'justify-end',
-          logoWrapperClassName,
-        )}
-      >
-        {clientLogoUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
+      {/* Có logo thì hiện logo rồi tới tên công ty; chưa upload logo thì chỉ hiện tên */}
+      {clientLogoUrl && (
+        <div
+          className={cn(
+            'flex h-12 items-center',
+            align === 'center' && 'justify-center',
+            align === 'right' && 'justify-end',
+            logoWrapperClassName,
+          )}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={resolveImageUrl(clientLogoUrl)}
             alt={clientName ? `${clientName} logo` : 'Client logo'}
             className={cn('h-12 w-auto object-contain', logoClassName)}
           />
-        ) : null}
-        {/* Chưa upload logo thì để trống — không in tên công ty thay logo */}
-      </div>
+        </div>
+      )}
+      {clientName && (
+        <span className={cn('body-16-bold text-white', clientLogoUrl && 'mt-1', nameClassName)}>
+          {clientName}
+        </span>
+      )}
       {departmentName && (
         <span className={cn('body-20-medium mt-2 text-white/90', departmentClassName)}>
           {departmentName}
