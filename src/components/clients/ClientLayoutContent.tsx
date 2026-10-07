@@ -170,7 +170,7 @@ export function ClientLayoutContent({ children }: { children: ReactNode }) {
         actions={headerSlot?.actions ?? defaultActions}
       />
 
-      <BaseTabs className="mb-8" items={TABS} activeKey={activeTab} onChange={handleTabChange} />
+      <BaseTabs className="mb-10" items={TABS} activeKey={activeTab} onChange={handleTabChange} />
 
       {children}
     </div>

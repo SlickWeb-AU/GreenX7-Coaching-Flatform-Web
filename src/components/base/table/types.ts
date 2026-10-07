@@ -36,4 +36,5 @@ export interface BaseTableProps<T> {
   onRowClick?: (record: T, index: number) => void;
   showFooter?: boolean;
   className?: string;
+  tableClassName?: string;
 }

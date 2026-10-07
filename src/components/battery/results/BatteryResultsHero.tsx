@@ -1,7 +1,8 @@
 import { ClientDepartmentHeader } from '@/components/clients';
 import { BatteryIcon, CardDecorBlob, Gx7BadgeLogo, HeartIcon } from '@/components/icons';
 import { AREA_BADGE, AREA_COLOR, AREA_ICON_MAP } from '@/constants/dashboard';
-import { normalizeAreaLabel } from '@/lib/battery';
+import { ZONE_COLORS } from '@/constants/tokens';
+import { normalizeAreaLabel, resolveZoneKey } from '@/lib/battery';
 import { cn } from '@/lib/utils';
 import type { BatteryAreaResultDto } from '@/types/battery';
 
@@ -18,22 +19,6 @@ export interface BatteryResultsHeroProps {
   clientLogoUrl?: string | null;
 }
 
-const ZONE_COLORS: Record<string, string> = {
-  Thrive: '#63D556',
-  Momentum: '#F5D547',
-  Function: '#FAF4D0',
-  Survive: '#F56C77',
-};
-
-function normalizeZoneKey(zoneKey: string, zoneLabel: string): string {
-  const raw = (zoneKey || zoneLabel || '').trim().toLowerCase();
-  if (raw.includes('thrive')) return 'Thrive';
-  if (raw.includes('momentum')) return 'Momentum';
-  if (raw.includes('function')) return 'Function';
-  if (raw.includes('survive')) return 'Survive';
-  return zoneLabel || zoneKey;
-}
-
 export function BatteryResultsHero({
   average,
   zoneKey,
@@ -47,8 +32,8 @@ export function BatteryResultsHero({
   clientLogoUrl,
 }: BatteryResultsHeroProps) {
   const displayScore = Math.round(average);
-  const zone = normalizeZoneKey(zoneKey, zoneLabel);
-  const zoneColor = ZONE_COLORS[zone] ?? '#63D556';
+  const resolvedKey = resolveZoneKey(zoneKey) ?? resolveZoneKey(zoneLabel);
+  const zoneColor = resolvedKey ? ZONE_COLORS[resolvedKey].color : '#63D556';
 
   return (
     <div className="relative w-full overflow-hidden bg-brand-green-1 text-white">

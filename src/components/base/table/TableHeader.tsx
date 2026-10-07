@@ -44,7 +44,7 @@ export function TableHeader<T>({
                   : undefined
               }
               className={cn(
-                'px-4',
+                'whitespace-nowrap px-4',
                 column.align && alignClass[column.align],
                 column.headerClassName,
               )}

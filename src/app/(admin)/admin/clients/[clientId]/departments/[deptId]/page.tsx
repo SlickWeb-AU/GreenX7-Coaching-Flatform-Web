@@ -192,7 +192,7 @@ export default function DepartmentDetailPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="grid grid-cols-1 items-stretch gap-4 lg:grid-cols-12">
+      <div className="grid grid-cols-1 items-stretch gap-2 lg:grid-cols-12">
         <div className="lg:col-span-5">
           <ClientBatteryCard
             title="Current Battery Score"
@@ -230,7 +230,7 @@ export default function DepartmentDetailPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 items-stretch gap-4 lg:grid-cols-12">
+      <div className="grid grid-cols-1 items-stretch gap-2 lg:grid-cols-12">
         <div className="lg:col-span-8">
           <ClientWellbeingCard
             items={effectiveWellbeing}

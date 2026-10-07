@@ -14,6 +14,7 @@ import { ClientBatteryCard } from './ClientBatteryCard';
 import { ClientCurrentZoneCard } from './ClientCurrentZoneCard';
 import { ClientPeriodFilter } from './ClientPeriodFilter';
 import { ClientWellbeingCard } from './ClientWellbeingCard';
+import { cn } from '@/lib/utils';
 
 export interface ClientDashboardTabProps {
   clientId: string;
@@ -87,8 +88,8 @@ export function ClientDashboardTab({
   const firstCheckLabel = data?.firstCheck?.label;
 
   return (
-    <div className={`flex flex-col gap-6 ${className ?? ''}`}>
-      <div className="grid grid-cols-1 items-stretch gap-4 lg:grid-cols-12">
+    <div className={cn('flex flex-col gap-4', className ?? '')}>
+      <div className="grid grid-cols-1 items-stretch gap-2 lg:grid-cols-12">
         <div className="lg:col-span-12 min-[1360px]:col-span-6">
           <ClientBatteryCard
             score={effectiveScore}
@@ -123,7 +124,7 @@ export function ClientDashboardTab({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 items-stretch gap-4 lg:grid-cols-12">
+      <div className="grid grid-cols-1 items-stretch gap-2 lg:grid-cols-12">
         <div className="lg:col-span-6">
           <ClientWellbeingCard
             items={wellbeingItems}
@@ -144,7 +145,7 @@ export function ClientDashboardTab({
                   className="h-2 w-2 shrink-0 rounded-full bg-brand-green-2"
                   aria-hidden="true"
                 />
-                <span>First valid check: {firstCheckLabel}</span>
+                <span className="text-neutral-grey-3">First valid check: {firstCheckLabel}</span>
               </div>
             }
             className="h-full"

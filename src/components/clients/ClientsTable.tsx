@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 
 import { BaseTable, type BaseColumn } from '@/components/base';
-import { CLIENT_STATUSES } from '@/constants/clients';
+import { CLIENT_STATUSES, USER_STATUS_LABELS } from '@/constants';
 import { cn, getInitials } from '@/lib/utils';
 import { formatBatteryScore, industryName } from '@/lib/clients';
 import type { ClientListItem, ClientsSortField, PaginationMeta } from '@/types';
@@ -40,7 +40,7 @@ export function ClientsTable({
       sorter: 'name',
       render: (_, row) => (
         <div className="flex items-center gap-1.5">
-          <span className="body-12-medium flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-secondary-green-2 text-brand-green-2">
+          <span className="body-12-bold flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-neutral-grey-7 text-brand-green-2">
             {getInitials(row.businessName)}
           </span>
           <span className="body-16-bold text-neutral-grey-1">{row.businessName}</span>
@@ -60,7 +60,7 @@ export function ClientsTable({
     },
     {
       key: 'batteryScore',
-      title: 'Battery Score',
+      title: 'Current Battery Score',
       sorter: 'batteryScore',
       render: (_, row) => (
         <span className="font-medium text-brand-green-2">
@@ -71,18 +71,21 @@ export function ClientsTable({
     {
       key: 'status',
       title: 'Status',
-      render: (_, row) => (
-        <span
-          className={cn(
-            'inline-flex rounded-full px-2 py-0.5 text-xs font-bold',
-            row.status === CLIENT_STATUSES.ACTIVE
-              ? 'bg-secondary-green-2 text-secondary-green-4'
-              : 'bg-neutral-grey-7 text-neutral-grey-3',
-          )}
-        >
-          {row.status}
-        </span>
-      ),
+      render: (_, row) =>
+        row.status ? (
+          <span
+            className={cn(
+              'body-12-bold inline-flex items-center rounded-full px-2 py-0.5',
+              row.status === CLIENT_STATUSES.ACTIVE
+                ? 'bg-brand-green-5 text-brand-green-2'
+                : 'bg-neutral-grey-7 text-neutral-grey-2',
+            )}
+          >
+            {USER_STATUS_LABELS[row.status] ?? row.status}
+          </span>
+        ) : (
+          '—'
+        ),
     },
   ];
 

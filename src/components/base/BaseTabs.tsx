@@ -22,7 +22,7 @@ export function BaseTabs({ items, activeKey, onChange, className }: BaseTabsProp
     <div
       role="tablist"
       aria-label="Tabs"
-      className={cn('flex items-center gap-8 border-b border-neutral-grey-5', className)}
+      className={cn('flex items-center gap-6 border-b border-neutral-grey-5', className)}
     >
       {items.map((tab) => {
         const isActive = tab.key === activeKey;

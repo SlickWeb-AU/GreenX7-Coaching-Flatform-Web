@@ -11,11 +11,9 @@ export type BaseSelectVariant = 'primary' | 'secondary';
 
 export const selectSizeClass: Record<BaseSelectSize, string> = {
   small: 'h-9 body-16-medium',
-  medium: 'h-10 body-16-medium',
+  medium: 'h-11 body-14-bold',
   mediumPlus: 'h-12 body-16-medium',
 };
-
-const sizeClass = selectSizeClass;
 
 const variantBg: Record<BaseSelectVariant, string> = {
   primary: 'bg-white',
@@ -120,7 +118,7 @@ export function BaseSelect<T extends string = string>({
       <div
         className={cn(
           'w-full animate-pulse rounded-lg bg-neutral-grey-7',
-          sizeClass[size],
+          selectSizeClass[size],
           className,
         )}
         aria-hidden
@@ -154,7 +152,7 @@ export function BaseSelect<T extends string = string>({
             readOnly
               ? 'cursor-default bg-white'
               : [variantBg[variant], 'hover:border-neutral-grey-4 focus:border-brand-green-2'],
-            sizeClass[size],
+            selectSizeClass[size],
             error && 'border-secondary-red-4 focus:border-secondary-red-4',
             'outline-none focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0',
             disabled && 'cursor-not-allowed opacity-50',
@@ -166,7 +164,7 @@ export function BaseSelect<T extends string = string>({
               className={cn(
                 'truncate',
                 !selectedOption && 'font-normal text-neutral-grey-3',
-                selectedOption && 'font-medium text-neutral-grey-1',
+                selectedOption && 'text-neutral-grey-1',
               )}
             >
               {selectedOption ? selectedOption.label : resolvedPlaceholder}
