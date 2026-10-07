@@ -166,7 +166,8 @@ export function ResendReportDialog({
         )}
 
         <div className="mt-6 flex shrink-0 justify-end gap-3">
-          <BaseButton variant="outline" pill onClick={onClose} disabled={sendMutation.isPending}>
+          {/* Cùng màu chữ, nền, viền với nút Resend (bug 380) */}
+          <BaseButton pill onClick={onClose} disabled={sendMutation.isPending}>
             Cancel
           </BaseButton>
           <BaseButton

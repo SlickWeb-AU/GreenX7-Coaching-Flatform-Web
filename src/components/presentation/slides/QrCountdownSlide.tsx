@@ -36,13 +36,15 @@ export function QrCountdownSlide({ ...layoutProps }: BaseSlideProps = {}) {
   return (
     <StandardSlideLayout {...layoutProps}>
       <StaticSlide
+        // "BATTERY CHECK" ở 80px rộng hơn max-w-xl — cho cột chữ rộng ra để nằm một dòng
+        leftClassName="max-w-none"
         headline={
           <div className="flex flex-col">
             <div className="heading-80-black uppercase text-white">
               <span className="text-brand-green-3">START </span>
               <span>YOUR</span>
               <br />
-              <span>BATTERY CHECK</span>
+              <span className="whitespace-nowrap">BATTERY CHECK</span>
             </div>
             <div className="heading-48-bold mt-8 flex flex-col">
               <span className="text-white">60 seconds.</span>

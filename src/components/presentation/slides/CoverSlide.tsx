@@ -31,6 +31,7 @@ export function CoverSlide({
             clientName={clientName}
             departmentName={departmentName}
             clientLogoUrl={clientLogoUrl}
+            departmentClassName="text-neutral-grey-8"
             align="left"
           />
         </div>

@@ -52,6 +52,10 @@ jobs:
         with:
           context: .
           push: true
+          # NEXT_PUBLIC_* gắn vào JS lúc build. Đổi domain: Settings → Secrets and
+          # variables → Actions → Variables → NEXT_PUBLIC_GREENX7_URL, rồi build lại.
+          build-args: |
+            NEXT_PUBLIC_GREENX7_URL=${{ vars.NEXT_PUBLIC_GREENX7_URL || 'https://www.greenx7.com' }}
           # Gắn 2 tag: SHA để rollback chính xác, latest để server pull nhanh
           tags: |
             ${{ env.REGISTRY }}/${{ steps.meta.outputs.image_name }}:${{ steps.meta.outputs.short_sha }}

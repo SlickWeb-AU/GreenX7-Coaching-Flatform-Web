@@ -10,7 +10,10 @@ export function MakeItEasySlide(props: BaseSlideProps = {}) {
         headline={
           <div className="heading-80-black uppercase">
             <span className="block text-white">MAKE</span>
-            <span className="block text-brand-green-3">IT EASY</span>
+            <span className="block">
+              <span className="text-white">IT </span>
+              <span className="text-brand-green-3">EASY</span>
+            </span>
           </div>
         }
         rightSlot={
@@ -27,7 +30,7 @@ export function MakeItEasySlide(props: BaseSlideProps = {}) {
               </div>
             </div>
 
-            <p className="heading-48-medium mt-[64px] text-white/90">
+            <p className="heading-48-medium mt-[64px] text-white">
               If I miss one day, I&apos;ll simply start again tomorrow.
             </p>
           </div>

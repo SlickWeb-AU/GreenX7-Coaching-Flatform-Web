@@ -39,12 +39,15 @@ export function LiveSummaryPanel({
         <div className="flex flex-col gap-2">
           {logoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={logoUrl} alt={clientName ?? ''} className="h-10 w-auto object-contain" />
-          ) : (
-            <div className="body-24-bold uppercase tracking-wide text-neutral-grey-8">
-              {clientName ?? '—'}
-            </div>
-          )}
+            <img
+              src={logoUrl}
+              alt={clientName ?? ''}
+              // self-start: không để flex-col kéo giãn khung ảnh hết bề ngang làm logo
+              // lệch vào giữa, không thẳng hàng với chữ bên dưới
+              className="h-10 w-auto self-start object-contain object-left"
+            />
+          ) : null}
+          {/* Chưa upload logo thì để trống — không in tên công ty thay logo */}
           <span className="body-20-medium text-neutral-grey-8">{departmentName ?? '—'}</span>
         </div>
 
@@ -80,12 +83,13 @@ export function LiveSummaryPanel({
         </div>
       </div>
 
-      <div className="flex items-center gap-2 pt-8">
+      <div className="flex items-center gap-2 pt-6">
         {!closedLabel && <LiveIndicator />}
         <div className="flex items-center gap-1.5">
           <span className="body-14-bold text-white">{participantCount ?? '—'}</span>
+          <span className="body-14-medium text-white">Participants</span>
           <span className="body-14-medium text-white/80">
-            {closedLabel ? `Participants (${closedLabel})` : 'Participants (Updated just now)'}
+            {closedLabel ? `(${closedLabel})` : '(Updated just now)'}
           </span>
         </div>
       </div>

@@ -59,3 +59,11 @@ export interface ReportContentDto {
 export interface ReportPasswordPayload {
   password: string;
 }
+
+/** GET /reports/:token — dựng màn nhập mật khẩu, cố ý không có số liệu */
+export interface ReportGateDto {
+  businessName: string;
+  whiteLogoUrl: string | null;
+  periodLabel: string;
+  requiresPassword: boolean;
+}

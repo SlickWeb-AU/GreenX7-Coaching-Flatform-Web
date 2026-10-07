@@ -60,6 +60,9 @@ async function refreshSession(): Promise<boolean> {
   return refreshPromise;
 }
 
+/** Endpoint không cần đăng nhập — 401 của chúng không liên quan tới phiên admin */
+const PUBLIC_API_PREFIXES = ['/reports/', '/battery-check/'];
+
 interface RetriableConfig extends AxiosRequestConfig {
   _retried?: boolean;
 }
@@ -77,7 +80,12 @@ http.interceptors.response.use(
       // Do not refresh for auth endpoints themselves (prevents infinite loop)
       !config.url?.includes('/auth/request-code') &&
       !config.url?.includes('/auth/verify-code') &&
-      !config.url?.includes('/auth/refresh');
+      !config.url?.includes('/auth/refresh') &&
+      // API công khai (trang báo cáo, Battery Check): 401 nghĩa là sai mật khẩu /
+      // link hỏng, không phải hết phiên. Làm mới phiên rồi đẩy sang /login thì
+      // người nhận báo cáo (không có tài khoản) gõ sai mật khẩu là bị đưa sang
+      // trang đăng nhập admin thay vì thấy thông báo lỗi.
+      !PUBLIC_API_PREFIXES.some((prefix) => config.url?.startsWith(prefix));
 
     if (shouldRefresh) {
       config._retried = true;

@@ -19,18 +19,21 @@ export function SmallActionSlide(props: BaseSlideProps = {}) {
           </div>
         }
         rightSlot={
-          <div className="flex w-[715px] flex-col items-center gap-8">
-            <div className="heading-48-bold flex w-fit -rotate-[1.69deg] items-center justify-center rounded-3xl bg-secondary-red-1 px-9 py-8 text-center text-brand-green-1 shadow-xl">
+          <div
+            // 580 thay 715: chừa đủ chỗ cho "SMALL ACTION" (80px) không lấn sang thẻ
+            className="flex w-[580px] flex-col items-center gap-8"
+          >
+            <div className="heading-48-bold flex w-fit -rotate-[1.69deg] items-center justify-center rounded-2xl bg-secondary-red-1 px-9 py-8 text-center text-brand-green-1 shadow-xl">
               <span>
                 Less than
                 <br />
                 10 minutes?
               </span>
             </div>
-            <div className="heading-48-bold flex w-fit items-center justify-center rounded-3xl bg-secondary-cyan-1 px-9 py-8 text-center text-brand-green-1 shadow-xl">
+            <div className="heading-48-bold flex w-fit items-center justify-center rounded-2xl bg-secondary-cyan-1 px-9 py-8 text-center text-brand-green-1 shadow-xl">
               Easy to repeat?
             </div>
-            <div className="heading-48-bold flex w-fit -rotate-[1.33deg] items-center justify-center rounded-3xl bg-secondary-violet-1 px-9 py-8 text-center text-brand-green-1 shadow-xl">
+            <div className="heading-48-bold flex w-fit -rotate-[1.33deg] items-center justify-center rounded-2xl bg-secondary-violet-1 px-9 py-8 text-center text-brand-green-1 shadow-xl">
               <span>
                 Makes me feel
                 <br />

@@ -22,13 +22,13 @@ export function PresentationControls({
   return (
     <div className={cn('flex items-center gap-3', className)}>
       {canGoPrev && (
-        <BaseButton variant="outline" pill size="small" onClick={onPrev} className="px-4">
+        <BaseButton variant="outline" pill size="presentation" onClick={onPrev}>
           Previous
         </BaseButton>
       )}
 
       {canGoNext && (
-        <BaseButton variant="outline" pill size="small" onClick={onNext} className="px-4">
+        <BaseButton variant="outline" pill size="presentation" onClick={onNext}>
           Next
         </BaseButton>
       )}

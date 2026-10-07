@@ -272,7 +272,6 @@ export function EditClientForm({
 
   // Deep-link from the Departments tab: ?addDepartment=1 pre-appends one
   // draft row and scrolls to it. Guarded to run once (StrictMode safe).
-  // ponytail: fixed 1s ease scroll — native smooth is time-capped so long pages swoosh
   const autoAddDone = useRef(false);
   useEffect(() => {
     if (!autoAddDepartment || autoAddDone.current) return;

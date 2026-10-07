@@ -68,7 +68,7 @@ function LiveDashboardContent() {
           <TeamBatteryCard score={score} items={items} previousMonthLabel={previousMonthLabel} />
         </main>
 
-        <footer className="w-full border-t border-white/10 px-10 py-2 text-left">
+        <footer className="w-full border-t border-white/10 bg-brand-green-1 px-10 py-2 text-left">
           <span className="body-16-regular text-white/60">
             {isLive
               ? 'Results update as participant responses are submitted.'

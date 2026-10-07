@@ -80,7 +80,6 @@ export function BatteryCheckFlow({ clientSlug, departmentSlug, stateData }: Batt
       const saved = window.localStorage.getItem(draftStorageKey);
       if (saved) {
         const parsed = JSON.parse(saved);
-        // ponytail: stale draft (>60m) is discarded, no migration
         if (parsed?.updatedAt && !isDraftFresh(parsed.updatedAt)) {
           window.localStorage.removeItem(draftStorageKey);
           return;
@@ -235,7 +234,6 @@ export function BatteryCheckFlow({ clientSlug, departmentSlug, stateData }: Batt
   }
 
   if (step === BATTERY_STEPS.LOADING) {
-    // ponytail: preview-only average for animation; server score is source of truth
     const filled = scores.filter((s): s is number => s !== null && s !== undefined);
     const preview =
       filled.length === total && total > 0

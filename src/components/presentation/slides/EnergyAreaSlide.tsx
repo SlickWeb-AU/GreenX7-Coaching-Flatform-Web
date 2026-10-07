@@ -23,7 +23,7 @@ export function EnergyAreaSlide(props: BaseSlideProps = {}) {
           </div>
         }
         subheadline={
-          <span className="body-32-medium block text-white/90">
+          <span className="block text-[1.75rem]/[2.125rem] font-medium tracking-tight-2 text-white">
             What&apos;s helping it stay strong?
           </span>
         }

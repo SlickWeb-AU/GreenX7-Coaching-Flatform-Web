@@ -181,7 +181,8 @@ export default function DepartmentDetailPage() {
       ? deptDashboard.historicalTrend.map((t) => ({
           year: t.year,
           month: t.month,
-          score: t.score ?? 0,
+          // null = tháng chưa có bài nộp: để trống trên biểu đồ, không vẽ thành 0%
+          score: t.score,
           label: t.label,
         }))
       : [];
