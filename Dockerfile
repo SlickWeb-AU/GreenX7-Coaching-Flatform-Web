@@ -14,8 +14,11 @@ FROM node:22-alpine AS build
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-# Không có biến NEXT_PUBLIC_ nào => image này dùng lại được cho mọi môi trường,
-# chỉ cần đổi env lúc chạy container.
+# Biến NEXT_PUBLIC_ bị Next.js GẮN CỨNG vào JS lúc build — đặt trong .env của
+# container lúc chạy KHÔNG có tác dụng. Truyền qua build-arg (xem deploy.yml).
+# Các biến còn lại (API_URL, APP_URL…) vẫn đổi được lúc chạy container.
+ARG NEXT_PUBLIC_GREENX7_URL=https://www.greenx7.com
+ENV NEXT_PUBLIC_GREENX7_URL=$NEXT_PUBLIC_GREENX7_URL
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
