@@ -46,11 +46,8 @@ export function LiveSummaryPanel({
               // lệch vào giữa, không thẳng hàng với chữ bên dưới
               className="h-10 w-auto self-start object-contain object-left"
             />
-          ) : (
-            <div className="body-24-bold uppercase tracking-wide text-neutral-grey-8">
-              {clientName ?? '—'}
-            </div>
-          )}
+          ) : null}
+          {/* Chưa upload logo thì để trống — không in tên công ty thay logo */}
           <span className="body-20-medium text-neutral-grey-8">{departmentName ?? '—'}</span>
         </div>
 

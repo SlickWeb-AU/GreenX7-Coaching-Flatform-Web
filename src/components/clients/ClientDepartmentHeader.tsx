@@ -8,7 +8,6 @@ export interface ClientDepartmentHeaderProps {
   className?: string;
   logoWrapperClassName?: string;
   logoClassName?: string;
-  nameClassName?: string;
   departmentClassName?: string;
 }
 
@@ -20,10 +19,9 @@ export function ClientDepartmentHeader({
   className,
   logoWrapperClassName,
   logoClassName,
-  nameClassName,
   departmentClassName,
 }: ClientDepartmentHeaderProps) {
-  if (!clientLogoUrl && !clientName && !departmentName) return null;
+  if (!clientLogoUrl && !departmentName) return null;
 
   const alignClasses = {
     left: 'items-start text-left',
@@ -48,9 +46,8 @@ export function ClientDepartmentHeader({
             alt={clientName ? `${clientName} logo` : 'Client logo'}
             className={cn('h-12 w-auto object-contain', logoClassName)}
           />
-        ) : clientName ? (
-          <span className={cn('body-16-bold text-white', nameClassName)}>{clientName}</span>
         ) : null}
+        {/* Chưa upload logo thì để trống — không in tên công ty thay logo */}
       </div>
       {departmentName && (
         <span className={cn('body-20-medium mt-2 text-white/90', departmentClassName)}>

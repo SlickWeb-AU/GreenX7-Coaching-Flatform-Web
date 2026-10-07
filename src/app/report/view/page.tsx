@@ -222,11 +222,8 @@ function ReportViewContent() {
               alt={content.businessName}
               className="h-12 w-auto max-w-[240px] object-contain sm:h-[72px] sm:max-w-[320px]"
             />
-          ) : (
-            <h1 className="heading-32-bold sm:heading-48-bold break-words text-center text-neutral-grey-1">
-              {content.businessName}
-            </h1>
-          )}
+          ) : null}
+          {/* Chưa upload logo thì để trống — không in tên công ty thay logo */}
         </div>
 
         <div className="mb-6 flex flex-col-reverse gap-4 border-b border-neutral-grey-6 sm:mb-8 sm:flex-row sm:items-end sm:justify-between">

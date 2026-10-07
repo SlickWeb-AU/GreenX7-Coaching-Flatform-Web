@@ -103,20 +103,15 @@ function ReportPasswordContent() {
         </div>
         <div className="relative z-10 flex items-center justify-between gap-6">
           <GreenX7LogoLight className="h-10 w-auto shrink-0" />
-          {/* Logo trắng của công ty (design 16 - Logo); chưa upload thì in tên */}
-          {gate &&
-            (resolveImageUrl(gate.whiteLogoUrl) ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={resolveImageUrl(gate.whiteLogoUrl) as string}
-                alt={gate.businessName}
-                className="h-10 w-auto max-w-[160px] object-contain"
-              />
-            ) : (
-              <span className="body-18-bold truncate uppercase text-neutral-white-solid">
-                {gate.businessName}
-              </span>
-            ))}
+          {/* Logo trắng của công ty (design 16 - Logo); chưa upload thì để trống */}
+          {gate && resolveImageUrl(gate.whiteLogoUrl) && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={resolveImageUrl(gate.whiteLogoUrl) as string}
+              alt={gate.businessName}
+              className="h-10 w-auto max-w-[160px] object-contain"
+            />
+          )}
         </div>
         <div className="relative z-10 my-12 lg:my-0">
           <p className="body-18-bold mb-2 text-secondary-yellow-1">Report access</p>

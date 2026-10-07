@@ -109,8 +109,6 @@ export function PresentationMobileWarning({
                 alt={clientName ?? 'Client logo'}
                 className="h-[26px] w-auto object-contain"
               />
-            ) : clientName ? (
-              <span className="body-14-bold text-neutral-grey-1">{clientName}</span>
             ) : null}
           </div>
           {departmentName && (
