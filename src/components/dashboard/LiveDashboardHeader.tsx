@@ -29,7 +29,7 @@ export function LiveDashboardHeader({ periodLabel, isLive = true }: LiveDashboar
             <span className="body-12-bold text-white">LIVE</span>
           </div>
         )}
-        {periodLabel && <span className="body-14-medium text-white">{periodLabel}</span>}
+        {periodLabel && <span className="body-14-medium text-[#C6DDD1]">{periodLabel}</span>}
       </div>
     </header>
   );

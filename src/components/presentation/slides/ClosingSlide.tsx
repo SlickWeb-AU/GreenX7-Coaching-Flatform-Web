@@ -28,7 +28,7 @@ export function ClosingSlide({
     >
       <div className="absolute inset-0 z-0">
         <Image
-          src="/images/Northern-Rivers_Wolllunbin.png"
+          src="/images/Northern-Rivers_Wolllunbin.webp"
           alt="Northern Rivers Wollumbin"
           fill
           sizes="100vw"
@@ -45,6 +45,7 @@ export function ClosingSlide({
           clientName={clientName}
           departmentName={departmentName}
           clientLogoUrl={clientLogoUrl}
+          departmentClassName="text-neutral-grey-8"
           align="center"
         />
       </div>

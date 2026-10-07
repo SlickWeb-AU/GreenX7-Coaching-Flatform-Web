@@ -6,6 +6,8 @@ export const BASE_BUTTON_SIZE_CLASS: Record<BaseSize, string> = {
   mediumPlus: 'h-12 px-5 body-16-bold',
   large: 'h-14 px-6 body-20-bold',
   xlarge: 'h-16 px-6 body-20-bold',
+  // Nút Previous/Next của bộ trình chiếu: cao 40, chữ 18/24 đậm (design 01–12)
+  presentation: 'h-10 px-6 body-18-bold',
 };
 
 export const BASE_BUTTON_VARIANT_CLASS: Record<BaseVariant, string> = {

@@ -19,7 +19,7 @@ export function WellbeingStrengthsFocusCards({
   }
 
   return (
-    <div className={cn('flex w-full flex-col gap-4', className)}>
+    <div className={cn('flex w-full flex-col gap-2', className)}>
       <InsightGroup
         title="Our Strengths"
         titleClassName="text-brand-green-2"
@@ -50,7 +50,7 @@ function InsightGroup({
   return (
     <div className={cn('flex flex-col rounded-2xl p-6', cardClassName)}>
       <h4 className={cn('body-24-bold', titleClassName)}>{title}</h4>
-      <div className="mt-8 flex flex-wrap items-center">
+      <div className="mt-8 flex flex-nowrap items-center">
         {items.map((item, idx) => {
           const Icon = AREA_ICON_MAP[item.area] ?? HeartIcon;
           const displayScore =
@@ -60,7 +60,7 @@ function InsightGroup({
             <div key={item.area} className="flex items-center">
               <div className="flex items-center gap-2">
                 <Icon size={20} color={AREA_COLOR[item.area]} aria-hidden="true" />
-                <span className="body-16-regular text-neutral-grey-1">
+                <span className="body-16-regular whitespace-nowrap text-neutral-grey-1">
                   {item.label}:{' '}
                   <span className="body-16-bold text-neutral-grey-1">{displayScore}</span>
                 </span>

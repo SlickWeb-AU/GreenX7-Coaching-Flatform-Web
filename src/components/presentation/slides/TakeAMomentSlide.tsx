@@ -4,6 +4,7 @@
 import { BatteryIcon, BoltIcon, CardDecorBlob, Gx7BadgeLogo, HeartIcon } from '@/components/icons';
 import { BatteryWheelChart } from '@/components/dashboard/BatteryWheelChart';
 import { AREA_BADGE, AREA_BAR_COLORS, AREA_COLOR, AREA_ICON_MAP } from '@/constants/dashboard';
+import { SCORE_ZONE_COPY, zoneKeyForScore, type ScoreZoneKey } from '@/constants/presentation';
 import { cn } from '@/lib/utils';
 import type { BaseSlideProps } from '@/types';
 import { usePresentation } from '@/components/presentation/PresentationContext';
@@ -19,6 +20,16 @@ export function TakeAMomentSlide({ ...slideProps }: BaseSlideProps = {}) {
     .filter((i) => i.score !== null && i.score !== undefined)
     .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
     .slice(0, 3);
+
+  // Zone lấy từ API (cùng phép tính với dashboard và slide 11); thiếu thì tự suy từ điểm
+  const apiZone = pres.data?.zone?.key?.toUpperCase();
+  const zoneKey: ScoreZoneKey | null =
+    apiZone && apiZone in SCORE_ZONE_COPY
+      ? (apiZone as ScoreZoneKey)
+      : displayScore !== null
+        ? zoneKeyForScore(displayScore)
+        : null;
+  const copy = zoneKey ? SCORE_ZONE_COPY[zoneKey] : null;
 
   return (
     <StandardSlideLayout {...slideProps}>
@@ -41,8 +52,8 @@ export function TakeAMomentSlide({ ...slideProps }: BaseSlideProps = {}) {
               <div className="relative flex flex-col">
                 <Gx7BadgeLogo />
                 <div className="flex flex-col items-center text-center">
-                  <span className="body-16-bold">Well done 👍</span>
-                  <span className="body-20-bold">Your battery score:</span>
+                  <span className="body-20-bold text-brand-green-5">{copy?.intro ?? '—'}</span>
+                  <span className="body-20-bold text-brand-green-5">Your battery score:</span>
                   <div className="relative mt-2 flex items-center justify-center">
                     <BatteryIcon
                       percentage={displayScore ?? 0}
@@ -52,7 +63,10 @@ export function TakeAMomentSlide({ ...slideProps }: BaseSlideProps = {}) {
                       aria-hidden="true"
                     />
                     <span className="body-32-black absolute inset-0 flex items-center justify-center pr-3 leading-none text-white drop-shadow-sm">
-                      {displayScore ?? '—'}%
+                      {displayScore ?? '—'}
+                      {displayScore !== null && (
+                        <span className="self-start pt-3 text-[16px] font-black">%</span>
+                      )}
                     </span>
                   </div>
                 </div>
@@ -60,32 +74,28 @@ export function TakeAMomentSlide({ ...slideProps }: BaseSlideProps = {}) {
                 <div className="mt-[85px] flex flex-col gap-2.5">
                   <div className="text-[32px] font-black leading-[1.15]">
                     <span className="block">You are in the</span>
-                    <span className="block text-secondary-orange-1">momentum zone</span>
+                    <span className="block" style={{ color: copy?.color }}>
+                      {copy?.zone ?? '—'}
+                    </span>
                   </div>
-                  <p className="body-14-medium text-white/80">
-                    Momentum&apos;s building. You&apos;re finding your rhythm—stay with it, keep
-                    showing up, and you&apos;ll be thriving before you know it.
-                  </p>
+                  <p className="body-14-medium text-brand-green-5">{copy?.description}</p>
                 </div>
 
                 <span className="body-12-bold mt-[10px] block">Strongest areas</span>
                 <div className="mt-2 flex gap-1.5">
                   {strongest.map((item) => {
                     const Icon = AREA_ICON_MAP[item.area] ?? HeartIcon;
-                    const badgeBg = AREA_BADGE[item.area] ?? 'bg-neutral-grey-7';
-                    const iconColor = AREA_COLOR[item.area];
+                    // Design: chấm tròn màu đặc của vùng, icon trắng, tên vùng đầy đủ
                     return (
                       <div key={item.area} className="flex flex-1 flex-col items-center gap-1.5">
                         <div
-                          className={cn(
-                            'flex h-10 w-10 items-center justify-center rounded-full',
-                            badgeBg,
-                          )}
+                          className="flex h-10 w-10 items-center justify-center rounded-full"
+                          style={{ backgroundColor: AREA_COLOR[item.area] }}
                         >
-                          <Icon size={20} color={iconColor} aria-hidden="true" />
+                          <Icon size={20} color="#FFFFFF" aria-hidden="true" />
                         </div>
-                        <span className="body-12-bold leading-tight">
-                          {(item.label ?? item.area).split(' ')[0]}
+                        <span className="text-center text-[11px] font-medium leading-tight">
+                          {item.label ?? item.area}
                         </span>
                       </div>
                     );
@@ -100,9 +110,9 @@ export function TakeAMomentSlide({ ...slideProps }: BaseSlideProps = {}) {
                 <BatteryWheelChart
                   score={rawScore ?? null}
                   items={displayItems}
-                  size={150}
-                  scoreClassName="text-[40px] font-black"
-                  percentClassName="text-[12px] font-black"
+                  size={200}
+                  scoreClassName="text-[48px] font-black text-black"
+                  percentClassName="text-[14px] font-black text-black"
                 />
               </div>
 

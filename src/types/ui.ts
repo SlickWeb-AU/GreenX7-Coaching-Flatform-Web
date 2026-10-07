@@ -1,6 +1,6 @@
 export type BaseVariant = 'primary' | 'secondary' | 'ghost' | 'outline' | 'custom';
 
-export type BaseSize = 'small' | 'medium' | 'mediumPlus' | 'large' | 'xlarge';
+export type BaseSize = 'small' | 'medium' | 'mediumPlus' | 'large' | 'xlarge' | 'presentation';
 
 export type PageItem = number | '…';
 

@@ -18,14 +18,14 @@ export function MyPromiseSlide(props: BaseSlideProps = {}) {
             <div className="flex flex-col gap-6">
               <span className="heading-48-medium text-white">I promise myself that I will...</span>
               <div className="flex flex-col gap-4">
-                <div className="h-16 w-full rounded-2xl bg-brand-green-4 shadow-inner lg:h-20" />
-                <div className="h-16 w-full rounded-2xl bg-brand-green-4 shadow-inner lg:h-20" />
+                <div className="h-24 w-full rounded-2xl bg-brand-green-4 shadow-inner" />
+                <div className="h-24 w-full rounded-2xl bg-brand-green-4 shadow-inner" />
               </div>
             </div>
 
             <div className="mt-[48px] flex flex-col gap-6">
               <span className="heading-48-medium text-white">Who could support you?</span>
-              <div className="h-16 w-full rounded-2xl bg-brand-green-4 shadow-inner lg:h-20" />
+              <div className="h-24 w-full rounded-2xl bg-brand-green-4 shadow-inner" />
             </div>
           </div>
         }
