@@ -66,7 +66,12 @@ export function BatteryQuestionStep({
         </div>
       </header>
 
-      <div className={cn('flex flex-1 flex-col justify-center px-10 py-12', theme.bodyBg)}>
+      <div
+        className={cn(
+          'flex flex-1 flex-col justify-start px-10 py-12 md:justify-center',
+          theme.bodyBg,
+        )}
+      >
         <div className="mb-12 w-full max-w-[320px] md:mx-auto md:flex md:max-w-[425px] md:flex-col md:items-center md:text-center">
           {Icon && (
             <div className="mb-5 md:mb-6">

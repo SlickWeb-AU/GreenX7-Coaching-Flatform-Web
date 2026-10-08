@@ -35,7 +35,7 @@ export function BatterySlider({
           className="pointer-events-none absolute top-0 -translate-x-1/2 transition-all duration-75"
           style={{ left: `${percentage}%` }}
         >
-          <div className="relative flex h-10 min-w-10 items-center justify-center rounded-lg bg-white p-2">
+          <div className="relative flex h-10 min-w-10 items-center justify-center rounded-lg bg-white p-2 shadow-[0px_0px_24px_0px_#00000029]">
             <span className="body-32-black leading-none" style={{ color }}>
               {displayValue}
             </span>
@@ -44,12 +44,12 @@ export function BatterySlider({
         </div>
       )}
 
-      <div className="relative flex h-10 items-center rounded-full focus-within:ring-2 focus-within:ring-black/30">
+      <div className="relative flex h-10 items-center rounded-full">
         <div className="absolute inset-x-0 h-3 overflow-hidden rounded-full bg-white">
           {ticks.map((stepNum) => (
             <div
               key={stepNum}
-              className="absolute top-0 h-full w-[3px] -translate-x-1/2"
+              className="absolute top-0 h-full w-[2px] -translate-x-1/2"
               style={{
                 left: `${((stepNum - min) / span) * 100}%`,
                 backgroundColor: color,
@@ -89,7 +89,7 @@ export function BatterySlider({
           aria-label={`Score from ${min} to ${max}`}
           aria-valuetext={value === null ? 'No score selected' : `${value} out of ${max}`}
           onChange={(e) => onChange(Number(e.target.value))}
-          className="absolute inset-0 z-20 h-full w-full cursor-pointer opacity-0"
+          className="absolute inset-0 z-20 h-full w-full cursor-pointer opacity-0 focus:outline-none focus:ring-0"
         />
       </div>
 

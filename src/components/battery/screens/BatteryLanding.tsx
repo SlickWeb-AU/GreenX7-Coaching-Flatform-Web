@@ -28,7 +28,7 @@ export function BatteryLanding({
 }: BatteryLandingProps) {
   return (
     <main className="relative flex min-h-screen w-full flex-col justify-between overflow-hidden bg-brand-green-2 text-white">
-      <div className="relative z-10 mx-auto flex w-full max-w-1600 flex-1 flex-col justify-between px-[60px] pb-6 pt-10 md:px-[80px]">
+      <div className="relative z-10 mx-auto flex w-full max-w-1600 flex-1 flex-col justify-between px-[60px] pb-6 pt-9 md:px-[80px]">
         <div className="pointer-events-none absolute -top-8 left-0 z-0 w-full sm:hidden">
           <WheelXsIcon className="h-auto w-full object-cover opacity-60" />
         </div>
