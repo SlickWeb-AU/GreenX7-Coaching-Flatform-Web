@@ -10,4 +10,5 @@ export interface BaseButtonStyleOptions {
   pill?: boolean;
   fullWidth?: boolean;
   className?: string;
+  medium16Bold?: boolean;
 }
