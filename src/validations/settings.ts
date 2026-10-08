@@ -16,8 +16,16 @@ export const industryFormSchema = z.object({
 export type IndustryFormValues = z.infer<typeof industryFormSchema>;
 
 export const inviteSchema = z.object({
-  firstName: z.string().trim().min(1, 'Please enter first name.'),
-  lastName: z.string().trim().min(1, 'Please enter last name.'),
+  firstName: z
+    .string()
+    .trim()
+    .min(1, 'Please enter first name.')
+    .max(100, 'First name must be at most 100 characters.'),
+  lastName: z
+    .string()
+    .trim()
+    .min(1, 'Please enter last name.')
+    .max(100, 'Last name must be at most 100 characters.'),
   email: z.string().trim().email('Please enter a valid email.'),
 });
 
