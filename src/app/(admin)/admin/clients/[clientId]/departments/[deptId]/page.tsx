@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Download, Presentation, SlidersHorizontal } from 'lucide-react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 
 import { BaseButton, BaseLoading } from '@/components/base';
 import { ROUTES } from '@/config/routes';
@@ -45,9 +45,14 @@ export default function DepartmentDetailPage() {
   const clientId = params.clientId;
   const deptId = params.deptId;
 
+  const searchParams = useSearchParams();
   const now = new Date();
-  const [selectedMonth, setSelectedMonth] = useState(String(now.getMonth() + 1));
-  const [selectedYear, setSelectedYear] = useState(String(now.getFullYear()));
+  const [selectedMonth, setSelectedMonth] = useState(
+    () => searchParams.get('month') || String(now.getMonth() + 1),
+  );
+  const [selectedYear, setSelectedYear] = useState(
+    () => searchParams.get('year') || String(now.getFullYear()),
+  );
   const { exporting, exportPdf } = useExportPdf();
 
   // Consume client from layout context
@@ -98,7 +103,9 @@ export default function DepartmentDetailPage() {
           pill
           startIcon={<SlidersHorizontal size={16} aria-hidden />}
           onClick={() => {
-            router.push(ROUTES.admin.clientEdit(clientId));
+            router.push(`${ROUTES.admin.clientEdit(clientId)}?scrollTo=departments`, {
+              scroll: false,
+            });
           }}
         >
           Manage Department
@@ -204,7 +211,7 @@ export default function DepartmentDetailPage() {
             lastMonthLabel={previousMonthName}
             changeVsFirstCheck={deptDashboard?.vsFirstCheck?.change ?? null}
             firstCheckLabel={deptDashboard?.firstCheck?.label}
-            className="h-full"
+            className="h-full py-4"
           />
         </div>
 

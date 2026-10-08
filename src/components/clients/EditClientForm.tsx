@@ -2,8 +2,10 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
-import { useEffect, useLayoutEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
+
+import { useScrollToSection } from '@/hooks/useScrollToSection';
 
 import {
   BaseButton,
@@ -63,7 +65,9 @@ export interface EditClientFormProps {
   formId?: string;
   showSubmitAction?: boolean;
   submitLabel?: string;
-  /** When true, append one draft department row and scroll to it on mount. */
+  /** Section ID to smooth scroll to on mount. */
+  scrollTo?: string;
+  /** When true, append one draft department row on mount. */
   autoAddDepartment?: boolean;
 }
 
@@ -79,6 +83,7 @@ export function EditClientForm({
   formId = 'edit-client-form',
   showSubmitAction = false,
   submitLabel = 'Save changes',
+  scrollTo,
   autoAddDepartment = false,
 }: EditClientFormProps) {
   const persist = useClientRowPersistence(clientId);
@@ -240,55 +245,20 @@ export function EditClientForm({
     appendDepartment({ ...DEFAULT_DEPARTMENT_ROW });
   };
 
-  // Pin to top before first paint so the page never flashes mid-content
-  // from scroll restoration. Runs before the steady-poll scroll below.
-  useLayoutEffect(() => {
-    if (!autoAddDepartment) return;
-    const prev = history.scrollRestoration;
-    history.scrollRestoration = 'manual';
-    window.scrollTo(0, 0);
-    return () => {
-      history.scrollRestoration = prev;
-    };
-  }, [autoAddDepartment]);
+  useScrollToSection(scrollTo);
 
   // Deep-link from the Departments tab: ?addDepartment=1 pre-appends one
-  // draft row and scrolls to it. Guarded to run once (StrictMode safe).
+  // draft row. Guarded to run once (StrictMode safe).
   const autoAddDone = useRef(false);
   useEffect(() => {
     if (!autoAddDepartment || autoAddDone.current) return;
     autoAddDone.current = true;
     appendDepartment({ ...DEFAULT_DEPARTMENT_ROW });
-    // Wait until the card position is stable (layout/fonts/images settled)
-    // instead of a fixed delay, then ease-scroll over 1s.
-    const startedAt = Date.now();
-    let lastTop: number | null = null;
-    let steady = 0;
-    const poll = window.setInterval(() => {
-      const el = document.getElementById('departments');
-      const top = el ? el.getBoundingClientRect().top + window.scrollY : null;
-      steady = top !== null && lastTop !== null && Math.abs(top - lastTop) <= 2 ? steady + 1 : 0;
-      lastTop = top;
-      const timedOut = Date.now() - startedAt > 5000;
-      if ((steady >= 3 && document.readyState === 'complete') || timedOut) {
-        window.clearInterval(poll);
-        const target = document.getElementById('departments');
-        if (!target) return;
-        const startY = window.scrollY;
-        const targetY = target.getBoundingClientRect().top + startY - 96; // match scroll-mt-24
-        const distance = targetY - startY;
-        if (distance <= 0) return;
-        const duration = 1000;
-        const start = performance.now();
-        const step = (now: number) => {
-          const t = Math.min((now - start) / duration, 1);
-          const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-          window.scrollTo(0, startY + distance * eased);
-          if (t < 1) requestAnimationFrame(step);
-        };
-        requestAnimationFrame(step);
-      }
-    }, 100);
+    if (typeof window !== 'undefined' && window.location.search.includes('addDepartment')) {
+      const nextUrl = new URL(window.location.href);
+      nextUrl.searchParams.delete('addDepartment');
+      window.history.replaceState(null, '', nextUrl.pathname + nextUrl.search + nextUrl.hash);
+    }
   }, [autoAddDepartment, appendDepartment]);
 
   const handleFormSubmit = handleSubmit(onSubmit, (formErrors) => {

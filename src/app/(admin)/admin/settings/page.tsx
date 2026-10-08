@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Pencil, Plus, Trash2, UserPlus } from 'lucide-react';
+import { Pencil, Plus, UserPlus } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -91,17 +91,6 @@ export default function SettingsPage() {
       setShowIndustry(false);
       setEditingId(null);
       industryForm.reset();
-      invalidateIndustries();
-    },
-    onError: (e: unknown) => {
-      toast.error(toApiError(e).message);
-    },
-  });
-
-  const deleteIndustry = useMutation({
-    mutationFn: settingsApi.deleteIndustry,
-    onSuccess: () => {
-      toast.success('Industry deleted successfully');
       invalidateIndustries();
     },
     onError: (e: unknown) => {
@@ -260,37 +249,17 @@ export default function SettingsPage() {
                     className="min-w-0 flex-1"
                   />
                   {canManage && (
-                    <>
-                      <BaseIconButton
-                        aria-label={`Rename ${ind.name}`}
-                        size={40}
-                        icon={<Pencil size={18} aria-hidden />}
-                        className="text-neutral-grey-3 hover:text-brand-green-2"
-                        onClick={() => {
-                          setEditingId(ind.id);
-                          industryForm.reset({ name: ind.name });
-                          setShowIndustry(true);
-                        }}
-                      />
-                      <BaseIconButton
-                        aria-label={`Delete ${ind.name}`}
-                        size={40}
-                        icon={<Trash2 size={18} aria-hidden />}
-                        className="text-neutral-grey-3 hover:text-secondary-red-4"
-                        onClick={async () => {
-                          const confirmed = await showConfirm({
-                            title: 'Delete industry',
-                            message: `Are you sure you want to delete "${ind.name}"? This action cannot be undone.`,
-                            confirmText: 'Delete',
-                            cancelText: 'Cancel',
-                            variant: 'danger',
-                          });
-                          if (confirmed) {
-                            deleteIndustry.mutate(ind.id);
-                          }
-                        }}
-                      />
-                    </>
+                    <BaseIconButton
+                      aria-label={`Rename ${ind.name}`}
+                      size={40}
+                      icon={<Pencil size={18} aria-hidden />}
+                      className="text-neutral-grey-3 hover:text-brand-green-2"
+                      onClick={() => {
+                        setEditingId(ind.id);
+                        industryForm.reset({ name: ind.name });
+                        setShowIndustry(true);
+                      }}
+                    />
                   )}
                 </div>
               ))}

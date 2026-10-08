@@ -76,6 +76,7 @@ export function ClientHistoryTab({
       {/* Table with integrated loading, pagination and empty state */}
       <ClientCheckInHistoryTable
         clientId={clientId}
+        departmentId={departmentId}
         data={data?.items ?? []}
         loading={isLoading || isFetching}
         meta={data?.meta}
