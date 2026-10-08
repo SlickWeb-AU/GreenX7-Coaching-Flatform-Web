@@ -17,16 +17,17 @@ export function MakeItEasySlide(props: BaseSlideProps = {}) {
           </div>
         }
         rightSlot={
-          <div className="flex w-[715px] flex-col">
+          <div className="flex w-[750px] flex-col">
+            {/* Nhãn 160 + khoảng cách 24 + ô nhập 566 (bug 372) */}
             <div className="flex flex-col gap-[48px]">
               <div className="flex items-center gap-6">
                 <span className="heading-48-medium min-w-[160px] shrink-0 text-white">After I</span>
-                <div className="h-16 flex-1 rounded-2xl bg-brand-green-4 shadow-inner lg:h-20" />
+                <div className="h-[136px] w-[566px] shrink-0 rounded-2xl bg-brand-green-4 shadow-inner" />
               </div>
 
               <div className="flex items-center gap-6">
                 <span className="heading-48-medium min-w-[160px] shrink-0 text-white">I will</span>
-                <div className="h-16 flex-1 rounded-2xl bg-brand-green-4 shadow-inner lg:h-20" />
+                <div className="h-[136px] w-[566px] shrink-0 rounded-2xl bg-brand-green-4 shadow-inner" />
               </div>
             </div>
 
