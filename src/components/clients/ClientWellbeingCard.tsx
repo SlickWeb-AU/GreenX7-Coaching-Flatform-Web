@@ -44,82 +44,89 @@ export function ClientWellbeingCard({
 
   return (
     <BaseCard title="Wellbeing areas" className={cn('flex flex-col', className)}>
-      {/* Header */}
-      <div className="body-12-bold mb-2 flex items-center justify-between text-neutral-grey-3">
-        <div className="flex-1">Area</div>
-        <div className="flex items-center gap-3">
-          <div className="w-20 text-center">
-            {previousMonthLabel ? `vs. ${previousMonthLabel}` : 'vs. Previous'}
-          </div>
-          <div className="w-24 text-center">vs. First Check</div>
-        </div>
-      </div>
-
-      {/* Rows */}
-      <div className="flex flex-col gap-2">
-        {items.map((item) => {
-          const areaKey = item.area;
-          const Icon = AREA_ICON_MAP[areaKey] ?? HeartIcon;
-          const displayScore = formatScoreToPercent(item.score);
-
-          return (
-            <div key={item.area} className="flex items-center justify-between">
-              {/* Area Info & Progress bar */}
-              <div className="flex flex-1 items-center gap-4 pr-12">
-                {/* 24px icon + label (gap 8px) */}
-                <div className="flex items-center gap-2">
-                  <div
-                    className={cn(
-                      'flex h-6 w-6 shrink-0 items-center justify-center rounded-full',
-                      AREA_BADGE[areaKey] ?? 'bg-neutral-grey-7',
-                    )}
-                  >
-                    <Icon size={14} color={AREA_COLOR[areaKey]} aria-hidden="true" />
-                  </div>
-
-                  <div className="body-14-bold w-24 shrink-0 text-neutral-grey-1">
-                    {item.label ?? item.area}
-                  </div>
-                </div>
-
-                {/* Progress bar + Score cluster (gap 8px) */}
-                <div className="flex flex-1 items-center gap-2">
-                  <div
-                    className={cn(
-                      'h-1.5 flex-1 overflow-hidden rounded-full',
-                      AREA_BADGE[areaKey] ?? 'bg-neutral-grey-7',
-                    )}
-                  >
-                    <div
-                      className={cn(
-                        'h-full rounded-full',
-                        AREA_BAR_COLORS[areaKey] ?? 'bg-brand-green-2',
-                      )}
-                      style={{ width: `${Math.min(100, Math.max(0, displayScore ?? 0))}%` }}
-                    />
-                  </div>
-
-                  {/* Score + Bolt icon (gap 4px, size 10) */}
-                  <div className="body-14-bold flex shrink-0 items-center gap-1 text-neutral-grey-1">
-                    <span>{displayScore ?? '—'}</span>
-                    <BoltIcon size={10} aria-hidden="true" />
-                  </div>
-                </div>
+      {/* Điện thoại (bug 388): cột so sánh hẹp lại cho cả hàng nằm gọn trong thẻ từ màn
+          360px; màn hẹp hơn nữa thì cuộn ngang trong thẻ thay vì tràn ra ngoài */}
+      <div className="-mx-1 overflow-x-auto px-1">
+        <div className="min-w-[278px]">
+          {/* Header */}
+          <div className="body-12-bold mb-2 flex items-center justify-between text-neutral-grey-3">
+            <div className="flex-1">Area</div>
+            <div className="flex items-center gap-1.5 sm:gap-3">
+              <div className="w-[52px] text-center sm:w-20">
+                {previousMonthLabel ? `vs. ${previousMonthLabel}` : 'vs. Previous'}
               </div>
-
-              {/* Comparison columns (gap 12px) */}
-              <div className="flex items-center gap-3">
-                <div className="flex w-20 items-center justify-end">
-                  <Delta value={item.vsPreviousMonth} />
-                </div>
-
-                <div className="flex w-24 items-center justify-end">
-                  <Delta value={item.vsFirstCheck} />
-                </div>
-              </div>
+              <div className="w-[58px] text-center sm:w-24">vs. First Check</div>
             </div>
-          );
-        })}
+          </div>
+
+          {/* Rows */}
+          <div className="flex flex-col gap-2">
+            {items.map((item) => {
+              const areaKey = item.area;
+              const Icon = AREA_ICON_MAP[areaKey] ?? HeartIcon;
+              const displayScore = formatScoreToPercent(item.score);
+
+              return (
+                <div key={item.area} className="flex items-center justify-between">
+                  {/* Area Info & Progress bar */}
+                  <div className="flex min-w-0 flex-1 items-center gap-1.5 pr-1.5 sm:gap-4 sm:pr-12">
+                    {/* 24px icon + label (gap 8px) */}
+                    <div className="flex items-center gap-1.5 sm:gap-2">
+                      <div
+                        className={cn(
+                          'flex h-6 w-6 shrink-0 items-center justify-center rounded-full',
+                          AREA_BADGE[areaKey] ?? 'bg-neutral-grey-7',
+                        )}
+                      >
+                        <Icon size={14} color={AREA_COLOR[areaKey]} aria-hidden="true" />
+                      </div>
+
+                      <div className="body-14-bold w-[88px] shrink-0 text-neutral-grey-1 sm:w-24">
+                        {item.label ?? item.area}
+                      </div>
+                    </div>
+
+                    {/* Progress bar + Score cluster (gap 8px) */}
+                    {/* Thanh tiến độ co lại trước, điểm luôn hiện */}
+                    <div className="flex min-w-fit flex-1 items-center gap-2">
+                      <div
+                        className={cn(
+                          'h-1.5 min-w-0 flex-1 overflow-hidden rounded-full',
+                          AREA_BADGE[areaKey] ?? 'bg-neutral-grey-7',
+                        )}
+                      >
+                        <div
+                          className={cn(
+                            'h-full rounded-full',
+                            AREA_BAR_COLORS[areaKey] ?? 'bg-brand-green-2',
+                          )}
+                          style={{ width: `${Math.min(100, Math.max(0, displayScore ?? 0))}%` }}
+                        />
+                      </div>
+
+                      {/* Score + Bolt icon (gap 4px, size 10) */}
+                      <div className="body-14-bold flex shrink-0 items-center gap-1 text-neutral-grey-1">
+                        <span>{displayScore ?? '—'}</span>
+                        <BoltIcon size={10} aria-hidden="true" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Comparison columns (gap 12px) */}
+                  <div className="flex shrink-0 items-center gap-1.5 sm:gap-3">
+                    <div className="flex w-[52px] items-center justify-end sm:w-20">
+                      <Delta value={item.vsPreviousMonth} />
+                    </div>
+
+                    <div className="flex w-[58px] items-center justify-end sm:w-24">
+                      <Delta value={item.vsFirstCheck} />
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </BaseCard>
   );
