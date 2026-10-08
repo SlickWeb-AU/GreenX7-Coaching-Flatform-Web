@@ -149,8 +149,11 @@ export function CreateClientForm({
 
     if (draft) {
       setValue(`contacts.${index}`, draft);
+      contactsEdit.markSaved(id);
+    } else {
+      removeContact(index);
+      contactsEdit.drop(id);
     }
-    contactsEdit.markSaved(id);
   };
 
   const handleStartEditContact = (index: number, id: string) => {
@@ -201,8 +204,11 @@ export function CreateClientForm({
 
     if (draft) {
       setValue(`departments.${index}`, draft);
+      departmentsEdit.markSaved(id);
+    } else {
+      removeDepartment(index);
+      departmentsEdit.drop(id);
     }
-    departmentsEdit.markSaved(id);
   };
 
   const handleStartEditDept = (index: number, id: string) => {
