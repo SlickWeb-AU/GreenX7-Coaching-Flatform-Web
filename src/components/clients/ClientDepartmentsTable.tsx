@@ -2,8 +2,9 @@
 
 import Link from 'next/link';
 
-import { BaseTable, BaseTrend, type BaseColumn } from '@/components/base';
+import { BaseTable, BaseTag, BaseTrend, type BaseColumn } from '@/components/base';
 import { ROUTES } from '@/config/routes';
+import { CLIENT_STATUSES, USER_STATUS_LABELS } from '@/constants';
 import { formatBatteryScore } from '@/lib/clients';
 import type { ClientDepartment, DepartmentListItemDto, PaginationMeta } from '@/types';
 
@@ -89,6 +90,19 @@ export function ClientDepartmentsTable({
           hasSubmissions && 'vsFirstCheckChange' in row ? row.vsFirstCheckChange : null;
         return <BaseTrend value={vsFirst} />;
       },
+    },
+    {
+      key: 'status',
+      title: 'Status',
+      sorter: 'status',
+      render: (_, row) =>
+        row.status ? (
+          <BaseTag variant={row.status === CLIENT_STATUSES.ACTIVE ? 'green' : 'neutral'}>
+            {USER_STATUS_LABELS[row.status] ?? row.status}
+          </BaseTag>
+        ) : (
+          '—'
+        ),
     },
     {
       key: 'actions',

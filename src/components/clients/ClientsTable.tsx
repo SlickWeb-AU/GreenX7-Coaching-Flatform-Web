@@ -2,9 +2,9 @@
 
 import { useRouter } from 'next/navigation';
 
-import { BaseTable, type BaseColumn } from '@/components/base';
+import { BaseTable, BaseTag, type BaseColumn } from '@/components/base';
 import { CLIENT_STATUSES, USER_STATUS_LABELS } from '@/constants';
-import { cn, getInitials } from '@/lib/utils';
+import { getInitials } from '@/lib/utils';
 import { formatBatteryScore, industryName } from '@/lib/clients';
 import type { ClientListItem, ClientsSortField, PaginationMeta } from '@/types';
 
@@ -73,16 +73,9 @@ export function ClientsTable({
       title: 'Status',
       render: (_, row) =>
         row.status ? (
-          <span
-            className={cn(
-              'body-12-bold inline-flex items-center rounded-full px-2 py-0.5',
-              row.status === CLIENT_STATUSES.ACTIVE
-                ? 'bg-brand-green-5 text-brand-green-2'
-                : 'bg-neutral-grey-7 text-neutral-grey-2',
-            )}
-          >
+          <BaseTag variant={row.status === CLIENT_STATUSES.ACTIVE ? 'green' : 'neutral'}>
             {USER_STATUS_LABELS[row.status] ?? row.status}
-          </span>
+          </BaseTag>
         ) : (
           '—'
         ),

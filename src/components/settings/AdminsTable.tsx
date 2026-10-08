@@ -1,6 +1,5 @@
-import { BaseTable, type BaseColumn } from '@/components/base';
+import { BaseTable, BaseTag, type BaseColumn } from '@/components/base';
 import { USER_ROLE_LABELS, USER_STATUS_LABELS } from '@/constants';
-import { cn } from '@/lib/utils';
 import { USER_ROLES, USER_STATUSES } from '@/types/auth';
 import type { AdminUser } from '@/types';
 
@@ -43,16 +42,9 @@ export function AdminsTable({
       title: 'Status',
       render: (_value, record) =>
         record.status ? (
-          <span
-            className={cn(
-              'body-12-bold inline-flex items-center rounded-full px-2 py-0.5',
-              record.status === USER_STATUSES.ACTIVE
-                ? 'bg-brand-green-5 text-brand-green-2'
-                : 'bg-neutral-grey-7 text-neutral-grey-2',
-            )}
-          >
+          <BaseTag variant={record.status === USER_STATUSES.ACTIVE ? 'green' : 'neutral'}>
             {USER_STATUS_LABELS[record.status] ?? record.status}
-          </span>
+          </BaseTag>
         ) : (
           '—'
         ),

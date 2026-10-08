@@ -96,6 +96,7 @@ export function ClientDepartmentsTab({
           size="medium"
           pill
           startIcon={<Plus size={24} aria-hidden />}
+          medium16Bold
           onClick={() => {
             router.push(
               `${ROUTES.admin.clientEdit(clientId)}?scrollTo=departments&addDepartment=1`,
