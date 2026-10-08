@@ -25,6 +25,8 @@ export const CLIENT_STATUSES = {
 
 export type ClientStatus = (typeof CLIENT_STATUSES)[keyof typeof CLIENT_STATUSES];
 
+export const CLIENT_LOGO_MAX_SIZE_BYTES = 2 * 1024 * 1024; // 2MB
+
 export const WELLBEING_AREAS = {
   PHYSICAL: 'PHYSICAL',
   SLEEP: 'SLEEP',

@@ -43,6 +43,7 @@ const REPORT_STATUS_TAG_MAP: Record<ReportStatus, { variant: BaseTagVariant; lab
 
 export interface ClientCheckInHistoryTableProps {
   clientId: string;
+  departmentId?: string;
   data: CheckInHistoryItemDto[];
   meta?: PaginationMeta | null;
   page?: number;
@@ -54,6 +55,7 @@ export interface ClientCheckInHistoryTableProps {
 
 export function ClientCheckInHistoryTable({
   clientId,
+  departmentId,
   data,
   meta,
   page,
@@ -193,10 +195,12 @@ export function ClientCheckInHistoryTable({
             </button>
 
             <Link
-              // Admin không có mã của người nhận (chỉ lưu bản băm) nên không mở trang
-              // báo cáo công khai được — mở tab Dashboard đúng kỳ đó, cùng số liệu với
-              // tab Overall của báo cáo.
-              href={`${ROUTES.admin.clientDetail(clientId)}?tab=${CLIENT_TABS.DASHBOARD}&month=${row.periodMonth}&year=${row.periodYear}`}
+              // Route to the corresponding dashboard period (department vs overall client)
+              href={
+                departmentId
+                  ? `${ROUTES.admin.departmentDetail(clientId, departmentId)}?month=${row.periodMonth}&year=${row.periodYear}`
+                  : `${ROUTES.admin.clientDetail(clientId)}?tab=${CLIENT_TABS.DASHBOARD}&month=${row.periodMonth}&year=${row.periodYear}`
+              }
               className="body-14-bold text-brand-green-2 transition-colors hover:underline"
             >
               View

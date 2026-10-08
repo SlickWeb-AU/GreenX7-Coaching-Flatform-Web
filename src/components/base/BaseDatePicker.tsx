@@ -35,6 +35,7 @@ export interface BaseDatePickerProps {
   startIcon?: ReactNode;
   format?: (date: Date, day: number) => string;
   maxDay?: number;
+  disableMonthNavigation?: boolean;
 }
 
 const WEEKDAYS = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
@@ -60,6 +61,7 @@ export function BaseDatePicker({
   startIcon,
   format = defaultFormat,
   maxDay = 28,
+  disableMonthNavigation = false,
 }: BaseDatePickerProps) {
   const generatedId = useId();
   const datePickerId = id ?? generatedId;
@@ -262,24 +264,26 @@ export function BaseDatePicker({
               <span className="body-14-bold text-neutral-grey-1">
                 {MONTH_NAMES[currentMonth]} {currentYear}
               </span>
-              <div className="flex items-center gap-1">
-                <button
-                  type="button"
-                  aria-label="Previous month"
-                  onClick={handlePrevMonth}
-                  className="rounded-lg p-1.5 text-neutral-grey-2 transition-colors hover:bg-neutral-grey-7 hover:text-neutral-grey-1"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </button>
-                <button
-                  type="button"
-                  aria-label="Next month"
-                  onClick={handleNextMonth}
-                  className="rounded-lg p-1.5 text-neutral-grey-2 transition-colors hover:bg-neutral-grey-7 hover:text-neutral-grey-1"
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </button>
-              </div>
+              {!disableMonthNavigation && (
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    aria-label="Previous month"
+                    onClick={handlePrevMonth}
+                    className="rounded-lg p-1.5 text-neutral-grey-2 transition-colors hover:bg-neutral-grey-7 hover:text-neutral-grey-1"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Next month"
+                    onClick={handleNextMonth}
+                    className="rounded-lg p-1.5 text-neutral-grey-2 transition-colors hover:bg-neutral-grey-7 hover:text-neutral-grey-1"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Weekday headers */}

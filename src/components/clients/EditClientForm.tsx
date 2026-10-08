@@ -2,8 +2,10 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
-import { useEffect, useLayoutEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
+
+import { useScrollToSection } from '@/hooks/useScrollToSection';
 
 import {
   BaseButton,
@@ -63,7 +65,9 @@ export interface EditClientFormProps {
   formId?: string;
   showSubmitAction?: boolean;
   submitLabel?: string;
-  /** When true, append one draft department row and scroll to it on mount. */
+  /** Section ID to smooth scroll to on mount. */
+  scrollTo?: string;
+  /** When true, append one draft department row on mount. */
   autoAddDepartment?: boolean;
 }
 
@@ -79,6 +83,7 @@ export function EditClientForm({
   formId = 'edit-client-form',
   showSubmitAction = false,
   submitLabel = 'Save changes',
+  scrollTo,
   autoAddDepartment = false,
 }: EditClientFormProps) {
   const persist = useClientRowPersistence(clientId);
@@ -112,7 +117,6 @@ export function EditClientForm({
   const {
     fields: contactFields,
     append: appendContact,
-    update: updateContact,
     remove: removeContact,
   } = useFieldArray({
     control,
@@ -122,7 +126,6 @@ export function EditClientForm({
   const {
     fields: departmentFields,
     append: appendDepartment,
-    update: updateDepartment,
     remove: removeDepartment,
   } = useFieldArray({
     control,
@@ -156,7 +159,7 @@ export function EditClientForm({
     clearErrors(`contacts.${index}`);
     const saved = await persist.saveContact(contactSaveKey(id), getValues(`contacts.${index}`));
     if (!saved) return;
-    updateContact(index, saved);
+    setValue(`contacts.${index}`, saved);
     contactsEdit.markSaved(id);
   };
 
@@ -167,16 +170,8 @@ export function EditClientForm({
 
     if (draft) {
       setValue(`contacts.${index}`, draft);
-      updateContact(index, draft);
-      contactsEdit.markSaved(id);
-    } else if (contactFields.length > 1) {
-      removeContact(index);
-      contactsEdit.drop(id);
-    } else {
-      setValue(`contacts.${index}`, { ...DEFAULT_CONTACT_ROW });
-      updateContact(index, { ...DEFAULT_CONTACT_ROW });
-      contactsEdit.markSaved(id);
     }
+    contactsEdit.markSaved(id);
   };
 
   const handleStartEditContact = (index: number, id: string) => {
@@ -218,7 +213,7 @@ export function EditClientForm({
     clearErrors(`departments.${index}`);
     const saved = await persist.saveDepartment(deptSaveKey(id), getValues(`departments.${index}`));
     if (!saved) return;
-    updateDepartment(index, saved);
+    setValue(`departments.${index}`, saved);
     departmentsEdit.markSaved(id);
   };
 
@@ -229,16 +224,8 @@ export function EditClientForm({
 
     if (draft) {
       setValue(`departments.${index}`, draft);
-      updateDepartment(index, draft);
-      departmentsEdit.markSaved(id);
-    } else if (departmentFields.length > 1) {
-      removeDepartment(index);
-      departmentsEdit.drop(id);
-    } else {
-      setValue(`departments.${index}`, { ...DEFAULT_DEPARTMENT_ROW });
-      updateDepartment(index, { ...DEFAULT_DEPARTMENT_ROW });
-      departmentsEdit.markSaved(id);
     }
+    departmentsEdit.markSaved(id);
   };
 
   const handleStartEditDept = (index: number, id: string) => {
@@ -258,59 +245,33 @@ export function EditClientForm({
     appendDepartment({ ...DEFAULT_DEPARTMENT_ROW });
   };
 
-  // Pin to top before first paint so the page never flashes mid-content
-  // from scroll restoration. Runs before the steady-poll scroll below.
-  useLayoutEffect(() => {
-    if (!autoAddDepartment) return;
-    const prev = history.scrollRestoration;
-    history.scrollRestoration = 'manual';
-    window.scrollTo(0, 0);
-    return () => {
-      history.scrollRestoration = prev;
-    };
-  }, [autoAddDepartment]);
+  useScrollToSection(scrollTo);
 
   // Deep-link from the Departments tab: ?addDepartment=1 pre-appends one
-  // draft row and scrolls to it. Guarded to run once (StrictMode safe).
+  // draft row. Guarded to run once (StrictMode safe).
   const autoAddDone = useRef(false);
   useEffect(() => {
     if (!autoAddDepartment || autoAddDone.current) return;
     autoAddDone.current = true;
     appendDepartment({ ...DEFAULT_DEPARTMENT_ROW });
-    // Wait until the card position is stable (layout/fonts/images settled)
-    // instead of a fixed delay, then ease-scroll over 1s.
-    const startedAt = Date.now();
-    let lastTop: number | null = null;
-    let steady = 0;
-    const poll = window.setInterval(() => {
-      const el = document.getElementById('departments');
-      const top = el ? el.getBoundingClientRect().top + window.scrollY : null;
-      steady = top !== null && lastTop !== null && Math.abs(top - lastTop) <= 2 ? steady + 1 : 0;
-      lastTop = top;
-      const timedOut = Date.now() - startedAt > 5000;
-      if ((steady >= 3 && document.readyState === 'complete') || timedOut) {
-        window.clearInterval(poll);
-        const target = document.getElementById('departments');
-        if (!target) return;
-        const startY = window.scrollY;
-        const targetY = target.getBoundingClientRect().top + startY - 96; // match scroll-mt-24
-        const distance = targetY - startY;
-        if (distance <= 0) return;
-        const duration = 1000;
-        const start = performance.now();
-        const step = (now: number) => {
-          const t = Math.min((now - start) / duration, 1);
-          const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-          window.scrollTo(0, startY + distance * eased);
-          if (t < 1) requestAnimationFrame(step);
-        };
-        requestAnimationFrame(step);
-      }
-    }, 100);
+    if (typeof window !== 'undefined' && window.location.search.includes('addDepartment')) {
+      const nextUrl = new URL(window.location.href);
+      nextUrl.searchParams.delete('addDepartment');
+      window.history.replaceState(null, '', nextUrl.pathname + nextUrl.search + nextUrl.hash);
+    }
   }, [autoAddDepartment, appendDepartment]);
 
+  const handleFormSubmit = handleSubmit(onSubmit, (formErrors) => {
+    if (formErrors.darkLogo || formErrors.whiteLogo) {
+      const el = document.getElementById('branding');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  });
+
   return (
-    <form id={formId} onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-6">
+    <form id={formId} onSubmit={handleFormSubmit} noValidate className="flex flex-col gap-6">
       {/* 1. Client details */}
       <BaseCard
         title="Client details"
@@ -396,6 +357,7 @@ export function EditClientForm({
         title="Contacts"
         subtitle="Recipients for email notifications"
         prefixIcon={<ContactsIcon label="Contacts icon" />}
+        headerClassName={contactFields.length === 0 ? 'mb-0' : undefined}
         actions={
           <BaseButton
             type="button"
@@ -518,17 +480,20 @@ export function EditClientForm({
       </BaseCard>
 
       {/* 3. Branding */}
-      <BaseCard
-        title="Branding"
-        subtitle="Used on the Battery Check, live dashboard and presentation."
-        prefixIcon={<BrandingIcon label="Branding icon" />}
-      >
-        <ControlledClientLogoUpload
-          control={control}
-          darkLogoUrl={darkLogoUrl}
-          whiteLogoUrl={whiteLogoUrl}
-        />
-      </BaseCard>
+      <div id="branding" className="scroll-mt-24">
+        <BaseCard
+          title="Branding"
+          subtitle="Used on the Battery Check, live dashboard and presentation."
+          prefixIcon={<BrandingIcon label="Branding icon" />}
+        >
+          <ControlledClientLogoUpload
+            control={control}
+            trigger={trigger}
+            darkLogoUrl={darkLogoUrl}
+            whiteLogoUrl={whiteLogoUrl}
+          />
+        </BaseCard>
+      </div>
 
       {/* 4. Departments */}
       <div id="departments" className="scroll-mt-24">
@@ -688,6 +653,7 @@ export function EditClientForm({
                   value={field.value}
                   onChange={field.onChange}
                   placeholder="Select date"
+                  disableMonthNavigation
                   error={Boolean(errors.checkInStartDay)}
                   helperText={errors.checkInStartDay?.message}
                 />
@@ -706,6 +672,7 @@ export function EditClientForm({
                   value={field.value}
                   onChange={field.onChange}
                   placeholder="Select date"
+                  disableMonthNavigation
                   error={Boolean(errors.checkInEndDay)}
                   helperText={errors.checkInEndDay?.message}
                 />

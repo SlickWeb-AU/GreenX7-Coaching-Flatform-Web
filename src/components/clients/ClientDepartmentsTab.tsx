@@ -97,7 +97,12 @@ export function ClientDepartmentsTab({
           pill
           startIcon={<Plus size={24} aria-hidden />}
           onClick={() => {
-            router.push(`${ROUTES.admin.clientEdit(clientId)}?addDepartment=1#departments`);
+            router.push(
+              `${ROUTES.admin.clientEdit(clientId)}?scrollTo=departments&addDepartment=1`,
+              {
+                scroll: false,
+              },
+            );
           }}
         >
           Add Department

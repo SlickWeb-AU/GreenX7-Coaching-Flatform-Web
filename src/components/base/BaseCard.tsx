@@ -14,6 +14,7 @@ export interface BaseCardProps {
   prefixIcon?: ReactNode;
   isEmpty?: boolean;
   emptyText?: ReactNode;
+  headerClassName?: string;
 }
 
 export function BaseCard({
@@ -26,13 +27,14 @@ export function BaseCard({
   prefixIcon,
   isEmpty,
   emptyText = 'No data available',
+  headerClassName,
 }: BaseCardProps) {
   const hasHeader = Boolean(title || subtitle || prefixIcon || actions);
 
   return (
     <div className={cn('rounded-2xl bg-white p-6 shadow-none', className)}>
       {hasHeader && (
-        <div className="mb-6 flex items-start justify-between gap-4">
+        <div className={cn('mb-6 flex items-start justify-between gap-4', headerClassName)}>
           <div className="min-w-0 flex-1">
             {(title || prefixIcon) && (
               <div className="flex items-center gap-2">

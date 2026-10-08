@@ -88,7 +88,7 @@ export function CreateClientForm({
       companySize: '',
       state: '',
       status: CLIENT_STATUSES.ACTIVE,
-      contacts: [{ ...DEFAULT_CONTACT_ROW }],
+      contacts: [],
       departments: [{ ...DEFAULT_DEPARTMENT_ROW }],
       darkLogo: null,
       whiteLogo: null,
@@ -102,7 +102,6 @@ export function CreateClientForm({
     fields: contactFields,
     append: appendContact,
     remove: removeContact,
-    update: updateContact,
   } = useFieldArray({
     control,
     name: 'contacts',
@@ -112,7 +111,6 @@ export function CreateClientForm({
     fields: departmentFields,
     append: appendDepartment,
     remove: removeDepartment,
-    update: updateDepartment,
   } = useFieldArray({
     control,
     name: 'departments',
@@ -140,7 +138,7 @@ export function CreateClientForm({
     clearErrors(`contacts.${index}`);
 
     const savedVal = getValues(`contacts.${index}`);
-    updateContact(index, savedVal);
+    setValue(`contacts.${index}`, savedVal);
     contactsEdit.markSaved(id);
   };
 
@@ -151,16 +149,8 @@ export function CreateClientForm({
 
     if (draft) {
       setValue(`contacts.${index}`, draft);
-      updateContact(index, draft);
-      contactsEdit.markSaved(id);
-    } else if (contactFields.length > 1) {
-      removeContact(index);
-      contactsEdit.drop(id);
-    } else {
-      setValue(`contacts.${index}`, { ...DEFAULT_CONTACT_ROW });
-      updateContact(index, { ...DEFAULT_CONTACT_ROW });
-      contactsEdit.markSaved(id);
     }
+    contactsEdit.markSaved(id);
   };
 
   const handleStartEditContact = (index: number, id: string) => {
@@ -200,7 +190,7 @@ export function CreateClientForm({
     clearErrors(`departments.${index}`);
 
     const savedVal = getValues(`departments.${index}`);
-    updateDepartment(index, savedVal);
+    setValue(`departments.${index}`, savedVal);
     departmentsEdit.markSaved(id);
   };
 
@@ -211,16 +201,8 @@ export function CreateClientForm({
 
     if (draft) {
       setValue(`departments.${index}`, draft);
-      updateDepartment(index, draft);
-      departmentsEdit.markSaved(id);
-    } else if (departmentFields.length > 1) {
-      removeDepartment(index);
-      departmentsEdit.drop(id);
-    } else {
-      setValue(`departments.${index}`, { ...DEFAULT_DEPARTMENT_ROW });
-      updateDepartment(index, { ...DEFAULT_DEPARTMENT_ROW });
-      departmentsEdit.markSaved(id);
     }
+    departmentsEdit.markSaved(id);
   };
 
   const handleStartEditDept = (index: number, id: string) => {
@@ -238,8 +220,17 @@ export function CreateClientForm({
     appendDepartment({ ...DEFAULT_DEPARTMENT_ROW });
   };
 
+  const handleFormSubmit = handleSubmit(onSubmit, (formErrors) => {
+    if (formErrors.darkLogo || formErrors.whiteLogo) {
+      const el = document.getElementById('branding');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  });
+
   return (
-    <form id={formId} onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-6">
+    <form id={formId} onSubmit={handleFormSubmit} noValidate className="flex flex-col gap-6">
       {/* 1. Client Details */}
       <BaseCard
         title="Client details"
@@ -325,6 +316,7 @@ export function CreateClientForm({
         title="Contacts"
         subtitle="Recipients for email notifications"
         prefixIcon={<ContactsIcon label="Contacts icon" />}
+        headerClassName={contactFields.length === 0 ? 'mb-0' : undefined}
         actions={
           <BaseButton
             type="button"
@@ -441,13 +433,15 @@ export function CreateClientForm({
       </BaseCard>
 
       {/* 3. Branding */}
-      <BaseCard
-        title="Branding"
-        subtitle="Used on the Battery Check, live dashboard and presentation."
-        prefixIcon={<BrandingIcon label="Branding icon" />}
-      >
-        <ControlledClientLogoUpload control={control} />
-      </BaseCard>
+      <div id="branding" className="scroll-mt-24">
+        <BaseCard
+          title="Branding"
+          subtitle="Used on the Battery Check, live dashboard and presentation."
+          prefixIcon={<BrandingIcon label="Branding icon" />}
+        >
+          <ControlledClientLogoUpload control={control} trigger={trigger} />
+        </BaseCard>
+      </div>
 
       {/* 4. Departments */}
       <BaseCard
@@ -590,6 +584,7 @@ export function CreateClientForm({
                   value={field.value}
                   onChange={field.onChange}
                   placeholder="Select date"
+                  disableMonthNavigation
                   error={Boolean(errors.checkInStartDay)}
                   helperText={errors.checkInStartDay?.message}
                 />
@@ -607,6 +602,7 @@ export function CreateClientForm({
                   value={field.value}
                   onChange={field.onChange}
                   placeholder="Select date"
+                  disableMonthNavigation
                   error={Boolean(errors.checkInEndDay)}
                   helperText={errors.checkInEndDay?.message}
                 />
