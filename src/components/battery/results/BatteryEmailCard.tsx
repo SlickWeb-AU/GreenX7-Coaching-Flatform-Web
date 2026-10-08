@@ -39,7 +39,7 @@ export function BatteryEmailCard({ onSubmitEmail, isPending, disabled }: Battery
       <h3 className="text-[24px] font-bold leading-tight text-white">
         Want a copy of your results?
       </h3>
-      <p className="mt-1 text-[24px] font-bold leading-tight text-white">
+      <p className="body-14-regular mt-1 text-white">
         We don&apos;t store your email - used only to send your report.
       </p>
 

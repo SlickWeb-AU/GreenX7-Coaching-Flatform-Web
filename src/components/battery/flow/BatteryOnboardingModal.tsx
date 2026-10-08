@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 import { BaseButton, BaseIconButton } from '@/components/base';
 import { ClientDepartmentHeader } from '@/components/clients';
@@ -46,7 +46,6 @@ export function BatteryOnboardingModal({
   clientName,
   departmentName,
   clientLogoUrl,
-  onClose,
   onStart,
 }: BatteryOnboardingModalProps) {
   const [index, setIndex] = useState(0);
@@ -92,26 +91,17 @@ export function BatteryOnboardingModal({
         <HowItWorksWheelLgIcon className="h-[250px] w-auto min-w-[630px] object-contain opacity-70" />
       </div>
 
-      <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-1600 flex-col justify-between p-10 sm:p-10 md:p-12 lg:p-16">
-        <header className="mb-[60px] flex w-full items-center justify-center md:mb-8">
+      <div className="mx-auto flex min-h-dvh min-h-screen w-full max-w-1600 flex-col justify-between px-10 pt-10 sm:px-10 sm:pt-10 md:px-12 md:pt-12 lg:px-16 lg:pt-16">
+        <header className="mb-8 flex w-full items-center justify-center md:mb-[60px]">
           <ClientDepartmentHeader
             clientName={clientName}
             departmentName={departmentName}
             clientLogoUrl={clientLogoUrl}
             align="center"
             logoClassName="h-8 sm:h-10"
-            departmentClassName="text-xs text-brand-green-1/80 sm:text-sm"
+            nameClassName="text-neutral-grey-1"
+            departmentClassName="text-neutral-grey-1"
           />
-          {onClose && (
-            <button
-              type="button"
-              aria-label="Close"
-              onClick={onClose}
-              className="absolute right-6 top-6 rounded-full p-2 text-brand-green-2 hover:bg-brand-green-2/10 md:right-10 md:top-10"
-            >
-              <X size={24} />
-            </button>
-          )}
         </header>
 
         <section className="relative my-auto flex w-full flex-col items-center justify-center">
@@ -148,15 +138,15 @@ export function BatteryOnboardingModal({
             }}
             onClick={() => setPaused(true)}
           >
-            <div className="mb-4 flex h-[160px] w-full items-center justify-start sm:justify-center">
+            <div className="mb-4 flex h-[160px] w-full items-center justify-center sm:h-[200px]">
               {index === 0 && (
-                <HowItWorksStep1Icon className="h-[140px] w-[140px] object-contain sm:h-[160px] sm:w-[160px]" />
+                <HowItWorksStep1Icon className="h-[160px] w-[160px] object-contain sm:h-[200px] sm:w-[200px]" />
               )}
               {index === 1 && (
-                <HowItWorksStep2Icon className="h-auto max-h-[84px] w-auto max-w-[183px] object-contain" />
+                <HowItWorksStep2Icon className="h-auto max-h-[84px] w-auto max-w-[183px] object-contain sm:max-h-[104px] sm:max-w-[228px]" />
               )}
               {index === 2 && (
-                <HowItWorksStep3Icon className="h-[140px] w-[140px] object-contain sm:h-[148px] sm:w-[148px]" />
+                <HowItWorksStep3Icon className="h-[160px] w-[160px] object-contain sm:h-[200px] sm:w-[200px]" />
               )}
             </div>
 
@@ -170,12 +160,12 @@ export function BatteryOnboardingModal({
               <span className="text-secondary-orange-1">{STEPS[index].line2}</span>
             </h2>
 
-            <p className="body-18-medium mb-8 w-full text-left text-brand-green-2 sm:text-center">
+            <p className="body-18-medium min-h-[72px] w-full text-left text-brand-green-2 sm:text-center">
               {STEPS[index].body}
             </p>
 
             <div
-              className="mb-8 flex h-16 w-full items-center justify-start gap-2.5 sm:justify-center"
+              className="mb-8 flex h-16 w-full items-center justify-center gap-2.5"
               role="tablist"
               aria-label="Walkthrough steps"
             >
@@ -200,21 +190,26 @@ export function BatteryOnboardingModal({
               ))}
             </div>
 
-            <BaseButton
-              variant="custom"
-              size="large"
-              pill
-              onClick={onStart}
-              className="w-full bg-brand-green-3 text-neutral-grey-1 transition-opacity hover:opacity-90 sm:w-auto sm:min-w-[280px]"
-            >
-              Start Battery Check
-            </BaseButton>
+            <div className="flex w-full items-center justify-center">
+              <BaseButton
+                variant="custom"
+                size="large"
+                pill
+                onClick={onStart}
+                className="w-[240px] bg-brand-green-3 text-brand-green-2 transition-opacity hover:opacity-90"
+              >
+                Start Battery Check
+              </BaseButton>
+            </div>
           </div>
         </section>
 
-        <footer className="relative z-10 flex w-full flex-col items-center justify-center pt-8 md:pt-10">
-          <GreenX7LogoDark className="h-10 w-auto" />
-        </footer>
+        <div>
+          <footer className="flex w-full flex-col items-center justify-center pt-8 md:pt-10">
+            <GreenX7LogoDark className="h-10 w-auto" />
+          </footer>
+          <div aria-hidden className="h-[50px]" />
+        </div>
       </div>
     </div>
   );

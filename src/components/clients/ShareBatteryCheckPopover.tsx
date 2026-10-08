@@ -73,7 +73,7 @@ export function ShareBatteryCheckPopover({
             size="medium"
             pill
             startIcon={<Share2 size={16} />}
-            skeleton={isLoading}
+            loading={isLoading}
             className={className}
           >
             {label}

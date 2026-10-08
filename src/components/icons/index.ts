@@ -46,6 +46,8 @@ export * from './WheelLgIcon';
 export * from './HowItWorksWheelXsIcon';
 export * from './HowItWorksWheelSmIcon';
 export * from './HowItWorksWheelLgIcon';
+export * from './LoadingFlowerIcon';
+export * from './ResultDecorBlob';
 export * from './BatteryStatusTopLeftWave';
 export * from './BatteryStatusBottomRightWave';
 export * from './BatteryStatusCheckIcon';

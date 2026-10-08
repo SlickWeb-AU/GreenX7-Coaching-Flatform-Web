@@ -1,4 +1,4 @@
-import type { SVGProps } from 'react';
+import { useId, type SVGProps } from 'react';
 
 export interface BatteryChargingPillIconProps extends SVGProps<SVGSVGElement> {
   percentage?: number;
@@ -11,89 +11,79 @@ export function BatteryChargingPillIcon({
 }: BatteryChargingPillIconProps) {
   // Clamped percentage 0 - 100
   const clamped = Math.max(0, Math.min(100, percentage));
-  // Total fillable inner width: 136.231
-  const maxFillWidth = 136.231;
-  const currentFillWidth = Math.max(8, (clamped / 100) * maxFillWidth);
+  // Total fillable inner width
+  const maxFillWidth = 129.231;
+  const currentFillWidth = (clamped / 100) * maxFillWidth;
+  const rawId = useId().replace(/[^a-zA-Z0-9]/g, '');
+  const clipId = `battery_charging_fill_${rawId}`;
 
   return (
-    <svg width="183" height="84" viewBox="0 0 183 84" fill="none" className={className} {...props}>
+    <svg width="167" height="80" viewBox="0 0 167 80" fill="none" className={className} {...props}>
       <rect
         x="4"
         y="4"
-        width="175"
-        height="76"
+        width="145.846"
+        height="72"
         rx="24"
         fill="#CFE4CA"
         stroke="#CFE4CA"
         strokeWidth="8"
         strokeLinejoin="round"
       />
-      <mask id="battery_charging_pill_mask" fill="white">
-        <path d="M166.926 31.692C169.374 31.692 171.722 32.9887 173.453 35.2968C175.184 37.605 176.157 40.7355 176.157 43.9997C176.157 47.2639 175.184 50.3944 173.453 52.7025C171.722 55.0107 169.374 56.3074 166.926 56.3074L166.926 43.9997V31.692Z" />
-      </mask>
       <path
-        d="M166.926 31.692C169.374 31.692 171.722 32.9887 173.453 35.2968C175.184 37.605 176.157 40.7355 176.157 43.9997C176.157 47.2639 175.184 50.3944 173.453 52.7025C171.722 55.0107 169.374 56.3074 166.926 56.3074L166.926 43.9997V31.692Z"
+        d="M156.926 27.6921C159.374 27.6921 161.722 28.9888 163.453 31.2969C165.184 33.605 166.157 36.7355 166.157 39.9997C166.157 43.2639 165.184 46.3945 163.453 48.7026C161.722 51.0107 159.374 52.3074 156.926 52.3074L156.926 39.9997V27.6921Z"
         fill="#CFE4CA"
-        stroke="#CFE4CA"
-        strokeWidth="5.31086"
-        mask="url(#battery_charging_pill_mask)"
       />
       <rect
-        x="14"
-        y="8"
+        opacity="0.4"
+        x="4"
+        y="4"
         width="145.846"
         height="72"
         rx="24"
         stroke="white"
-        strokeOpacity="0.4"
         strokeWidth="8"
         strokeLinejoin="round"
       />
       <path
-        d="M166.926 31.692C169.374 31.692 171.722 32.9887 173.453 35.2968C175.184 37.605 176.157 40.7355 176.157 43.9997C176.157 47.2639 175.184 50.3944 173.453 52.7025C171.722 55.0107 169.374 56.3074 166.926 56.3074L166.926 43.9997V31.692Z"
+        opacity="0.4"
+        d="M156.926 27.6921C159.374 27.6921 161.722 28.9888 163.453 31.2969C165.184 33.605 166.157 36.7355 166.157 39.9997C166.157 43.2639 165.184 46.3945 163.453 48.7026C161.722 51.0107 159.374 52.3074 156.926 52.3074L156.926 39.9997V27.6921Z"
         fill="white"
-        fillOpacity="0.4"
       />
-      {/* Background container of fill */}
+      {/* Dark track */}
       <rect
-        x="18.8047"
-        y="12.8075"
+        x="8.80469"
+        y="8.80746"
         width="136.231"
         height="62.3846"
         rx="23.5"
-        fill="#01A179"
-        fillOpacity="0.15"
+        fill="#005943"
         stroke="#01A179"
         strokeWidth="7"
       />
-      {/* Clip path for green dynamic fill */}
-      <g clipPath="url(#battery_pill_fill_clip)">
-        <rect
-          x="18.8047"
-          y="12.8075"
-          width={currentFillWidth}
-          height="62.3846"
-          rx="23.5"
-          fill="#9ACC63"
-        />
+      {/* Dynamic green fill, clipped to the track's inner rounded shape */}
+      <g clipPath={`url(#${clipId})`}>
+        <rect x="12.3047" y="12.3075" width={currentFillWidth} height="55.3846" fill="#9ACC63" />
       </g>
-      {/* Centered Percentage text inside battery */}
+      {/* Dynamic percentage text */}
       <text
-        x="87"
-        y="49"
+        x="77"
+        y="54"
         textAnchor="middle"
-        dominantBaseline="middle"
         fill="white"
-        fontSize="24"
-        fontWeight="800"
+        fontSize="40"
+        fontWeight="900"
         fontFamily="inherit"
         className="select-none"
       >
-        {Math.round(clamped)}%
+        {Math.round(clamped)}
+        <tspan dx="2" fill="#E7F1E5" fontSize="24" fontWeight="900">
+          %
+        </tspan>
       </text>
       <defs>
-        <clipPath id="battery_pill_fill_clip">
-          <rect x="18.8047" y="12.8075" width="136.231" height="62.3846" rx="23.5" />
+        <clipPath id={clipId}>
+          <rect x="12.3047" y="12.3075" width="129.231" height="55.3846" rx="20" />
         </clipPath>
       </defs>
     </svg>

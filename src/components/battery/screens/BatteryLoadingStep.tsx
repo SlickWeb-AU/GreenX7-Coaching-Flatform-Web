@@ -6,7 +6,7 @@ import {
   BatteryChargingPillIcon,
   Gx7BadgeRoundIcon,
   HowsYourBatterySticker,
-  WheelXsIcon,
+  LoadingFlowerIcon,
 } from '@/components/icons';
 
 interface BatteryLoadingStepProps {
@@ -52,8 +52,8 @@ export function BatteryLoadingStep({
 
   return (
     <main className="relative flex min-h-screen w-full flex-col justify-between overflow-hidden bg-brand-green-5 text-neutral-grey-1">
-      <div className="pointer-events-none absolute -top-8 left-0 z-0 flex max-h-[180px] w-full justify-center overflow-hidden sm:-top-12 sm:max-h-[220px] lg:-top-16 lg:max-h-[240px]">
-        <WheelXsIcon className="h-auto w-full max-w-[600px] object-cover opacity-60 sm:max-w-[700px] lg:max-w-[800px]" />
+      <div className="pointer-events-none absolute left-0 top-0 z-0 flex w-full justify-center">
+        <LoadingFlowerIcon />
       </div>
 
       <div className="relative z-10 mx-auto flex w-full max-w-1600 flex-1 flex-col justify-between px-10 py-8 md:px-[80px] md:py-10">
@@ -65,7 +65,7 @@ export function BatteryLoadingStep({
           <div className="flex w-full justify-center">
             <BatteryChargingPillIcon
               percentage={currentScore}
-              className="h-auto max-h-[96px] w-auto max-w-[210px] object-contain drop-shadow-sm sm:max-h-[110px] sm:max-w-[240px]"
+              className="block h-auto max-h-[96px] w-auto max-w-[210px] object-contain drop-shadow-sm sm:max-h-[110px] sm:max-w-[240px]"
             />
           </div>
 
@@ -84,6 +84,8 @@ export function BatteryLoadingStep({
               departmentName={departmentName}
               clientLogoUrl={clientLogoUrl}
               align="left"
+              nameClassName="text-neutral-grey-1"
+              departmentClassName="text-neutral-grey-1"
             />
           </div>
           <div className="flex items-center">

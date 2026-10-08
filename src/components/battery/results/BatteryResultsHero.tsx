@@ -1,5 +1,5 @@
 import { ClientDepartmentHeader } from '@/components/clients';
-import { BatteryIcon, CardDecorBlob, Gx7BadgeLogo, HeartIcon } from '@/components/icons';
+import { BatteryIcon, Gx7BadgeLogo, HeartIcon, ResultDecorBlob } from '@/components/icons';
 import { AREA_BADGE, AREA_COLOR, AREA_ICON_MAP } from '@/constants/dashboard';
 import { ZONE_COLORS } from '@/constants/tokens';
 import { normalizeAreaLabel, resolveZoneKey } from '@/lib/battery';
@@ -36,8 +36,8 @@ export function BatteryResultsHero({
   const zoneColor = resolvedKey ? ZONE_COLORS[resolvedKey].color : '#63D556';
 
   return (
-    <div className="relative w-full overflow-hidden bg-brand-green-1 text-white">
-      <CardDecorBlob />
+    <div className="relative w-full bg-brand-green-2 text-white">
+      <ResultDecorBlob className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/3" />
       <div className="relative flex flex-col">
         <div className="flex items-center justify-between gap-3 px-4 pt-4">
           <Gx7BadgeLogo className="text-white" width={48} height={46} />
@@ -70,7 +70,7 @@ export function BatteryResultsHero({
           </div>
         </div>
 
-        <div className="mt-[100px] w-full bg-brand-green-2 px-[40px] pb-[48px] pt-8">
+        <div className="mt-[100px] w-full px-[40px] pb-[48px] pt-8">
           <div className="heading-40-black mb-3 leading-[1.15]">
             <span className="block text-white">{zoneHeadline || `You are in the`}</span>
             {!zoneHeadline && (

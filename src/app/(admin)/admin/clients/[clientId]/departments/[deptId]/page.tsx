@@ -132,6 +132,7 @@ export default function DepartmentDetailPage() {
           size="medium"
           pill
           disabled={!presentationUrl}
+          loading={isShareLinksLoading}
           startIcon={<Presentation size={16} />}
           onClick={() => {
             window.open(normalizeUrl(presentationUrl), '_blank', 'noopener,noreferrer');

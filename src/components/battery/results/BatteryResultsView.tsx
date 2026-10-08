@@ -30,8 +30,8 @@ export function BatteryResultsView({
   });
 
   return (
-    <main className="min-h-screen w-full text-neutral-grey-1">
-      <section className="w-full bg-brand-green-1">
+    <main className="min-h-screen w-full overflow-x-clip text-neutral-grey-1">
+      <section className="w-full bg-brand-green-2">
         <div className="mx-auto w-full max-w-md">
           <BatteryResultsHero
             average={result.batteryScore}

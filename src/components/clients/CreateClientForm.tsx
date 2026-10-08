@@ -149,8 +149,11 @@ export function CreateClientForm({
 
     if (draft) {
       setValue(`contacts.${index}`, draft);
+      contactsEdit.markSaved(id);
+    } else {
+      removeContact(index);
+      contactsEdit.drop(id);
     }
-    contactsEdit.markSaved(id);
   };
 
   const handleStartEditContact = (index: number, id: string) => {
@@ -201,8 +204,11 @@ export function CreateClientForm({
 
     if (draft) {
       setValue(`departments.${index}`, draft);
+      departmentsEdit.markSaved(id);
+    } else {
+      removeDepartment(index);
+      departmentsEdit.drop(id);
     }
-    departmentsEdit.markSaved(id);
   };
 
   const handleStartEditDept = (index: number, id: string) => {
@@ -401,7 +407,6 @@ export function CreateClientForm({
                         aria-label="Delete contact"
                         size={40}
                         icon={<Trash2 size={20} aria-hidden />}
-                        disabled={contactFields.length <= 1}
                         className="text-neutral-grey-3 hover:text-secondary-red-4"
                         onClick={() => handleRemoveContact(index, field.id)}
                       />
