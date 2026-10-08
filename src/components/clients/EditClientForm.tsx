@@ -112,7 +112,6 @@ export function EditClientForm({
   const {
     fields: contactFields,
     append: appendContact,
-    update: updateContact,
     remove: removeContact,
   } = useFieldArray({
     control,
@@ -122,7 +121,6 @@ export function EditClientForm({
   const {
     fields: departmentFields,
     append: appendDepartment,
-    update: updateDepartment,
     remove: removeDepartment,
   } = useFieldArray({
     control,
@@ -156,7 +154,7 @@ export function EditClientForm({
     clearErrors(`contacts.${index}`);
     const saved = await persist.saveContact(contactSaveKey(id), getValues(`contacts.${index}`));
     if (!saved) return;
-    updateContact(index, saved);
+    setValue(`contacts.${index}`, saved);
     contactsEdit.markSaved(id);
   };
 
@@ -167,16 +165,8 @@ export function EditClientForm({
 
     if (draft) {
       setValue(`contacts.${index}`, draft);
-      updateContact(index, draft);
-      contactsEdit.markSaved(id);
-    } else if (contactFields.length > 1) {
-      removeContact(index);
-      contactsEdit.drop(id);
-    } else {
-      setValue(`contacts.${index}`, { ...DEFAULT_CONTACT_ROW });
-      updateContact(index, { ...DEFAULT_CONTACT_ROW });
-      contactsEdit.markSaved(id);
     }
+    contactsEdit.markSaved(id);
   };
 
   const handleStartEditContact = (index: number, id: string) => {
@@ -218,7 +208,7 @@ export function EditClientForm({
     clearErrors(`departments.${index}`);
     const saved = await persist.saveDepartment(deptSaveKey(id), getValues(`departments.${index}`));
     if (!saved) return;
-    updateDepartment(index, saved);
+    setValue(`departments.${index}`, saved);
     departmentsEdit.markSaved(id);
   };
 
@@ -229,16 +219,8 @@ export function EditClientForm({
 
     if (draft) {
       setValue(`departments.${index}`, draft);
-      updateDepartment(index, draft);
-      departmentsEdit.markSaved(id);
-    } else if (departmentFields.length > 1) {
-      removeDepartment(index);
-      departmentsEdit.drop(id);
-    } else {
-      setValue(`departments.${index}`, { ...DEFAULT_DEPARTMENT_ROW });
-      updateDepartment(index, { ...DEFAULT_DEPARTMENT_ROW });
-      departmentsEdit.markSaved(id);
     }
+    departmentsEdit.markSaved(id);
   };
 
   const handleStartEditDept = (index: number, id: string) => {
@@ -309,8 +291,17 @@ export function EditClientForm({
     }, 100);
   }, [autoAddDepartment, appendDepartment]);
 
+  const handleFormSubmit = handleSubmit(onSubmit, (formErrors) => {
+    if (formErrors.darkLogo || formErrors.whiteLogo) {
+      const el = document.getElementById('branding');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  });
+
   return (
-    <form id={formId} onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-6">
+    <form id={formId} onSubmit={handleFormSubmit} noValidate className="flex flex-col gap-6">
       {/* 1. Client details */}
       <BaseCard
         title="Client details"
@@ -396,6 +387,7 @@ export function EditClientForm({
         title="Contacts"
         subtitle="Recipients for email notifications"
         prefixIcon={<ContactsIcon label="Contacts icon" />}
+        headerClassName={contactFields.length === 0 ? 'mb-0' : undefined}
         actions={
           <BaseButton
             type="button"
@@ -518,17 +510,20 @@ export function EditClientForm({
       </BaseCard>
 
       {/* 3. Branding */}
-      <BaseCard
-        title="Branding"
-        subtitle="Used on the Battery Check, live dashboard and presentation."
-        prefixIcon={<BrandingIcon label="Branding icon" />}
-      >
-        <ControlledClientLogoUpload
-          control={control}
-          darkLogoUrl={darkLogoUrl}
-          whiteLogoUrl={whiteLogoUrl}
-        />
-      </BaseCard>
+      <div id="branding" className="scroll-mt-24">
+        <BaseCard
+          title="Branding"
+          subtitle="Used on the Battery Check, live dashboard and presentation."
+          prefixIcon={<BrandingIcon label="Branding icon" />}
+        >
+          <ControlledClientLogoUpload
+            control={control}
+            trigger={trigger}
+            darkLogoUrl={darkLogoUrl}
+            whiteLogoUrl={whiteLogoUrl}
+          />
+        </BaseCard>
+      </div>
 
       {/* 4. Departments */}
       <div id="departments" className="scroll-mt-24">
@@ -688,6 +683,7 @@ export function EditClientForm({
                   value={field.value}
                   onChange={field.onChange}
                   placeholder="Select date"
+                  disableMonthNavigation
                   error={Boolean(errors.checkInStartDay)}
                   helperText={errors.checkInStartDay?.message}
                 />
@@ -706,6 +702,7 @@ export function EditClientForm({
                   value={field.value}
                   onChange={field.onChange}
                   placeholder="Select date"
+                  disableMonthNavigation
                   error={Boolean(errors.checkInEndDay)}
                   helperText={errors.checkInEndDay?.message}
                 />
