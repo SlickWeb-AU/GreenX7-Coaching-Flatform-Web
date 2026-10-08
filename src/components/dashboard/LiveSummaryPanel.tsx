@@ -37,8 +37,8 @@ export function LiveSummaryPanel({
     <div className={cn('flex flex-col justify-between text-white', className)}>
       <div className="flex flex-col">
         <div className="flex flex-col gap-2">
-          {/* Có logo thì hiện logo rồi tới tên công ty; chưa upload logo thì chỉ hiện tên */}
-          {logoUrl && (
+          {/* Có logo (khách đã upload) thì chỉ hiện logo; chưa có logo mới hiện tên công ty */}
+          {logoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={logoUrl}
@@ -47,10 +47,11 @@ export function LiveSummaryPanel({
               // lệch vào giữa, không thẳng hàng với chữ bên dưới
               className="h-10 w-auto self-start object-contain object-left"
             />
+          ) : (
+            <div className="body-24-bold uppercase tracking-wide text-neutral-grey-8">
+              {clientName ?? '—'}
+            </div>
           )}
-          <div className="body-24-bold uppercase tracking-wide text-neutral-grey-8">
-            {clientName ?? '—'}
-          </div>
           <span className="body-20-medium text-neutral-grey-8">{departmentName ?? '—'}</span>
         </div>
 

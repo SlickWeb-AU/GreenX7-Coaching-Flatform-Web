@@ -33,8 +33,8 @@ export function ClientDepartmentHeader({
 
   return (
     <div className={cn('flex flex-col', alignClasses[align], className)}>
-      {/* Có logo thì hiện logo rồi tới tên công ty; chưa upload logo thì chỉ hiện tên */}
-      {clientLogoUrl && (
+      {/* Có logo (khách đã upload) thì chỉ hiện logo; chưa có logo mới hiện tên công ty */}
+      {clientLogoUrl ? (
         <div
           className={cn(
             'flex h-12 items-center',
@@ -50,12 +50,9 @@ export function ClientDepartmentHeader({
             className={cn('h-12 w-auto object-contain', logoClassName)}
           />
         </div>
-      )}
-      {clientName && (
-        <span className={cn('body-16-bold text-white', clientLogoUrl && 'mt-1', nameClassName)}>
-          {clientName}
-        </span>
-      )}
+      ) : clientName ? (
+        <span className={cn('body-16-bold text-white', nameClassName)}>{clientName}</span>
+      ) : null}
       {departmentName && (
         <span className={cn('body-20-medium mt-2 text-white/90', departmentClassName)}>
           {departmentName}

@@ -100,8 +100,8 @@ export function PresentationMobileWarning({
       <div className="flex w-full items-center justify-between pt-2">
         <GreenX7LogoDark className="h-[32px] w-auto" />
         <div className="flex flex-col items-end text-right">
-          {/* Có logo thì hiện logo rồi tới tên công ty; chưa upload logo thì chỉ hiện tên */}
-          {clientLogoUrl && (
+          {/* Có logo (khách đã upload) thì chỉ hiện logo; chưa có logo mới hiện tên công ty */}
+          {clientLogoUrl ? (
             <div className="flex h-[26px] items-center justify-end">
               {/* Dynamic client logo URL bypasses next/image optimizer */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -111,12 +111,9 @@ export function PresentationMobileWarning({
                 className="h-[26px] w-auto object-contain"
               />
             </div>
-          )}
-          {clientName && (
-            <span className={cn('body-14-bold text-neutral-grey-1', clientLogoUrl && 'mt-0.5')}>
-              {clientName}
-            </span>
-          )}
+          ) : clientName ? (
+            <span className="body-14-bold text-neutral-grey-1">{clientName}</span>
+          ) : null}
           {departmentName && (
             <span className="body-14-medium mt-0.5 text-neutral-grey-2">{departmentName}</span>
           )}
