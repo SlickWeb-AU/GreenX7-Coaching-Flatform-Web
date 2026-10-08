@@ -401,7 +401,6 @@ export function CreateClientForm({
                         aria-label="Delete contact"
                         size={40}
                         icon={<Trash2 size={20} aria-hidden />}
-                        disabled={contactFields.length <= 1}
                         className="text-neutral-grey-3 hover:text-secondary-red-4"
                         onClick={() => handleRemoveContact(index, field.id)}
                       />

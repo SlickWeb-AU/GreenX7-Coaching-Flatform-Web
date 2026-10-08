@@ -123,6 +123,7 @@ export function ClientLayoutContent({ children }: { children: ReactNode }) {
         size="medium"
         pill
         disabled={!presentationUrl}
+        loading={isShareLinksLoading}
         startIcon={<Presentation size={16} />}
         onClick={() => {
           window.open(normalizeUrl(presentationUrl), '_blank', 'noopener,noreferrer');
