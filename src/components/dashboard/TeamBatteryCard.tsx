@@ -42,13 +42,7 @@ export function TeamBatteryCard({
         )}
       >
         <div className="w-full" style={{ maxWidth: wheel }}>
-          <BatteryWheelChart
-            score={score}
-            items={items}
-            size={wheel}
-            scoreClassName="text-black"
-            percentClassName="text-black"
-          />
+          <BatteryWheelChart score={score} items={items} size={wheel} />
         </div>
         <div className="flex flex-col justify-center">
           <WellbeingStrengthsFocusCards strengths={strengths} focus={focus} />
