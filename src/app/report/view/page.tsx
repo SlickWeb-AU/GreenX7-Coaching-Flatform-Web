@@ -37,7 +37,9 @@ import type { ReportContentDto } from '@/types/reports';
  *
  * Responsive: < 640px mọi thẻ xếp một cột, tab cuộn ngang, nút Export full-width;
  * 640–1359px thẻ Battery chiếm trọn hàng, ba thẻ nhỏ chia 3; từ 1360px đúng bố
- * cục design (6/2/2/2). Hàng dưới chia đôi từ 1024px.
+ * cục design (6/2/2/2). Hàng dưới chỉ chia đôi từ 1360px — dưới mức đó (kể cả
+ * tablet ngang 1024px) thẻ Wellbeing areas chiếm trọn hàng như màn 768, nếu không
+ * thanh điểm bị ép còn một chấm (bug 393).
  */
 
 const OVERALL = 'overall';
@@ -320,7 +322,7 @@ function ReportViewContent() {
 
           {department ? (
             <>
-              <div className="grid grid-cols-1 items-stretch gap-4 lg:grid-cols-2">
+              <div className="grid grid-cols-1 items-stretch gap-4 min-[1360px]:grid-cols-2">
                 <div className="min-w-0">
                   <ClientWellbeingCard
                     items={wellbeingItems}
@@ -329,7 +331,7 @@ function ReportViewContent() {
                     className="h-full"
                   />
                 </div>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-1 lg:grid-rows-2">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 min-[1360px]:grid-cols-1 min-[1360px]:grid-rows-2">
                   <DepartmentInsightListCard
                     title="Strongest areas"
                     titleColorClass="text-secondary-green-4"
@@ -347,7 +349,7 @@ function ReportViewContent() {
               <div className="min-w-0">{trendCard}</div>
             </>
           ) : (
-            <div className="grid grid-cols-1 items-stretch gap-4 lg:grid-cols-2">
+            <div className="grid grid-cols-1 items-stretch gap-4 min-[1360px]:grid-cols-2">
               <div className="min-w-0">
                 <ClientWellbeingCard
                   items={wellbeingItems}
