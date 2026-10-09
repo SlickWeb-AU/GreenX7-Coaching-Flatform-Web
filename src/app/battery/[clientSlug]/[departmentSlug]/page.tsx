@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { useParams } from 'next/navigation';
 
 import { BaseLoading } from '@/components/base';
@@ -22,13 +22,24 @@ function BatteryCheckPageContent() {
   }, []);
 
   const {
-    data: stateData,
+    data: freshState,
     isLoading,
     isError,
     refetch,
   } = useBatteryState(clientSlug, departmentSlug, deviceId, {
     enabled: Boolean(clientSlug && departmentSlug && deviceId),
   });
+
+  // BC/E7: trạng thái (đóng / đã nộp / mở) xét LÚC MỞ LINK. Đã vào luồng làm bài thì
+  // giữ nguyên trạng thái lúc đó: query tự gọi lại khi quay về tab, và ngay sau khi
+  // nộp server đã trả "already submitted" — trước đây màn kết quả bị thay bằng màn
+  // đã nộp chỉ vì người dùng sang tab khác rồi quay lại. Nộp khi kỳ vừa đóng thì
+  // API submit vẫn từ chối và luồng tự hiện màn đóng.
+  const lockedState = useRef<typeof freshState>(undefined);
+  if (!lockedState.current && freshState?.state === BATTERY_CHECK_STATES.OPEN) {
+    lockedState.current = freshState;
+  }
+  const stateData = lockedState.current ?? freshState;
 
   if (isLoading || !stateData) {
     if (isError) {
