@@ -106,13 +106,7 @@ export function TakeAMomentSlide({ ...slideProps }: BaseSlideProps = {}) {
             <div className="flex h-fit w-80 translate-y-[50px] flex-col rounded-[20px] border border-neutral-grey-6 bg-white p-5 text-neutral-grey-1 transition-transform duration-500">
               <span className="body-16-bold block text-brand-green-1">Score breakdown</span>
               <div className="flex justify-center py-1">
-                <BatteryWheelChart
-                  score={rawScore ?? null}
-                  items={displayItems}
-                  size={200}
-                  scoreClassName="text-[48px] font-black text-black"
-                  percentClassName="text-[14px] font-black text-black"
-                />
+                <BatteryWheelChart score={rawScore ?? null} items={displayItems} size={200} />
               </div>
 
               <div className="flex flex-col border-t border-neutral-grey-6/40 pt-1">

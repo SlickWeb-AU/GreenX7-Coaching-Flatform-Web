@@ -10,7 +10,6 @@ export interface BatteryResultsHeroProps {
   average: number;
   zoneKey: string;
   zoneLabel: string;
-  zoneHeadline: string;
   zoneDescription: string;
   introMessage: string;
   strongestAreas: BatteryAreaResultDto[];
@@ -23,7 +22,6 @@ export function BatteryResultsHero({
   average,
   zoneKey,
   zoneLabel,
-  zoneHeadline,
   zoneDescription,
   introMessage,
   strongestAreas,
@@ -72,12 +70,10 @@ export function BatteryResultsHero({
 
         <div className="mt-[100px] w-full px-[40px] pb-[48px] pt-8">
           <div className="heading-40-black mb-3 leading-[1.15]">
-            <span className="block text-white">{zoneHeadline || `You are in the`}</span>
-            {!zoneHeadline && (
-              <span className="block" style={{ color: zoneColor }}>
-                {zoneLabel}
-              </span>
-            )}
+            <span className="block text-white">You are in the</span>
+            <span className="block lowercase" style={{ color: zoneColor }}>
+              {zoneLabel}
+            </span>
           </div>
           <p className="body-18-medium mb-3 leading-relaxed text-[#CFE4CA]">{zoneDescription}</p>
 

@@ -100,6 +100,7 @@ function ClientsContent() {
   const addBtn = (
     <BaseButton
       pill
+      medium16Bold
       startIcon={<Plus aria-hidden />}
       onClick={() => router.push(ROUTES.admin.clientNew)}
     >

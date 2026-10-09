@@ -12,12 +12,17 @@ export function baseButtonClass({
   pill = false,
   fullWidth = false,
   className,
+  medium16Bold = false,
 }: BaseButtonStyleOptions = {}): string {
+  const useMedium16Bold = medium16Bold && size === 'medium';
+  const sizeClass = useMedium16Bold
+    ? BASE_BUTTON_SIZE_CLASS[size].replace('body-14-bold', 'body-16-bold')
+    : BASE_BUTTON_SIZE_CLASS[size];
   return cn(
     'inline-flex items-center justify-center gap-2 rounded-lg transition-colors outline-none focus-visible:ring-1 focus-visible:ring-brand-green-2 disabled:cursor-not-allowed disabled:opacity-50 select-none shadow-none',
-    BASE_BUTTON_SIZE_CLASS[size],
+    sizeClass,
     BASE_BUTTON_VARIANT_CLASS[variant],
-    variant === 'primary' && size === 'medium' && 'body-16-bold',
+    useMedium16Bold && 'body-16-bold',
     pill && 'rounded-full',
     fullWidth && 'w-full',
     className,

@@ -37,7 +37,6 @@ export function BatteryResultsView({
             average={result.batteryScore}
             zoneKey={result.zoneKey}
             zoneLabel={result.zoneLabel}
-            zoneHeadline={result.zoneHeadline}
             zoneDescription={result.zoneDescription}
             introMessage={result.introMessage}
             strongestAreas={result.strongestAreas}

@@ -2,7 +2,7 @@ import { BatteryWheelChart } from '@/components/dashboard/BatteryWheelChart';
 import { BoltIcon, HeartIcon } from '@/components/icons';
 import { AREA_BADGE, AREA_BAR_COLORS, AREA_COLOR, AREA_ICON_MAP } from '@/constants/dashboard';
 import { normalizeAreaLabel } from '@/lib/battery';
-import { cn } from '@/lib/utils';
+import { cn, formatScoreToPercent } from '@/lib/utils';
 import type { BatteryAreaScore } from '@/types/battery';
 
 export interface BatteryScoreBreakdownProps {
@@ -63,7 +63,9 @@ export function BatteryScoreBreakdown({ areas, average }: BatteryScoreBreakdownP
               <div className={cn('h-2 w-full overflow-hidden rounded-full', badgeBg)}>
                 <div
                   className={cn('h-full rounded-full transition-all duration-500', barColor)}
-                  style={{ width: `${Math.min(100, Math.max(0, (itemScore ?? 0) * 10))}%` }}
+                  style={{
+                    width: `${Math.min(100, Math.max(0, formatScoreToPercent(itemScore) ?? 0))}%`,
+                  }}
                 />
               </div>
             </div>

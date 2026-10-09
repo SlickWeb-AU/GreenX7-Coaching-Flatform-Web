@@ -125,6 +125,7 @@ export default function EditClientPage() {
               form="edit-client-form"
               size="medium"
               pill
+              medium16Bold
               loading={update.isPending}
               disabled={update.isPending}
             >

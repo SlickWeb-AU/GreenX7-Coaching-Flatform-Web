@@ -16,6 +16,7 @@ export interface BaseButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>
   skeleton?: boolean;
   startIcon?: ReactNode;
   pill?: boolean;
+  medium16Bold?: boolean;
 }
 
 export function BaseButton({
@@ -26,6 +27,7 @@ export function BaseButton({
   skeleton = false,
   startIcon,
   pill = false,
+  medium16Bold = false,
   className,
   children,
   disabled,
@@ -45,7 +47,14 @@ export function BaseButton({
     );
   }
 
-  const combinedClassName = baseButtonClass({ variant, size, pill, fullWidth, className });
+  const combinedClassName = baseButtonClass({
+    variant,
+    size,
+    pill,
+    fullWidth,
+    medium16Bold,
+    className,
+  });
 
   return (
     <button type={type} disabled={disabled || loading} className={combinedClassName} {...props}>

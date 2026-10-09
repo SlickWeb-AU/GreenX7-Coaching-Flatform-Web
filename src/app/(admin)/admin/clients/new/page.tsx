@@ -67,6 +67,7 @@ export default function NewClientPage() {
               form="client-form"
               size="medium"
               pill
+              medium16Bold
               loading={create.isPending}
               disabled={create.isPending}
             >

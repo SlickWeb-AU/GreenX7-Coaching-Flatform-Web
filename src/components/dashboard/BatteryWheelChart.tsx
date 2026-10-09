@@ -110,6 +110,8 @@ export function BatteryWheelChart({
   };
 
   const badgeSize = Math.round(size * 0.42);
+  const roundedScore = score === null || score === undefined ? null : Math.round(score);
+  const scoreDigits = roundedScore === null ? 0 : String(Math.abs(roundedScore)).length;
 
   return (
     <div
@@ -171,18 +173,18 @@ export function BatteryWheelChart({
               <div className="flex items-center gap-0.5">
                 <span
                   className={cn(
-                    size <= 160 ? 'text-[40px]' : 'heading-52-black',
-                    'font-black leading-none text-neutral-grey-1',
+                    scoreDigits >= 3 ? 'body-32-black' : 'heading-40-black',
+                    'leading-none text-black',
                     scoreClassName,
                   )}
                 >
-                  {score === null || score === undefined ? '—' : Math.round(score)}
+                  {score === null || score === undefined ? '—' : roundedScore}
                 </span>
                 {score !== null && score !== undefined && (
                   <span
                     className={cn(
-                      size <= 160 ? 'text-[12px]' : 'body-18-black',
-                      'font-black leading-none text-neutral-grey-1',
+                      scoreDigits >= 3 ? 'caption-12-bold' : 'body-16-black',
+                      'font-black leading-none text-black',
                       percentClassName,
                     )}
                   >
