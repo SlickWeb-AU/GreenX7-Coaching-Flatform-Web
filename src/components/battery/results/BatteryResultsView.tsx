@@ -22,8 +22,6 @@ export function BatteryResultsView({
   departmentName,
   clientLogoUrl,
 }: BatteryResultsViewProps) {
-  const areas = result.areaScores.map((a) => ({ area: a.area, score: a.score }));
-
   const emailMutation = useMutation({
     mutationFn: (email: string) => batteryCheckApi.sendResultsEmail(email, result.resultToken),
     onError: (err) => toast.error(err instanceof Error ? err.message : 'Failed to send results'),
@@ -50,7 +48,7 @@ export function BatteryResultsView({
       <section className="w-full bg-forest-light">
         <div className="mx-auto w-full max-w-md">
           <div className="p-4">
-            <BatteryScoreBreakdown areas={areas} average={result.batteryScore} />
+            <BatteryScoreBreakdown areas={result.areaScores} average={result.batteryScore} />
           </div>
 
           <div className="px-[40px] pb-[40px]">

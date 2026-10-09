@@ -27,13 +27,13 @@ export function BatteryLanding({
   onHowItWorks,
 }: BatteryLandingProps) {
   return (
-    <main className="relative flex min-h-screen w-full flex-col justify-between overflow-hidden bg-brand-green-2 text-white">
+    <main className="relative flex h-dvh w-full flex-col justify-between overflow-hidden bg-brand-green-2 text-white">
       <div className="relative z-10 mx-auto flex w-full max-w-1600 flex-1 flex-col justify-between px-[60px] pb-6 pt-9 md:px-[80px]">
-        <div className="pointer-events-none absolute -top-8 left-0 z-0 w-full sm:hidden">
+        <div className="pointer-events-none absolute -top-8 left-0 z-0 w-full md:hidden">
           <WheelXsIcon className="h-auto w-full object-cover opacity-60" />
         </div>
 
-        <div className="pointer-events-none absolute bottom-0 right-0 z-0 hidden sm:block lg:hidden">
+        <div className="pointer-events-none absolute bottom-0 right-0 z-0 hidden md:block lg:hidden">
           <WheelSmIcon className="h-auto max-w-[60vw] object-contain opacity-50" />
         </div>
 
@@ -41,32 +41,35 @@ export function BatteryLanding({
           <WheelLgIcon className="h-[460px] w-auto object-contain opacity-70 2xl:h-[580px]" />
         </div>
 
-        <header className="relative z-10 flex w-full items-center justify-center sm:justify-start">
+        <header className="relative z-10 flex w-full items-center justify-center md:justify-start">
           <ClientDepartmentHeader
             clientName={clientName}
             departmentName={departmentName}
             clientLogoUrl={clientLogoUrl}
             align="left"
+            className="items-center text-center md:items-start md:text-left"
+            logoWrapperClassName="justify-center md:justify-start"
+            nameClassName="heading-24-bold text-white"
           />
         </header>
 
-        <section className="relative z-10 my-auto flex w-full flex-col items-center py-6 text-center sm:items-start sm:text-left lg:w-3/5">
-          <div className="mb-3 flex w-full items-center justify-center sm:mb-5 sm:justify-start">
-            <HowsYourBatterySticker className="h-[240px] w-[250px] object-contain drop-shadow-md sm:h-[270px] sm:w-[280px]" />
+        <section className="relative z-10 my-auto flex w-full flex-col items-center py-2 text-center md:items-start md:py-6 md:text-left lg:w-3/5">
+          <div className="mb-3 flex w-full items-center justify-center md:mb-5 md:justify-start">
+            <HowsYourBatterySticker className="h-[240px] w-[250px] object-contain drop-shadow-md md:h-[270px] md:w-[280px]" />
           </div>
 
-          <p className="body-18-medium mb-9 max-w-[400px] leading-relaxed text-brand-green-5 sm:mb-11 sm:text-xl sm:leading-8">
+          <p className="body-18-medium md:body-20-medium mb-4 max-w-[400px] leading-relaxed text-brand-green-5 md:mb-11">
             Take 60 seconds to bring awareness to your wellbeing.{' '}
             <button
               type="button"
               onClick={onHowItWorks}
-              className="hidden font-bold text-brand-green-5 underline underline-offset-4 transition-colors hover:text-white sm:inline"
+              className="hidden font-bold text-brand-green-5 underline underline-offset-4 transition-colors hover:text-white md:inline"
             >
               How it works?
             </button>
           </p>
 
-          <div className="flex flex-col items-center sm:items-start">
+          <div className="flex flex-col items-center md:items-start">
             <BaseButton
               variant="custom"
               size="large"
@@ -80,7 +83,7 @@ export function BatteryLanding({
             <button
               type="button"
               onClick={onHowItWorks}
-              className="body-18-bold mt-8 text-brand-green-5 underline underline-offset-4 transition-colors hover:text-white sm:hidden"
+              className="body-18-bold mt-4 text-brand-green-5 underline underline-offset-4 transition-colors hover:text-white md:hidden"
             >
               How it works?
             </button>

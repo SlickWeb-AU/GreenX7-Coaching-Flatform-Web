@@ -143,6 +143,9 @@ export async function middleware(request: NextRequest) {
 
   // ---- 1. Guest-only routes ----
   if (GUEST_ONLY_ROUTES.some((route) => pathname.startsWith(route))) {
+    if (request.nextUrl.searchParams.has('error')) {
+      return clearTokens(nextWithPathname());
+    }
     if (isAuthenticated && role) {
       const redirectUrl = DEFAULT_REDIRECT_BY_ROLE[role] ?? ROUTES.admin.dashboard;
       return finalize(NextResponse.redirect(new URL(redirectUrl, request.url)));

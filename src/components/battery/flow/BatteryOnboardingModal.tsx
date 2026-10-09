@@ -86,11 +86,11 @@ export function BatteryOnboardingModal({
 
   return (
     <div className="fixed inset-0 z-50 flex min-h-screen w-full animate-fade-in flex-col overflow-y-auto overflow-x-hidden bg-brand-green-5 text-neutral-grey-1">
-      <div className="pointer-events-none absolute right-0 top-0 z-0 sm:hidden">
+      <div className="pointer-events-none absolute right-0 top-0 z-0 md:hidden">
         <HowItWorksWheelXsIcon className="h-[min(290px,40vh)] w-auto object-contain" />
       </div>
 
-      <div className="pointer-events-none absolute left-0 top-0 z-0 hidden w-full sm:block lg:hidden">
+      <div className="pointer-events-none absolute left-0 top-0 z-0 hidden w-full md:block lg:hidden">
         <HowItWorksWheelSmIcon className="h-auto max-h-[290px] w-full object-contain" />
       </div>
 
@@ -98,17 +98,18 @@ export function BatteryOnboardingModal({
         <HowItWorksWheelLgIcon className="h-[250px] w-auto min-w-[630px] object-contain opacity-70" />
       </div>
 
-      <div className="mx-auto flex min-h-screen w-full max-w-1600 flex-col justify-between px-10 pt-10 sm:px-10 sm:pt-10 md:px-12 md:pt-12 lg:px-16 lg:pt-16">
-        <header className="mb-8 flex w-full items-center justify-center sm:items-start sm:justify-start md:mb-[60px]">
+      <div className="mx-auto flex min-h-screen w-full max-w-1600 flex-col justify-between px-6 pt-8 md:px-12 md:pt-12 lg:px-16 lg:pt-16">
+        <header className="mb-8 flex w-full items-center justify-center md:mb-[60px] md:items-center md:justify-between">
+          <GreenX7LogoDark className="hidden h-auto w-auto md:block md:h-[28px] lg:h-[58px]" />
           <ClientDepartmentHeader
             clientName={clientName}
             departmentName={departmentName}
             clientLogoUrl={clientLogoUrl}
             align="left"
-            className="items-center text-center sm:items-start sm:text-left"
-            logoWrapperClassName="justify-center sm:justify-start"
-            logoClassName="h-8 sm:h-10"
-            nameClassName="text-neutral-grey-1"
+            className="items-center text-center md:items-end md:text-right"
+            logoWrapperClassName="justify-center md:justify-end"
+            logoClassName="h-8 md:h-10"
+            nameClassName="heading-24-bold text-neutral-grey-1"
             departmentClassName="text-neutral-grey-1"
           />
         </header>
@@ -119,7 +120,7 @@ export function BatteryOnboardingModal({
             pill
             aria-label="Previous step"
             onClick={prevStep}
-            className="absolute left-0 top-1/2 z-20 hidden -translate-y-1/2 border border-brand-green-2 bg-transparent text-brand-green-2 transition-colors hover:bg-brand-green-2/10 hover:text-brand-green-2 sm:inline-flex"
+            className="absolute left-0 top-1/2 z-20 hidden -translate-y-1/2 border border-brand-green-2 bg-transparent text-brand-green-2 transition-colors hover:bg-brand-green-2/10 hover:text-brand-green-2 md:inline-flex"
             icon={<ChevronLeft size={24} />}
           />
 
@@ -128,7 +129,7 @@ export function BatteryOnboardingModal({
             pill
             aria-label="Next step"
             onClick={nextStep}
-            className="absolute right-0 top-1/2 z-20 hidden -translate-y-1/2 border border-brand-green-2 bg-transparent text-brand-green-2 transition-colors hover:bg-brand-green-2/10 hover:text-brand-green-2 sm:inline-flex"
+            className="absolute right-0 top-1/2 z-20 hidden -translate-y-1/2 border border-brand-green-2 bg-transparent text-brand-green-2 transition-colors hover:bg-brand-green-2/10 hover:text-brand-green-2 md:inline-flex"
             icon={<ChevronRight size={24} />}
           />
 
@@ -154,19 +155,19 @@ export function BatteryOnboardingModal({
                 direction === 'right' ? 'animate-slide-left' : 'animate-slide-right',
               )}
             >
-              <div className="mb-4 flex h-[160px] w-full items-center justify-center sm:h-[200px] sm:justify-start">
+              <div className="mb-4 flex h-[160px] w-full items-center justify-center md:h-[200px] md:justify-start">
                 {index === 0 && (
-                  <HowItWorksStep1Icon className="h-[160px] w-[160px] object-contain sm:h-[200px] sm:w-[200px]" />
+                  <HowItWorksStep1Icon className="h-[148px] w-[148px] object-contain md:h-[200px] md:w-[200px]" />
                 )}
                 {index === 1 && (
-                  <HowItWorksStep2Icon className="h-auto max-h-[84px] w-auto max-w-[183px] object-contain sm:max-h-[104px] sm:max-w-[228px]" />
+                  <HowItWorksStep2Icon className="h-auto max-h-[84px] w-auto max-w-[183px] object-contain md:max-h-[104px] md:max-w-[228px]" />
                 )}
                 {index === 2 && (
-                  <HowItWorksStep3Icon className="h-[160px] w-[160px] object-contain sm:h-[200px] sm:w-[200px]" />
+                  <HowItWorksStep3Icon className="h-[148px] w-[148px] object-contain md:h-[200px] md:w-[200px]" />
                 )}
               </div>
 
-              <div className="-mr-6 w-[calc(100%+24px)] sm:mr-0 sm:w-full">
+              <div className="-mr-6 w-[calc(100%+24px)] md:mr-0 md:w-full">
                 <p className="body-16-bold mb-2 w-full text-left text-brand-green-dark">
                   How it works
                 </p>
@@ -184,7 +185,7 @@ export function BatteryOnboardingModal({
             </div>
 
             <div
-              className="mb-8 flex h-16 w-full items-center justify-center gap-2.5 sm:justify-start"
+              className="mb-8 flex h-16 w-full items-center justify-center gap-2.5 md:justify-start"
               role="tablist"
               aria-label="Walkthrough steps"
             >
@@ -210,7 +211,7 @@ export function BatteryOnboardingModal({
               ))}
             </div>
 
-            <div className="flex w-full items-center justify-center sm:justify-start">
+            <div className="flex w-full items-center justify-center md:justify-start">
               <BaseButton
                 variant="custom"
                 size="large"
@@ -224,9 +225,9 @@ export function BatteryOnboardingModal({
           </div>
         </section>
 
-        <div>
-          <footer className="flex w-full flex-col items-center justify-center pt-8 sm:items-start sm:justify-start md:pt-10">
-            <GreenX7LogoDark className="h-10 w-auto sm:h-[58px]" />
+        <div className="md:hidden">
+          <footer className="flex w-full flex-col items-center justify-center pt-8">
+            <GreenX7LogoDark className="h-10 w-auto" />
           </footer>
           <div aria-hidden className="h-[50px]" />
         </div>

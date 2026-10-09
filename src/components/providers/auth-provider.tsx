@@ -52,7 +52,11 @@ export function AuthProvider({
     setSessionExpiredHandler(() => {
       setUser(null);
       queryClient.clear();
-      router.replace(ROUTES.login);
+      if (typeof window !== 'undefined') {
+        window.location.href = '/api/auth/logout?reason=session_expired';
+      } else {
+        router.replace(ROUTES.login);
+      }
     });
   }, [queryClient, router]);
 

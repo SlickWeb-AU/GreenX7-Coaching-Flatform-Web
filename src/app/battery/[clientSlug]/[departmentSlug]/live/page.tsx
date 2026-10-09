@@ -52,7 +52,7 @@ function LiveDashboardContent() {
       <div className="hidden min-h-screen w-full flex-col justify-between bg-brand-green-2 lg:flex">
         <LiveDashboardHeader periodLabel={periodLabel} isLive={isLive} />
 
-        <main className="mx-auto grid w-full max-w-1440 flex-1 grid-cols-1 content-center items-center gap-y-8 px-6 py-6 md:px-10 lg:grid-cols-[1fr_2fr] lg:gap-x-10 lg:gap-y-10 xl:gap-x-16 xl:px-[120px] 2xl:gap-x-20">
+        <main className="mx-auto grid w-full max-w-1440 flex-1 grid-cols-1 content-center items-center gap-y-8 px-6 py-6 md:px-10 lg:grid-cols-[1fr_2fr] lg:gap-x-3 lg:gap-y-8 lg:px-5 xl:gap-x-16 xl:px-[120px] 2xl:gap-x-20">
           <LiveSummaryPanel
             clientName={clientName}
             clientLogoUrl={clientLogoUrl}

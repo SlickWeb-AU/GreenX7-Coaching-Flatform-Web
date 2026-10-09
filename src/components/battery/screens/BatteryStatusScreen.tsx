@@ -64,17 +64,17 @@ export function BatteryStatusScreen({
   return (
     <main
       className={cn(
-        'relative flex min-h-screen w-full flex-col justify-between overflow-x-hidden bg-neutral-grey-8 px-7 pb-8 pt-6 text-center sm:px-8 sm:pb-10 sm:pt-8',
+        'relative flex min-h-screen w-full flex-col justify-between overflow-x-hidden bg-neutral-grey-8 px-6 pb-8 pt-6 text-center md:px-8 md:pb-10 md:pt-8',
         className,
       )}
     >
       {/* Decorative Wave - Top Left */}
-      <div className="pointer-events-none absolute left-0 top-0 z-0 select-none opacity-40 sm:opacity-50">
+      <div className="pointer-events-none absolute left-0 top-0 z-0 select-none opacity-40 md:opacity-50">
         <BatteryStatusTopLeftWave />
       </div>
 
       {/* Decorative Wave - Bottom Right */}
-      <div className="pointer-events-none absolute bottom-0 right-0 z-0 select-none opacity-40 sm:opacity-50">
+      <div className="pointer-events-none absolute bottom-0 right-0 z-0 select-none opacity-40 md:opacity-50">
         <BatteryStatusBottomRightWave />
       </div>
 
@@ -88,7 +88,7 @@ export function BatteryStatusScreen({
           departmentName={departmentName}
           clientLogoUrl={clientLogoUrl}
           align="center"
-          logoClassName="h-9 sm:h-10 w-auto object-contain"
+          logoClassName="h-9 md:h-10 w-auto object-contain"
           nameClassName="body-16-bold text-neutral-grey-1"
           departmentClassName="body-14-medium text-neutral-grey-1 mt-0.5"
         />

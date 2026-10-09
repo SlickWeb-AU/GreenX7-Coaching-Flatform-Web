@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   cleanParams,
+  cn,
   formatCheckInDate,
   formatCurrency,
   formatNumber,
@@ -59,5 +60,36 @@ describe('getMonthName', () => {
     expect(getMonthName(1)).toBe('January');
     expect(getMonthName(12)).toBe('December');
     expect(getMonthName(null)).toBe('');
+  });
+});
+
+describe('cn (tailwind-merge typography)', () => {
+  it('overrides body typography classes with later classes', () => {
+    expect(cn('body-16-medium', 'body-14-bold')).toBe('body-14-bold');
+  });
+
+  it('overrides heading typography classes with body classes', () => {
+    expect(cn('heading-64-bold', 'body-16-medium')).toBe('body-16-medium');
+  });
+
+  it('overrides body classes with heading classes', () => {
+    expect(cn('body-16-medium', 'heading-28-bold')).toBe('heading-28-bold');
+  });
+
+  it('overrides caption classes with later typography classes', () => {
+    expect(cn('caption-12-regular', 'caption-12-bold')).toBe('caption-12-bold');
+    expect(cn('body-14-regular', 'caption-12-bold')).toBe('caption-12-bold');
+  });
+
+  it('preserves other non-conflicting tailwind classes like colors', () => {
+    expect(cn('body-16-medium text-neutral-grey-2', 'body-14-bold text-brand-green-1')).toBe(
+      'body-14-bold text-brand-green-1',
+    );
+  });
+
+  it('supports responsive and state variants correctly', () => {
+    expect(cn('hover:body-16-medium', 'hover:body-14-bold')).toBe('hover:body-14-bold');
+    expect(cn('md:heading-64-bold', 'md:heading-48-bold')).toBe('md:heading-48-bold');
+    expect(cn('body-16-medium', 'hover:body-14-bold')).toBe('body-16-medium hover:body-14-bold');
   });
 });
