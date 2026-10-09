@@ -71,7 +71,7 @@ export function BatteryRechargeAccordion({ tips }: BatteryRechargeAccordionProps
         your battery
       </h2>
 
-      <div className="mb-10 w-full space-y-2">
+      <div className="mb-0 w-full space-y-2">
         {tips.map((tip) => {
           const area = normalizeAreaLabel(tip.areaLabel ?? tip.area);
           const isOpen = openArea === tip.area;

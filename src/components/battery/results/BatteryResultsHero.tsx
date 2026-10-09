@@ -37,7 +37,7 @@ export function BatteryResultsHero({
     <div className="relative w-full bg-brand-green-2 text-white">
       <ResultDecorBlob className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/3" />
       <div className="relative flex flex-col">
-        <div className="flex items-center justify-between gap-3 px-4 pt-4">
+        <div className="flex items-center justify-between gap-3 px-6 pt-6">
           <Gx7BadgeLogo className="text-white" width={48} height={46} />
           <ClientDepartmentHeader
             clientName={clientName}
@@ -46,7 +46,7 @@ export function BatteryResultsHero({
             align="right"
             logoWrapperClassName="h-8"
             logoClassName="h-[32px] w-auto object-contain"
-            nameClassName="body-14-medium text-white"
+            nameClassName="body-20-bold text-[#F6F8F5]"
             departmentClassName="body-14-medium text-white/90"
           />
         </div>
@@ -55,10 +55,13 @@ export function BatteryResultsHero({
           <div className="mt-4 flex flex-col items-center text-center">
             <span className="body-24-bold text-[#CFE4CA]">{introMessage}</span>
             <span className="body-24-bold text-[#CFE4CA]">Your battery score:</span>
-            <div className="relative mt-2 flex items-center justify-center">
+            <div className="relative mt-3 flex items-center justify-center">
               <BatteryIcon
                 percentage={displayScore}
-                className="h-[80px] w-auto"
+                width={166}
+                height={80}
+                preserveAspectRatio="none"
+                className="h-[80px] w-[166px]"
                 aria-hidden="true"
               />
               <span className="body-32-black absolute inset-0 flex items-center justify-center pr-3 leading-none text-white drop-shadow-sm">
@@ -99,7 +102,9 @@ export function BatteryResultsHero({
                   >
                     <Icon size={24} color={iconColor} aria-hidden="true" />
                   </div>
-                  <span className="body-12-bold text-center leading-tight text-white">{area}</span>
+                  <span className="body-12-bold text-center leading-tight text-brand-green-5">
+                    {area}
+                  </span>
                 </div>
               );
             })}

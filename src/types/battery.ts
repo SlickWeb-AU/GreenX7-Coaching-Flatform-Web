@@ -1,18 +1,5 @@
 import type { BatteryCheckState } from '@/constants/battery';
 
-export type { BatteryCheckState };
-
-export interface BatteryAreaScore {
-  area: string;
-  score: number | null;
-}
-
-export interface BatteryScores {
-  areas: BatteryAreaScore[];
-  average: number | null;
-  zone: BatteryZone | null;
-}
-
 export type BatteryZone = 'Survive' | 'Function' | 'Momentum' | 'Thrive';
 
 export interface BatterySubmitPayload {

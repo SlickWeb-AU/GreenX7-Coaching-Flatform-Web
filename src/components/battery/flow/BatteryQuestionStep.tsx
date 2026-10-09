@@ -36,7 +36,7 @@ export function BatteryQuestionStep({
   const title = prompt.title || (area === 'Physical' ? 'Physical health' : area);
 
   return (
-    <main className={cn('relative flex min-h-screen w-full flex-col', theme.bodyBg)}>
+    <main className={cn('relative flex h-dvh w-full flex-col overflow-hidden', theme.bodyBg)}>
       <header className={cn('flex w-full flex-col', theme.headerBg)}>
         <div className="flex w-full items-center justify-between p-4 md:px-8">
           <BaseIconButton
@@ -68,13 +68,13 @@ export function BatteryQuestionStep({
 
       <div
         className={cn(
-          'flex flex-1 flex-col justify-start px-10 py-12 md:justify-center',
+          'flex flex-1 flex-col justify-between px-6 py-6 md:justify-center md:px-12 md:py-12 lg:px-16',
           theme.bodyBg,
         )}
       >
-        <div className="mb-12 w-full max-w-[320px] md:mx-auto md:flex md:max-w-[425px] md:flex-col md:items-center md:text-center">
+        <div className="mb-4 w-full max-w-[320px] md:mx-auto md:mb-12 md:flex md:max-w-[425px] md:flex-col md:items-center md:text-center">
           {Icon && (
-            <div className="mb-5 md:mb-6">
+            <div className="mb-3 md:mb-6">
               <Icon size={40} color={theme.color} className="md:hidden" />
               <Icon size={60} color={theme.color} className="hidden md:block" />
             </div>
@@ -82,12 +82,12 @@ export function BatteryQuestionStep({
           <h2 className="heading-36-bold md:heading-48-black mb-2 leading-tight text-black md:mb-4">
             {title}
           </h2>
-          <p className="body-18-medium md:body-24-medium min-h-[72px] text-black md:min-h-[90px]">
+          <p className="body-18-medium md:body-24-medium min-h-[56px] text-black md:min-h-[90px]">
             {prompt.question}
           </p>
         </div>
 
-        <div className="mx-auto mb-[180px] w-full max-w-[1256px] md:mb-[115px]">
+        <div className="mx-auto mb-6 w-full max-w-[1256px] md:mb-[115px]">
           <BatterySlider
             value={value}
             min={scoreMin}
@@ -98,7 +98,7 @@ export function BatteryQuestionStep({
           />
         </div>
 
-        <div className="flex w-full justify-center">
+        <div className="flex w-full justify-center pb-2 md:pb-0">
           <BaseButton
             variant="custom"
             size="xlarge"

@@ -1,9 +1,23 @@
 import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import { extendTailwindMerge } from 'tailwind-merge';
+
+const isTypographySuffix = (val: string) => /^\d+(-[a-z0-9]+)+$/.test(val);
+
+const customTwMerge = extendTailwindMerge<'typography'>({
+  extend: {
+    classGroups: {
+      typography: [
+        { heading: [isTypographySuffix] },
+        { body: [isTypographySuffix] },
+        { caption: [isTypographySuffix] },
+      ],
+    },
+  },
+});
 
 /** Merge Tailwind classes, later classes override earlier ones correctly */
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
+  return customTwMerge(clsx(inputs));
 }
 
 const currencyFormatter = new Intl.NumberFormat('vi-VN', {
@@ -110,16 +124,25 @@ export function roundScore(value: number | null | undefined): number | null {
   return Math.round(value);
 }
 
+export const SCORE_INPUT_TYPE = {
+  ANSWER: 'answer',
+  SCORE: 'score',
+} as const;
+
+export type ScoreInputType = (typeof SCORE_INPUT_TYPE)[keyof typeof SCORE_INPUT_TYPE];
+
 /**
- * Formats a score (whether given on a 1–10 scale e.g. 7.2 or 0–100 scale e.g. 72)
- * into a whole-number percentage integer (e.g. 72).
- * Calculation: to 1 decimal place on 1–10 scale (e.g. 7.2) -> displayed as whole-number percentage (72).
+ * Converts an API value into a whole-number percentage integer (e.g. 72).
+ * - 'score': already 0–100 (answer × 10), rounded as-is.
+ * - 'answer': raw 1–10 answer, multiplied by 10.
  */
-export function formatScoreToPercent(score: number | null | undefined): number | null {
+export function formatScoreToPercent(
+  score: number | null | undefined,
+  type: ScoreInputType = SCORE_INPUT_TYPE.SCORE,
+): number | null {
   if (score === null || score === undefined || isNaN(score)) return null;
-  // If score is on 1–10 scale (e.g. 7.2), convert to 0–100 percentage (7.2 * 10 = 72)
-  if (score > 0 && score <= 10) {
-    return Math.round(score * 10);
+  if (type === SCORE_INPUT_TYPE.ANSWER) {
+    return Math.min(100, Math.max(0, Math.round(score * 10)));
   }
   return Math.round(score);
 }
