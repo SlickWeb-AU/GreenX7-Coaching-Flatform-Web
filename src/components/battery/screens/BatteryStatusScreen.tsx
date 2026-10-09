@@ -146,7 +146,7 @@ export function BatteryStatusScreen({
             size="large"
             pill
             onClick={handleReturn}
-            className="w-full max-w-[240px] bg-brand-green-3 px-8 font-bold text-brand-green-2 transition-all hover:opacity-90 active:scale-[0.99]"
+            className="min-w-[240px] bg-brand-green-3 px-8 font-bold text-brand-green-2 transition-all hover:opacity-90 active:scale-[0.99]"
           >
             Return to GreenX7
           </BaseButton>

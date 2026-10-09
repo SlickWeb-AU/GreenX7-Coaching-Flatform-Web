@@ -49,29 +49,36 @@ export function BatteryOnboardingModal({
   onStart,
 }: BatteryOnboardingModalProps) {
   const [index, setIndex] = useState(0);
+  const [direction, setDirection] = useState<'right' | 'left'>('right');
   const [paused, setPaused] = useState(false);
   const [touchX, setTouchX] = useState<number | null>(null);
 
   useEffect(() => {
     if (open) {
       setIndex(0);
+      setDirection('right');
       setPaused(false);
     }
   }, [open]);
 
   const prevStep = useCallback(() => {
     setPaused(true);
+    setDirection('left');
     setIndex((i) => (i - 1 + STEPS.length) % STEPS.length);
   }, []);
 
   const nextStep = useCallback(() => {
     setPaused(true);
+    setDirection('right');
     setIndex((i) => (i + 1) % STEPS.length);
   }, []);
 
   useEffect(() => {
     if (!open || paused) return;
-    const t = setTimeout(() => setIndex((i) => (i + 1) % STEPS.length), 4500);
+    const t = setTimeout(() => {
+      setDirection('right');
+      setIndex((i) => (i + 1) % STEPS.length);
+    }, 4500);
     return () => clearTimeout(t);
   }, [open, paused, index]);
 
@@ -91,13 +98,15 @@ export function BatteryOnboardingModal({
         <HowItWorksWheelLgIcon className="h-[250px] w-auto min-w-[630px] object-contain opacity-70" />
       </div>
 
-      <div className="mx-auto flex min-h-dvh min-h-screen w-full max-w-1600 flex-col justify-between px-10 pt-10 sm:px-10 sm:pt-10 md:px-12 md:pt-12 lg:px-16 lg:pt-16">
-        <header className="mb-8 flex w-full items-center justify-center md:mb-[60px]">
+      <div className="mx-auto flex min-h-screen w-full max-w-1600 flex-col justify-between px-10 pt-10 sm:px-10 sm:pt-10 md:px-12 md:pt-12 lg:px-16 lg:pt-16">
+        <header className="mb-8 flex w-full items-center justify-center sm:items-start sm:justify-start md:mb-[60px]">
           <ClientDepartmentHeader
             clientName={clientName}
             departmentName={departmentName}
             clientLogoUrl={clientLogoUrl}
-            align="center"
+            align="left"
+            className="items-center text-center sm:items-start sm:text-left"
+            logoWrapperClassName="justify-center sm:justify-start"
             logoClassName="h-8 sm:h-10"
             nameClassName="text-neutral-grey-1"
             departmentClassName="text-neutral-grey-1"
@@ -124,7 +133,7 @@ export function BatteryOnboardingModal({
           />
 
           <div
-            className="flex w-full select-none flex-col items-start text-left sm:items-center sm:text-center"
+            className="mx-auto flex w-full max-w-[480px] select-none flex-col items-start text-left"
             onTouchStart={(e) => {
               setPaused(true);
               setTouchX(e.touches[0].clientX);
@@ -138,34 +147,44 @@ export function BatteryOnboardingModal({
             }}
             onClick={() => setPaused(true)}
           >
-            <div className="mb-4 flex h-[160px] w-full items-center justify-center sm:h-[200px]">
-              {index === 0 && (
-                <HowItWorksStep1Icon className="h-[160px] w-[160px] object-contain sm:h-[200px] sm:w-[200px]" />
+            <div
+              key={index}
+              className={cn(
+                'flex w-full flex-col items-start',
+                direction === 'right' ? 'animate-slide-left' : 'animate-slide-right',
               )}
-              {index === 1 && (
-                <HowItWorksStep2Icon className="h-auto max-h-[84px] w-auto max-w-[183px] object-contain sm:max-h-[104px] sm:max-w-[228px]" />
-              )}
-              {index === 2 && (
-                <HowItWorksStep3Icon className="h-[160px] w-[160px] object-contain sm:h-[200px] sm:w-[200px]" />
-              )}
+            >
+              <div className="mb-4 flex h-[160px] w-full items-center justify-center sm:h-[200px] sm:justify-start">
+                {index === 0 && (
+                  <HowItWorksStep1Icon className="h-[160px] w-[160px] object-contain sm:h-[200px] sm:w-[200px]" />
+                )}
+                {index === 1 && (
+                  <HowItWorksStep2Icon className="h-auto max-h-[84px] w-auto max-w-[183px] object-contain sm:max-h-[104px] sm:max-w-[228px]" />
+                )}
+                {index === 2 && (
+                  <HowItWorksStep3Icon className="h-[160px] w-[160px] object-contain sm:h-[200px] sm:w-[200px]" />
+                )}
+              </div>
+
+              <div className="-mr-6 w-[calc(100%+24px)] sm:mr-0 sm:w-full">
+                <p className="body-16-bold mb-2 w-full text-left text-brand-green-dark">
+                  How it works
+                </p>
+
+                <h2 className="heading-48-black mb-2 w-full text-left leading-tight">
+                  <span className="text-brand-green-2">{STEPS[index].line1}</span>
+                  <br />
+                  <span className="text-secondary-orange-1">{STEPS[index].line2}</span>
+                </h2>
+
+                <p className="body-18-medium min-h-[72px] w-full text-left text-brand-green-2">
+                  {STEPS[index].body}
+                </p>
+              </div>
             </div>
 
-            <p className="body-16-bold mb-2 w-full text-left text-brand-green-dark sm:text-center">
-              How it works
-            </p>
-
-            <h2 className="heading-48-black mb-2 w-full text-left leading-tight sm:text-center">
-              <span className="text-brand-green-2">{STEPS[index].line1}</span>
-              <br />
-              <span className="text-secondary-orange-1">{STEPS[index].line2}</span>
-            </h2>
-
-            <p className="body-18-medium min-h-[72px] w-full text-left text-brand-green-2 sm:text-center">
-              {STEPS[index].body}
-            </p>
-
             <div
-              className="mb-8 flex h-16 w-full items-center justify-center gap-2.5"
+              className="mb-8 flex h-16 w-full items-center justify-center gap-2.5 sm:justify-start"
               role="tablist"
               aria-label="Walkthrough steps"
             >
@@ -177,6 +196,7 @@ export function BatteryOnboardingModal({
                   aria-selected={i === index}
                   aria-label={`Step ${i + 1}`}
                   onClick={() => {
+                    setDirection(i > index ? 'right' : 'left');
                     setIndex(i);
                     setPaused(true);
                   }}
@@ -190,13 +210,13 @@ export function BatteryOnboardingModal({
               ))}
             </div>
 
-            <div className="flex w-full items-center justify-center">
+            <div className="flex w-full items-center justify-center sm:justify-start">
               <BaseButton
                 variant="custom"
                 size="large"
                 pill
                 onClick={onStart}
-                className="w-[240px] bg-brand-green-3 text-brand-green-2 transition-opacity hover:opacity-90"
+                className="min-w-[240px] bg-brand-green-3 px-8 text-brand-green-2 transition-opacity hover:opacity-90"
               >
                 Start Battery Check
               </BaseButton>
@@ -205,8 +225,8 @@ export function BatteryOnboardingModal({
         </section>
 
         <div>
-          <footer className="flex w-full flex-col items-center justify-center pt-8 md:pt-10">
-            <GreenX7LogoDark className="h-10 w-auto" />
+          <footer className="flex w-full flex-col items-center justify-center pt-8 sm:items-start sm:justify-start md:pt-10">
+            <GreenX7LogoDark className="h-10 w-auto sm:h-[58px]" />
           </footer>
           <div aria-hidden className="h-[50px]" />
         </div>

@@ -72,7 +72,7 @@ export function BatteryLanding({
               size="large"
               pill
               onClick={onStart}
-              className="bg-brand-green-3 px-8 text-brand-green-2 transition-all hover:opacity-90 active:scale-[0.99]"
+              className="min-w-[240px] bg-brand-green-3 px-8 text-brand-green-2 transition-all hover:opacity-90 active:scale-[0.99]"
             >
               Start Battery Check
             </BaseButton>

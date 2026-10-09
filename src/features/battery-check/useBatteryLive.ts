@@ -19,11 +19,8 @@ export function useBatteryLive(
   departmentSlug?: string,
   options?: UseBatteryLiveOptions,
 ) {
-  const {
-    refetchInterval = 10_000,
-    refetchIntervalInBackground = true,
-    enabled = Boolean(clientSlug && departmentSlug),
-  } = options ?? {};
+  const { refetchInterval = 10_000, enabled = Boolean(clientSlug && departmentSlug) } =
+    options ?? {};
 
   const { data, isLoading } = useQuery({
     queryKey: queryKeys.batteryCheck.live(clientSlug || '', departmentSlug || ''),
@@ -31,7 +28,6 @@ export function useBatteryLive(
     retry: false,
     enabled,
     refetchInterval,
-    refetchIntervalInBackground,
   });
 
   const score = data?.batteryScore ?? null;
