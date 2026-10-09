@@ -49,6 +49,17 @@ export default function LoginPage() {
   };
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    const errorParam = params.get('error');
+    if (errorParam === 'account_inactive') {
+      setLocalError('This account has been deactivated. Please contact your administrator.');
+    } else if (errorParam === 'session_expired') {
+      setLocalError('Your session has expired. Please sign in again.');
+    }
+  }, []);
+
+  useEffect(() => {
     if (isAuthenticated) {
       router.replace(ROUTES.admin.dashboard);
     }

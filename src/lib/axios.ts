@@ -67,11 +67,28 @@ interface RetriableConfig extends AxiosRequestConfig {
   _retried?: boolean;
 }
 
+let isHandlingInactive = false;
+
 http.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     const config = error.config as RetriableConfig | undefined;
     const status = error.response?.status;
+    const data = error.response?.data as { errorCode?: string; message?: string } | undefined;
+
+    // Khi tài khoản bị vô hiệu hoá (403 ACCOUNT_INACTIVE), tự động logout
+    const isAccountInactive =
+      status === 403 &&
+      (data?.errorCode === 'ACCOUNT_INACTIVE' ||
+        data?.message?.toLowerCase().includes('deactivated'));
+
+    if (isAccountInactive) {
+      if (typeof window !== 'undefined' && !isHandlingInactive) {
+        isHandlingInactive = true;
+        window.location.href = '/api/auth/logout?reason=account_inactive';
+      }
+      return Promise.reject(toApiError(error));
+    }
 
     const shouldRefresh =
       status === 401 &&

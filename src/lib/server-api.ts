@@ -28,6 +28,17 @@ export async function serverGet<T>(path: string): Promise<T | null> {
   return isSuccess(body) ? body.data : null;
 }
 
+export async function serverGetWithStatus<T>(
+  path: string,
+): Promise<{ data: T | null; status: number; errorCode?: string }> {
+  const { status, body } = await backendFetch<T>(path, { accessToken: await accessToken() });
+  return {
+    data: isSuccess(body) ? body.data : null,
+    status,
+    errorCode: !isSuccess(body) ? body.errorCode : undefined,
+  };
+}
+
 export async function serverGetPaginated<T>(path: string): Promise<PaginatedResult<T>> {
   const { body } = await backendFetch<T[]>(path, { accessToken: await accessToken() });
 

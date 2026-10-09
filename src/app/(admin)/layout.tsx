@@ -1,7 +1,8 @@
 import { redirect } from 'next/navigation';
+import type { ReactNode } from 'react';
 
 import { AdminShell } from '@/components/layout/admin-shell';
-import { serverGet } from '@/lib/server-api';
+import { serverGetWithStatus } from '@/lib/server-api';
 import { USER_ROLES, type AuthUser } from '@/types/auth';
 
 /**
@@ -11,12 +12,15 @@ import { USER_ROLES, type AuthUser } from '@/types/auth';
  * just demoted or locked, the old token stays signature-valid until expiry.
  * This check asks the BE directly, so it reflects the true state at request time.
  */
-import type { ReactNode } from 'react';
-
 export default async function AdminLayout({ children }: { children: ReactNode }) {
-  const user = await serverGet<AuthUser>('/auth/me');
+  const { data: user, status, errorCode } = await serverGetWithStatus<AuthUser>('/auth/me');
 
-  if (!user) redirect('/login');
+  if (!user) {
+    const reason =
+      status === 403 || errorCode === 'ACCOUNT_INACTIVE' ? 'account_inactive' : 'session_expired';
+    redirect(`/api/auth/logout?reason=${reason}`);
+  }
+
   if (user.role !== USER_ROLES.ADMINISTRATOR && user.role !== USER_ROLES.SUPER_ADMIN) {
     redirect('/forbidden');
   }
