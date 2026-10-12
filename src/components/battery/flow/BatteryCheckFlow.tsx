@@ -209,7 +209,7 @@ export function BatteryCheckFlow({ clientSlug, departmentSlug, stateData }: Batt
           open={showHowItWorks}
           clientName={clientName}
           departmentName={departmentName}
-          clientLogoUrl={clientLogoUrl}
+          clientLogoUrl={statusLogoUrl}
           onClose={() => setShowHowItWorks(false)}
           onStart={() => {
             setShowHowItWorks(false);
@@ -250,7 +250,7 @@ export function BatteryCheckFlow({ clientSlug, departmentSlug, stateData }: Batt
           score={preview}
           clientName={clientName}
           departmentName={departmentName}
-          clientLogoUrl={clientLogoUrl}
+          clientLogoUrl={statusLogoUrl}
           onDone={() => setAnimDone(true)}
         />
         {submitFailed && (

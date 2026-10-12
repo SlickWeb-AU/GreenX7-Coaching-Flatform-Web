@@ -93,7 +93,7 @@ export function BatterySlider({
         />
       </div>
 
-      <div className="body-16-bold mt-5 flex justify-between text-neutral-grey-1">
+      <div className="body-16-bold mt-5 flex justify-between text-neutral-black">
         <span>Low</span>
         <span>High</span>
       </div>

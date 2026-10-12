@@ -100,7 +100,7 @@ export function BatteryOnboardingModal({
       </div>
 
       <div className="mx-auto flex min-h-screen w-full max-w-1600 flex-col justify-between px-6 pb-8 pt-8 md:px-12 md:pb-12 md:pt-12 lg:px-16 lg:pb-16 lg:pt-16">
-        <header className="mb-8 flex w-full items-center justify-between md:mb-[60px]">
+        <header className="mb-0 flex w-full items-center justify-between md:mb-[60px] lg:mb-0 [@media(min-height:700px)]:mb-16">
           <ClientDepartmentHeader
             clientName={clientName}
             departmentName={departmentName}
@@ -118,7 +118,7 @@ export function BatteryOnboardingModal({
           </div>
         </header>
 
-        <section className="relative my-auto flex w-full flex-col items-center justify-center">
+        <section className="relative mb-auto mt-0 flex w-full flex-col items-center justify-center">
           <BaseIconButton
             size={44}
             pill
@@ -189,7 +189,7 @@ export function BatteryOnboardingModal({
             </div>
 
             <div
-              className="mb-8 flex h-16 w-full items-center justify-center gap-2.5 md:justify-start"
+              className="mb-0 flex h-16 w-full items-center justify-center gap-2.5 md:justify-start [@media(min-height:700px)]:mb-8"
               role="tablist"
               aria-label="Walkthrough steps"
             >

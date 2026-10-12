@@ -61,7 +61,7 @@ export function BatteryResultsView({
       {/* Recharge Tips Section */}
       <section className="w-full bg-forest-light">
         <div className="mx-auto w-full max-w-full md:max-w-none lg:max-w-2xl xl:max-w-3xl">
-          <div className="px-[40px] py-[40px] md:px-10 md:py-10">
+          <div className="px-10 pb-10 pt-4 md:px-10 md:pt-2 lg:pt-10">
             <BatteryRechargeAccordion tips={result.rechargeTips} />
           </div>
         </div>

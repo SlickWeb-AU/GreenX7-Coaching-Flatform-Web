@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useId, useState } from 'react';
-import { Upload } from 'lucide-react';
+import { Trash2, Upload } from 'lucide-react';
 import { cn, resolveImageUrl } from '@/lib/utils';
 import { BaseHelperText } from '../base/BaseHelperText';
 
@@ -16,9 +16,11 @@ export interface LogoUploadBoxProps {
   file?: File | null;
   currentUrl?: string | null;
   onChange?: (file: File | null) => void;
+  onDelete?: () => void;
   error?: boolean;
   helperText?: string;
   className?: string;
+  disabled?: boolean;
 }
 
 export function LogoUploadBox({
@@ -30,9 +32,11 @@ export function LogoUploadBox({
   file,
   currentUrl,
   onChange,
+  onDelete,
   error = false,
   helperText,
   className,
+  disabled = false,
 }: LogoUploadBoxProps) {
   const generatedId = useId();
   const inputId = id ?? generatedId;
@@ -55,57 +59,93 @@ export function LogoUploadBox({
     };
   }, [file, currentUrl]);
 
+  const hasLogo = Boolean(file || currentUrl);
+
+  const handleClear = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (disabled) return;
+    if (onDelete) {
+      onDelete();
+    } else {
+      onChange?.(null);
+    }
+  };
+
   return (
     <div className="flex flex-col">
-      <label
-        htmlFor={inputId}
-        className={cn(
-          'flex min-h-40 cursor-pointer flex-col items-center justify-center rounded-xl px-6 py-7 text-center transition-all',
-          isReversed
-            ? 'border border-dashed border-transparent bg-brand-green-2 hover:border-neutral-grey-6 hover:brightness-105'
-            : 'border border-dashed border-neutral-grey-5 bg-neutral-grey-8 hover:border-brand-green-2 hover:bg-neutral-grey-7',
-          error &&
-            'border-secondary-red-4 focus-within:border-secondary-red-4 hover:border-secondary-red-4',
-          className,
-        )}
-      >
-        {previewUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={previewUrl}
-            alt={file?.name ?? title ?? defaultTitle}
-            className="mb-3 max-h-12 w-auto max-w-full object-contain"
-          />
-        ) : (
-          <Upload
-            size={24}
-            className={cn('mb-3', isReversed ? 'text-neutral-grey-7' : 'text-neutral-grey-3')}
-            aria-hidden
-          />
-        )}
-        <span
-          className={cn('body-16-bold', isReversed ? 'text-neutral-grey-7' : 'text-neutral-grey-1')}
-        >
-          {title ?? defaultTitle}
-        </span>
-        <p
+      <div className="group relative">
+        <label
+          htmlFor={inputId}
           className={cn(
-            'body-14-regular mt-1',
-            isReversed ? 'text-neutral-grey-8' : 'text-neutral-grey-3',
+            'flex min-h-40 cursor-pointer flex-col items-center justify-center rounded-xl px-6 py-7 text-center transition-all',
+            isReversed
+              ? 'border border-dashed border-transparent bg-brand-green-2 hover:border-neutral-grey-6 hover:brightness-105'
+              : 'border border-dashed border-neutral-grey-5 bg-neutral-grey-8 hover:border-brand-green-2 hover:bg-neutral-grey-7',
+            error &&
+              'border-secondary-red-4 focus-within:border-secondary-red-4 hover:border-secondary-red-4',
+            className,
           )}
         >
-          {description ?? defaultDesc}
-        </p>
-        <input
-          id={inputId}
-          type="file"
-          aria-label={inputLabel ?? title ?? defaultTitle}
-          aria-invalid={error}
-          accept="image/png,image/svg+xml"
-          className="sr-only"
-          onChange={(event) => onChange?.(event.target.files?.[0] ?? null)}
-        />
-      </label>
+          {previewUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={previewUrl}
+              alt={file?.name ?? title ?? defaultTitle}
+              className="mb-3 max-h-12 w-auto max-w-full object-contain"
+            />
+          ) : (
+            <Upload
+              size={24}
+              className={cn('mb-3', isReversed ? 'text-neutral-grey-7' : 'text-neutral-grey-3')}
+              aria-hidden
+            />
+          )}
+          <span
+            className={cn(
+              'body-16-bold',
+              isReversed ? 'text-neutral-grey-7' : 'text-neutral-grey-1',
+            )}
+          >
+            {title ?? defaultTitle}
+          </span>
+          <p
+            className={cn(
+              'body-14-regular mt-1',
+              isReversed ? 'text-neutral-grey-8' : 'text-neutral-grey-3',
+            )}
+          >
+            {description ?? defaultDesc}
+          </p>
+          <input
+            id={inputId}
+            type="file"
+            aria-label={inputLabel ?? title ?? defaultTitle}
+            aria-invalid={error}
+            accept="image/png,image/svg+xml"
+            disabled={disabled}
+            className="sr-only"
+            onChange={(event) => onChange?.(event.target.files?.[0] ?? null)}
+          />
+        </label>
+
+        {hasLogo && (
+          <button
+            type="button"
+            onClick={handleClear}
+            disabled={disabled}
+            aria-label={`Clear ${title ?? defaultTitle}`}
+            className={cn(
+              'absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-lg opacity-0 transition-all focus:opacity-100 group-hover:opacity-100',
+              isReversed
+                ? 'text-white hover:bg-black/20 hover:text-secondary-red-4'
+                : 'text-neutral-grey-2 hover:bg-black/5 hover:text-secondary-red-4',
+            )}
+          >
+            <Trash2 size={20} aria-hidden />
+          </button>
+        )}
+      </div>
       <BaseHelperText helperText={helperText} error={error} />
     </div>
   );

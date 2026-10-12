@@ -65,7 +65,7 @@ export function BatteryRechargeAccordion({ tips }: BatteryRechargeAccordionProps
 
   return (
     <section className="w-full">
-      <h2 className="heading-30-bold lg:heading-48-black mb-6 mt-8 text-left leading-tight text-brand-green-1">
+      <h2 className="heading-30-bold lg:heading-48-black mb-6 text-left leading-tight text-brand-green-1">
         Ways to recharge <br className="sm:hidden" />
         your battery
       </h2>
@@ -91,7 +91,7 @@ export function BatteryRechargeAccordion({ tips }: BatteryRechargeAccordionProps
                 <div className="mb-2 flex w-full items-center justify-between">
                   <span
                     className={cn(
-                      'caption-12-bold rounded-md px-2.5 py-0.5 text-neutral-600',
+                      'caption-12-bold rounded-full px-2.5 py-0.5 text-neutral-600',
                       AREA_BADGE[area],
                     )}
                   >

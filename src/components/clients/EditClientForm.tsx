@@ -454,7 +454,10 @@ export function EditClientForm({
                         aria-label="Delete contact"
                         size={40}
                         icon={<Trash2 size={20} aria-hidden />}
-                        disabled={persist.busyKey === contactDeleteKey(field.id)}
+                        disabled={
+                          contactFields.length <= 1 ||
+                          persist.busyKey === contactDeleteKey(field.id)
+                        }
                         className="text-neutral-grey-3 hover:text-secondary-red-4"
                         onClick={() => handleRemoveContact(index, field.id)}
                       />
@@ -486,6 +489,12 @@ export function EditClientForm({
             );
           })}
         </div>
+        {typeof errors.contacts?.message === 'string' && (
+          <BaseHelperText helperText={errors.contacts.message} error className="mt-3" />
+        )}
+        {typeof errors.contacts?.root?.message === 'string' && (
+          <BaseHelperText helperText={errors.contacts.root.message} error className="mt-3" />
+        )}
       </BaseCard>
 
       {/* 3. Branding */}
@@ -500,6 +509,10 @@ export function EditClientForm({
             trigger={trigger}
             darkLogoUrl={darkLogoUrl}
             whiteLogoUrl={whiteLogoUrl}
+            onDeleteDarkLogo={() => persist.removeLogo('dark')}
+            onDeleteWhiteLogo={() => persist.removeLogo('white')}
+            isDeletingDarkLogo={persist.busyKey === 'logo:dark'}
+            isDeletingWhiteLogo={persist.busyKey === 'logo:white'}
           />
         </BaseCard>
       </div>

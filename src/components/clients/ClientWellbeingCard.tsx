@@ -42,9 +42,16 @@ export function ClientWellbeingCard({
   const [active, setActive] = useState(false);
 
   useEffect(() => {
-    const id = requestAnimationFrame(() => setActive(true));
-    return () => cancelAnimationFrame(id);
-  }, []);
+    if (!items || items.length === 0) {
+      setActive(false);
+      return;
+    }
+    setActive(false);
+    const timer = setTimeout(() => {
+      setActive(true);
+    }, 50);
+    return () => clearTimeout(timer);
+  }, [items]);
 
   const Delta = deltaVariant === 'pill' ? DeltaPill : BaseTrend;
   if (!items || items.length === 0) {

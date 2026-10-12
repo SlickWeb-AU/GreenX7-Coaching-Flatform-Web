@@ -146,5 +146,18 @@ export function useClientRowPersistence(clientId?: string) {
         'Department deleted successfully',
       ).then((r) => r === true);
     },
+    removeLogo: (variant: 'dark' | 'white') => {
+      if (!clientId) return Promise.resolve(true);
+      const label = variant === 'dark' ? 'Dark logo' : 'White logo';
+      return run(
+        `logo:${variant}`,
+        async () => {
+          await clientsApi.removeLogo(clientId, variant);
+          refreshClient();
+          return true;
+        },
+        `${label} removed successfully`,
+      ).then((r) => r === true);
+    },
   };
 }

@@ -61,6 +61,7 @@ const config: Config = {
         },
         neutral: {
           600: '#1F313D',
+          black: '#1A1A1A',
           white: {
             solid: '#FFFFFF',
           },

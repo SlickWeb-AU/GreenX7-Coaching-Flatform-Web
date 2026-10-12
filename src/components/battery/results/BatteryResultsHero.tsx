@@ -70,7 +70,7 @@ export function BatteryResultsHero({
             <span className="mb-3 block text-base font-black leading-tight text-white">
               Strongest areas
             </span>
-            <div className="flex flex-wrap items-center justify-start gap-3 pb-1">
+            <div className="-mr-6 flex flex-wrap items-center justify-start gap-3 pb-1 md:mr-0">
               {strongestAreas.map((item) => {
                 const area = normalizeAreaLabel(item.area);
                 const Icon = AREA_ICON_MAP[area] ?? HeartIcon;

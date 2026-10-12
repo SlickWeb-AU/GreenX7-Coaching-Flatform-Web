@@ -51,10 +51,10 @@ export function ClientDepartmentHeader({
           />
         </div>
       ) : clientName ? (
-        <span className={cn('body-16-bold text-white', nameClassName)}>{clientName}</span>
+        <span className={cn('body-16-bold text-neutral-grey-8', nameClassName)}>{clientName}</span>
       ) : null}
       {departmentName && (
-        <span className={cn('body-20-medium mt-2 text-white/90', departmentClassName)}>
+        <span className={cn('body-20-medium mt-2 text-neutral-grey-8', departmentClassName)}>
           {departmentName}
         </span>
       )}
