@@ -35,9 +35,16 @@ export function WellbeingGrid({
   const [active, setActive] = useState(false);
 
   useEffect(() => {
-    const id = requestAnimationFrame(() => setActive(true));
-    return () => cancelAnimationFrame(id);
-  }, []);
+    if (!areas || areas.length === 0) {
+      setActive(false);
+      return;
+    }
+    setActive(false);
+    const timer = setTimeout(() => {
+      setActive(true);
+    }, 50);
+    return () => clearTimeout(timer);
+  }, [areas]);
 
   if (!areas || areas.length === 0) {
     return <BaseCard title={title} isEmpty className={className} />;

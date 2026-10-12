@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+
 import { BaseTag } from '@/components/base';
 import { BatteryIcon } from '@/components/icons';
 import { cn, formatScoreToPercent } from '@/lib/utils';
@@ -33,6 +35,20 @@ export function ClientBatteryCard({
   layout = 'inline',
   className,
 }: ClientBatteryCardProps) {
+  const [active, setActive] = useState(false);
+
+  useEffect(() => {
+    if (score === null || score === undefined) {
+      setActive(false);
+      return;
+    }
+    setActive(false);
+    const timer = setTimeout(() => {
+      setActive(true);
+    }, 50);
+    return () => clearTimeout(timer);
+  }, [score]);
+
   const displayScore = formatScoreToPercent(score);
   const hasLastMonth = changeVsLastMonth !== null && changeVsLastMonth !== undefined;
   const roundedLastMonth = hasLastMonth ? Math.round(changeVsLastMonth) : null;
@@ -59,7 +75,7 @@ export function ClientBatteryCard({
         {/* Bottom cluster: Battery Icon, Score & Comparisons */}
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-3">
-            <BatteryIcon percentage={displayScore ?? 0} aria-hidden="true" />
+            <BatteryIcon percentage={active ? (displayScore ?? 0) : 0} aria-hidden="true" />
             <div className="flex items-stretch gap-1">
               <span className="heading-48-bold leading-none text-white">{displayScore ?? '—'}</span>
               <span className="self-start text-3xl font-bold leading-none text-white">%</span>
@@ -136,7 +152,7 @@ export function ClientBatteryCard({
 
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <BatteryIcon percentage={displayScore ?? 0} aria-hidden="true" />
+          <BatteryIcon percentage={active ? (displayScore ?? 0) : 0} aria-hidden="true" />
           <div className="flex items-stretch gap-1">
             <span className="heading-48-bold leading-none text-white">{displayScore ?? '—'}</span>
             <span className="self-start text-3xl font-bold leading-none text-white">%</span>
