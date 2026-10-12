@@ -500,6 +500,10 @@ export function EditClientForm({
             trigger={trigger}
             darkLogoUrl={darkLogoUrl}
             whiteLogoUrl={whiteLogoUrl}
+            onDeleteDarkLogo={() => persist.removeLogo('dark')}
+            onDeleteWhiteLogo={() => persist.removeLogo('white')}
+            isDeletingDarkLogo={persist.busyKey === 'logo:dark'}
+            isDeletingWhiteLogo={persist.busyKey === 'logo:white'}
           />
         </BaseCard>
       </div>

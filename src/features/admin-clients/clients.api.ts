@@ -44,6 +44,8 @@ export const clientsApi = {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
   },
+  removeLogo: (id: string, variant: 'dark' | 'white') =>
+    del<void>(`/clients/${id}/logos/${variant}`),
   uploadClientLogos: (id: string, logos: { darkLogo?: File | null; whiteLogo?: File | null }) => {
     const uploads: Promise<unknown>[] = [];
     if (logos.darkLogo instanceof File) {

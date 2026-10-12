@@ -10,6 +10,10 @@ export interface ControlledClientLogoUploadProps {
   trigger?: UseFormTrigger<ClientFormValues>;
   darkLogoUrl?: string | null;
   whiteLogoUrl?: string | null;
+  onDeleteDarkLogo?: () => void;
+  onDeleteWhiteLogo?: () => void;
+  isDeletingDarkLogo?: boolean;
+  isDeletingWhiteLogo?: boolean;
 }
 
 export function ControlledClientLogoUpload({
@@ -17,6 +21,10 @@ export function ControlledClientLogoUpload({
   trigger,
   darkLogoUrl,
   whiteLogoUrl,
+  onDeleteDarkLogo,
+  onDeleteWhiteLogo,
+  isDeletingDarkLogo = false,
+  isDeletingWhiteLogo = false,
 }: ControlledClientLogoUploadProps) {
   const darkLogoId = useId();
   const whiteLogoId = useId();
@@ -34,6 +42,15 @@ export function ControlledClientLogoUpload({
             currentUrl={darkLogoUrl}
             error={Boolean(fieldState.error)}
             helperText={fieldState.error?.message}
+            disabled={isDeletingDarkLogo}
+            onDelete={() => {
+              if (field.value) {
+                field.onChange(null);
+                trigger?.('darkLogo');
+              } else if (onDeleteDarkLogo) {
+                onDeleteDarkLogo();
+              }
+            }}
             onChange={(file) => {
               field.onChange(file);
               trigger?.('darkLogo');
@@ -52,6 +69,15 @@ export function ControlledClientLogoUpload({
             currentUrl={whiteLogoUrl}
             error={Boolean(fieldState.error)}
             helperText={fieldState.error?.message}
+            disabled={isDeletingWhiteLogo}
+            onDelete={() => {
+              if (field.value) {
+                field.onChange(null);
+                trigger?.('whiteLogo');
+              } else if (onDeleteWhiteLogo) {
+                onDeleteWhiteLogo();
+              }
+            }}
             onChange={(file) => {
               field.onChange(file);
               trigger?.('whiteLogo');
