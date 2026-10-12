@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+
 import { BaseCard, BaseTrend } from '@/components/base';
 import { BoltIcon, HeartIcon } from '@/components/icons';
 import { AREA_BADGE, AREA_BAR_COLORS, AREA_COLOR, AREA_ICON_MAP } from '@/constants/dashboard';
@@ -37,6 +39,13 @@ export function ClientWellbeingCard({
   className,
   deltaVariant = 'arrow',
 }: ClientWellbeingCardProps) {
+  const [active, setActive] = useState(false);
+
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setActive(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
+
   const Delta = deltaVariant === 'pill' ? DeltaPill : BaseTrend;
   if (!items || items.length === 0) {
     return <BaseCard title="Wellbeing areas" isEmpty className={cn('flex flex-col', className)} />;
@@ -97,10 +106,14 @@ export function ClientWellbeingCard({
                       >
                         <div
                           className={cn(
-                            'h-full rounded-full',
+                            'h-full rounded-full transition-all duration-[1000ms] ease-out',
                             AREA_BAR_COLORS[areaKey] ?? 'bg-brand-green-2',
                           )}
-                          style={{ width: `${Math.min(100, Math.max(0, displayScore ?? 0))}%` }}
+                          style={{
+                            width: active
+                              ? `${Math.min(100, Math.max(0, displayScore ?? 0))}%`
+                              : '0%',
+                          }}
                         />
                       </div>
 

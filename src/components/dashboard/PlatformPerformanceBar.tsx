@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+
 import { BaseCard } from '@/components/base';
 import { ZONE_COLORS } from '@/constants/tokens';
 import { resolveZoneKey } from '@/lib/battery';
@@ -14,6 +16,13 @@ export function PlatformPerformanceBar({
   distribution?: DashboardZoneDistributionDto[];
   className?: string;
 }) {
+  const [active, setActive] = useState(false);
+
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setActive(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
+
   if (!distribution || distribution.length === 0) {
     return (
       <BaseCard
@@ -41,8 +50,8 @@ export function PlatformPerformanceBar({
             return (
               <div
                 key={item.key}
-                className={cn('h-full', zone.bgClass)}
-                style={{ width: `${percentage}%` }}
+                className={cn('h-full transition-all duration-[1000ms] ease-out', zone.bgClass)}
+                style={{ width: active ? `${percentage}%` : '0%' }}
                 title={`${zone.label}: ${percentage}%`}
               />
             );

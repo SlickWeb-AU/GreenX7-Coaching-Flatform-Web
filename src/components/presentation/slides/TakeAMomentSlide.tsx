@@ -2,8 +2,14 @@
  * Slide 04 — Take a Moment (Reflect & Breakdown)
  */
 import { BatteryIcon, BoltIcon, CardDecorBlob, Gx7BadgeLogo, HeartIcon } from '@/components/icons';
-import { BatteryWheelChart } from '@/components/dashboard/BatteryWheelChart';
-import { AREA_BADGE, AREA_BAR_COLORS, AREA_COLOR, AREA_ICON_MAP } from '@/constants/dashboard';
+import { AreaScoreProgressBar, BatteryWheelChart } from '@/components/dashboard';
+import {
+  AREA_BADGE,
+  AREA_BAR_COLORS,
+  AREA_COLOR,
+  AREA_ICON_MAP,
+  AREA_LIGHT_COLOR,
+} from '@/constants/dashboard';
 import { SCORE_ZONE_COPY, zoneKeyForScore, type ScoreZoneKey } from '@/constants/presentation';
 import { cn } from '@/lib/utils';
 import type { BaseSlideProps } from '@/types';
@@ -91,7 +97,11 @@ export function TakeAMomentSlide({ ...slideProps }: BaseSlideProps = {}) {
                           className="flex h-10 w-10 items-center justify-center rounded-full"
                           style={{ backgroundColor: AREA_COLOR[item.area] }}
                         >
-                          <Icon size={20} color="#FFFFFF" aria-hidden="true" />
+                          <Icon
+                            size={20}
+                            color={AREA_LIGHT_COLOR[item.area] ?? '#FFFFFF'}
+                            aria-hidden="true"
+                          />
                         </div>
                         <span className="text-center text-[11px] font-medium leading-tight">
                           {item.label ?? item.area}
@@ -119,37 +129,18 @@ export function TakeAMomentSlide({ ...slideProps }: BaseSlideProps = {}) {
                     item.score === null || item.score === undefined ? null : Math.round(item.score);
 
                   return (
-                    <div key={item.area} className="flex flex-col gap-1.5 py-1.5">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <div
-                            className={cn(
-                              'flex h-7 w-7 shrink-0 items-center justify-center rounded-full',
-                              badgeBg,
-                            )}
-                          >
-                            <Icon size={14} color={iconColor} aria-hidden="true" />
-                          </div>
-                          <span className="body-14-bold text-neutral-grey-1">
-                            {item.label ?? item.area}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-1 text-neutral-grey-1">
-                          <span className="body-14-bold leading-none">{itemScore ?? '—'}</span>
-                          <BoltIcon size={12} aria-hidden="true" />
-                        </div>
-                      </div>
-
-                      <div className={cn('h-1.5 w-full overflow-hidden rounded-full', badgeBg)}>
-                        <div
-                          className={cn(
-                            'h-full rounded-full transition-all duration-500',
-                            barColor,
-                          )}
-                          style={{ width: `${Math.min(100, Math.max(0, itemScore ?? 0))}%` }}
-                        />
-                      </div>
-                    </div>
+                    <AreaScoreProgressBar
+                      key={item.area}
+                      label={item.label ?? item.area}
+                      badgeBg={badgeBg}
+                      iconColor={iconColor}
+                      barColor={barColor}
+                      score={itemScore ?? 0}
+                      displayValue={itemScore ?? '—'}
+                      Icon={Icon}
+                      size="sm"
+                      className="py-1.5"
+                    />
                   );
                 })}
               </div>

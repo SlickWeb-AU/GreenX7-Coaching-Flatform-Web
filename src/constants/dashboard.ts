@@ -85,6 +85,17 @@ export const AREA_COLOR: Record<string, string> = {
   Purpose: DASHBOARD_COLORS.secondary.teal1,
 };
 
+export const AREA_LIGHT_COLOR: Record<string, string> = {
+  Physical: DASHBOARD_COLORS.secondary.orange2,
+  Sleep: DASHBOARD_COLORS.secondary.cyan2,
+  Nutrition: DASHBOARD_COLORS.secondary.green2,
+  Fun: DASHBOARD_COLORS.secondary.yellow2,
+  Mindset: DASHBOARD_COLORS.secondary.violet2,
+  Friendships: DASHBOARD_COLORS.secondary.rose2,
+  Relationships: DASHBOARD_COLORS.secondary.red2,
+  Purpose: DASHBOARD_COLORS.secondary.teal2,
+};
+
 export const AREA_BAR_COLORS: Record<string, string> = {
   Physical: 'bg-secondary-orange-1',
   Sleep: 'bg-secondary-cyan-1',

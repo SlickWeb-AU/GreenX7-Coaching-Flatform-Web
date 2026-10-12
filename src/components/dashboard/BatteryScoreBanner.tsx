@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+
 import { BatteryIcon } from '@/components/icons';
 import { cn, formatNumber, formatScoreToPercent } from '@/lib/utils';
 
@@ -14,6 +16,13 @@ export function BatteryScoreBanner({
   industryName?: string | null;
   industryCount?: number | null;
 }) {
+  const [active, setActive] = useState(false);
+
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setActive(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
+
   const score = formatScoreToPercent(overview?.averageBatteryScore);
   const rawChange = overview?.change ?? null;
   const change = rawChange !== null && rawChange !== undefined ? Math.round(rawChange) : null;
@@ -31,7 +40,7 @@ export function BatteryScoreBanner({
         <div className="flex flex-col justify-between lg:col-span-5">
           <div className="body-14-bold mb-2 text-white/80">Average Battery Score</div>
           <div className="mb-4 flex items-center gap-4">
-            <BatteryIcon percentage={score ?? 0} aria-hidden="true" />
+            <BatteryIcon percentage={active ? (score ?? 0) : 0} aria-hidden="true" />
             <div className="flex items-stretch gap-1">
               <span className="heading-48-bold leading-none text-white">{score ?? '—'}</span>
               <span className="self-start text-3xl font-bold leading-none text-white">%</span>

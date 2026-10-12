@@ -9,3 +9,4 @@ export * from './TeamBatteryCard';
 export * from './LiveIndicator';
 export * from './LiveDashboardHeader';
 export * from './LiveSummaryPanel';
+export * from './AreaScoreProgressBar';
