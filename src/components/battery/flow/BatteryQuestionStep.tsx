@@ -58,7 +58,7 @@ export function BatteryQuestionStep({
         </div>
 
         <div className="relative -bottom-1 flex h-2 w-full items-center">
-          <div className="absolute inset-x-0 h-[2px] bg-[#1A1A1A]/20" />
+          <div className="absolute inset-x-0 h-[2px] bg-neutral-black/20" />
           <div
             className="relative h-2 rounded-r-[10px] bg-brand-green-2 transition-all duration-300"
             style={{ width: `${((index + 1) / total) * 100}%` }}

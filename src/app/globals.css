@@ -61,6 +61,9 @@
   .heading-36-bold {
     @apply text-[2.25rem]/[2.625rem] font-bold tracking-tight-2;
   }
+  .heading-30-bold {
+    @apply text-[1.875rem]/[2.25rem] font-bold tracking-tight-2;
+  }
   .heading-28-bold {
     @apply text-[1.75rem]/[2rem] font-bold tracking-tight-2;
   }
