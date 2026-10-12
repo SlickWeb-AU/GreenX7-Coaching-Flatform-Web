@@ -71,7 +71,7 @@ function BatteryCheckPageContent() {
         variant="closed"
         clientName={stateData.branding.clientName}
         departmentName={stateData.branding.departmentName}
-        clientLogoUrl={stateData.branding.darkLogoUrl}
+        clientLogoUrl={stateData.branding.darkLogoUrl || stateData.branding.whiteLogoUrl}
         nextOpensAt={stateData.nextOpensAt}
         timeZone={stateData.timezone}
       />
@@ -84,7 +84,7 @@ function BatteryCheckPageContent() {
         variant="submitted"
         clientName={stateData.branding.clientName}
         departmentName={stateData.branding.departmentName}
-        clientLogoUrl={stateData.branding.darkLogoUrl}
+        clientLogoUrl={stateData.branding.darkLogoUrl || stateData.branding.whiteLogoUrl}
         periodMonth={stateData.periodMonth}
         periodYear={stateData.periodYear}
       />
