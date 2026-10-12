@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
 import { BATTERY_QUESTION_AREAS, BATTERY_STEPS, type BatteryStep } from '@/constants/battery';
 import { batteryCheckApi } from '@/features/battery-check/battery-check.api';
@@ -32,7 +33,8 @@ export interface BatteryCheckFlowProps {
 export function BatteryCheckFlow({ clientSlug, departmentSlug, stateData }: BatteryCheckFlowProps) {
   const clientName = stateData?.branding.clientName ?? formatSlugLabel(clientSlug);
   const departmentName = stateData?.branding.departmentName ?? formatSlugLabel(departmentSlug);
-  const clientLogoUrl = stateData?.branding.darkLogoUrl || stateData?.branding.whiteLogoUrl || null;
+  const clientLogoUrl = stateData?.branding.whiteLogoUrl || stateData?.branding.darkLogoUrl || null;
+  const statusLogoUrl = stateData?.branding.darkLogoUrl || stateData?.branding.whiteLogoUrl || null;
 
   const prompts = useMemo(
     () =>
@@ -141,6 +143,9 @@ export function BatteryCheckFlow({ clientSlug, departmentSlug, stateData }: Batt
       if (apiErr.statusCode === 409 || apiErr.errorCode === 'CONFLICT') {
         setSubmissionState('ALREADY_SUBMITTED');
       } else if (apiErr.errorCode === 'BAD_REQUEST') {
+        toast.error(
+          'Your responses were not recorded. The check-in window closed before your check was completed.',
+        );
         setSubmissionState('CLOSED');
       } else {
         setSubmitFailed(true);
@@ -170,7 +175,7 @@ export function BatteryCheckFlow({ clientSlug, departmentSlug, stateData }: Batt
         variant="submitted"
         clientName={clientName}
         departmentName={departmentName}
-        clientLogoUrl={clientLogoUrl}
+        clientLogoUrl={statusLogoUrl}
         periodMonth={stateData?.periodMonth}
         periodYear={stateData?.periodYear}
       />
@@ -183,7 +188,7 @@ export function BatteryCheckFlow({ clientSlug, departmentSlug, stateData }: Batt
         variant="closed"
         clientName={clientName}
         departmentName={departmentName}
-        clientLogoUrl={clientLogoUrl}
+        clientLogoUrl={statusLogoUrl}
         nextOpensAt={stateData?.nextOpensAt}
         timeZone={stateData?.timezone}
       />

@@ -54,5 +54,3 @@ export function GreenX7LogoDark({ className, ...props }: SVGProps<SVGSVGElement>
     </svg>
   );
 }
-
-export const GreenX7LogoDarkSvg = GreenX7LogoDark;
