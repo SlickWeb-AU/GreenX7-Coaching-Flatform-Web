@@ -32,12 +32,14 @@ export const http = axios.create({
 // ---------------------------------------------------------------------------
 
 let refreshPromise: Promise<boolean> | null = null;
-let onSessionExpired: (() => void) | null = null;
+let onSessionExpired: ((reason?: string) => void) | null = null;
 
 /** Cho AuthProvider đăng ký hành vi khi phiên hết hạn hẳn (clear state + điều hướng) */
-export function setSessionExpiredHandler(handler: () => void): void {
+export function setSessionExpiredHandler(handler: (reason?: string) => void): void {
   onSessionExpired = handler;
 }
+
+let lastRefreshReason: string = 'session_expired';
 
 async function refreshSession(): Promise<boolean> {
   refreshPromise ??= (async () => {
@@ -46,8 +48,27 @@ async function refreshSession(): Promise<boolean> {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
       });
+      if (!response.ok) {
+        try {
+          const body = (await response.json()) as { errorCode?: string };
+          if (response.status === 403 || body.errorCode === 'ACCOUNT_INACTIVE') {
+            lastRefreshReason = 'account_inactive';
+          } else if (
+            body.errorCode === 'TOKEN_INVALID' ||
+            body.errorCode === 'NOT_FOUND' ||
+            body.errorCode === 'ACCOUNT_BANNED'
+          ) {
+            lastRefreshReason = 'account_deleted';
+          } else {
+            lastRefreshReason = 'session_expired';
+          }
+        } catch {
+          lastRefreshReason = 'session_expired';
+        }
+      }
       return response.ok;
     } catch {
+      lastRefreshReason = 'session_expired';
       return false;
     } finally {
       // Nhả khoá ở tick kế tiếp để các request đang chờ kịp đọc kết quả
@@ -74,13 +95,18 @@ http.interceptors.response.use(
   async (error: AxiosError) => {
     const config = error.config as RetriableConfig | undefined;
     const status = error.response?.status;
-    const data = error.response?.data as { errorCode?: string; message?: string } | undefined;
+    const data = error.response?.data as { errorCode?: string } | undefined;
 
     // Khi tài khoản bị vô hiệu hoá (403 ACCOUNT_INACTIVE), tự động logout
+    // KHÔNG áp dụng cho auth endpoints (như request-code, verify-code) vì người dùng
+    // đang ở màn login, cần hiển thị lỗi tại form đăng nhập (local error) chứ không reload lại trang login.
+    const isAuthEndpoint =
+      config?.url?.includes('/auth/request-code') ||
+      config?.url?.includes('/auth/verify-code') ||
+      config?.url?.includes('/auth/refresh');
+
     const isAccountInactive =
-      status === 403 &&
-      (data?.errorCode === 'ACCOUNT_INACTIVE' ||
-        data?.message?.toLowerCase().includes('deactivated'));
+      !isAuthEndpoint && (status === 403 || data?.errorCode === 'ACCOUNT_INACTIVE');
 
     if (isAccountInactive) {
       if (typeof window !== 'undefined' && !isHandlingInactive) {
@@ -112,7 +138,7 @@ http.interceptors.response.use(
         return http.request(config);
       }
 
-      onSessionExpired?.();
+      onSessionExpired?.(lastRefreshReason);
     }
 
     return Promise.reject(toApiError(error));

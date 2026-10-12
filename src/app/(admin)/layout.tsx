@@ -16,8 +16,16 @@ export default async function AdminLayout({ children }: { children: ReactNode })
   const { data: user, status, errorCode } = await serverGetWithStatus<AuthUser>('/auth/me');
 
   if (!user) {
-    const reason =
-      status === 403 || errorCode === 'ACCOUNT_INACTIVE' ? 'account_inactive' : 'session_expired';
+    let reason = 'session_expired';
+    if (status === 403 || errorCode === 'ACCOUNT_INACTIVE') {
+      reason = 'account_inactive';
+    } else if (
+      status === 404 ||
+      errorCode === 'NOT_FOUND' ||
+      (status === 401 && errorCode === 'TOKEN_INVALID')
+    ) {
+      reason = 'account_deleted';
+    }
     redirect(`/api/auth/logout?reason=${reason}`);
   }
 

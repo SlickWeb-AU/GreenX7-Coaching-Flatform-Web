@@ -3,6 +3,7 @@
 import { ArrowLeft, Info, Lock } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, type FormEvent } from 'react';
+import { toast } from 'sonner';
 
 import { BaseButton, BaseInput, BaseOtp } from '@/components/base';
 import {
@@ -50,12 +51,26 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const params = new URLSearchParams(window.location.search);
-    const errorParam = params.get('error');
-    if (errorParam === 'account_inactive') {
-      setLocalError('This account has been deactivated. Please contact your administrator.');
-    } else if (errorParam === 'session_expired') {
-      setLocalError('Your session has expired. Please sign in again.');
+    const url = new URL(window.location.href);
+    const errorParam = url.searchParams.get('error');
+    if (errorParam) {
+      let msg = '';
+      if (errorParam === 'account_deleted') {
+        msg = 'This account no longer exists. Please contact your administrator.';
+      } else if (errorParam === 'account_inactive') {
+        msg = 'This account has been deactivated. Please contact your administrator.';
+      } else if (errorParam === 'session_expired') {
+        msg = 'Your session has expired. Please sign in again.';
+      }
+
+      if (msg) {
+        setTimeout(() => {
+          toast.error(msg, { duration: 5000 });
+        }, 150);
+      }
+
+      url.searchParams.delete('error');
+      window.history.replaceState(null, '', url.pathname + url.search + url.hash);
     }
   }, []);
 

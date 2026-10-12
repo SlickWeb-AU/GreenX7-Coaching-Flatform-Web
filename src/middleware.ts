@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
 
+import { ENV } from '@/constants/env';
 import { COOKIE_NAMES } from '@/lib/cookies';
 import { verifyAccessToken } from '@/lib/jwt';
 import {
@@ -126,18 +127,18 @@ export async function middleware(request: NextRequest) {
 
   // ---- 0. Redirect legacy admin routes ----
   if (pathname === '/admin/login' || pathname === '/admin/login/') {
-    return finalize(NextResponse.redirect(new URL(ROUTES.login, request.url)));
+    return finalize(NextResponse.redirect(new URL(ROUTES.login, ENV.APP_URL)));
   }
 
   // Home '/' was removed — guests here are redirected to the matching area
   if (pathname === '/') {
     const target = isAuthenticated ? `${ROUTES.admin.dashboard}${cleanSearch}` : ROUTES.login;
-    return finalize(NextResponse.redirect(new URL(target, request.url)));
+    return finalize(NextResponse.redirect(new URL(target, ENV.APP_URL)));
   }
 
   if (pathname === '/admin' || pathname === '/admin/') {
     return finalize(
-      NextResponse.redirect(new URL(`${ROUTES.admin.dashboard}${cleanSearch}`, request.url)),
+      NextResponse.redirect(new URL(`${ROUTES.admin.dashboard}${cleanSearch}`, ENV.APP_URL)),
     );
   }
 
@@ -148,7 +149,7 @@ export async function middleware(request: NextRequest) {
     }
     if (isAuthenticated && role) {
       const redirectUrl = DEFAULT_REDIRECT_BY_ROLE[role] ?? ROUTES.admin.dashboard;
-      return finalize(NextResponse.redirect(new URL(redirectUrl, request.url)));
+      return finalize(NextResponse.redirect(new URL(redirectUrl, ENV.APP_URL)));
     }
     return nextWithPathname();
   }
@@ -160,11 +161,11 @@ export async function middleware(request: NextRequest) {
 
   if (rule) {
     if (!isAuthenticated || !role) {
-      return finalize(NextResponse.redirect(new URL(ROUTES.login, request.url)));
+      return finalize(NextResponse.redirect(new URL(ROUTES.login, ENV.APP_URL)));
     }
 
     if (!rule.roles.includes(role)) {
-      return finalize(NextResponse.redirect(new URL('/forbidden', request.url)));
+      return finalize(NextResponse.redirect(new URL('/forbidden', ENV.APP_URL)));
     }
   }
 
