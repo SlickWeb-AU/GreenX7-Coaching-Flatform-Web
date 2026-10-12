@@ -1,8 +1,12 @@
-import { BatteryWheelChart } from '@/components/dashboard/BatteryWheelChart';
-import { BoltIcon, HeartIcon } from '@/components/icons';
+'use client';
+
+import { useEffect, useRef, useState } from 'react';
+
+import { AreaScoreProgressBar, BatteryWheelChart } from '@/components/dashboard';
+import { HeartIcon } from '@/components/icons';
 import { AREA_BADGE, AREA_BAR_COLORS, AREA_COLOR, AREA_ICON_MAP } from '@/constants/dashboard';
 import { normalizeAreaLabel } from '@/lib/battery';
-import { SCORE_INPUT_TYPE, cn, formatScoreToPercent, type ScoreInputType } from '@/lib/utils';
+import { SCORE_INPUT_TYPE, formatScoreToPercent, type ScoreInputType } from '@/lib/utils';
 import type { BatteryAreaResultDto } from '@/types/battery';
 
 export interface BatteryScoreBreakdownProps {
@@ -16,27 +20,55 @@ export function BatteryScoreBreakdown({
   average,
   calculateBy = SCORE_INPUT_TYPE.ANSWER,
 }: BatteryScoreBreakdownProps) {
+  const [isActive, setIsActive] = useState(false);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsActive(true);
+        }
+      },
+      { threshold: 0.2 },
+    );
+
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
+
   const percentOf = (a: BatteryAreaResultDto) =>
     calculateBy === SCORE_INPUT_TYPE.ANSWER
       ? (formatScoreToPercent(a.answer, SCORE_INPUT_TYPE.ANSWER) ?? 0)
       : (formatScoreToPercent(a.score) ?? 0);
+
   return (
-    <div className="flex w-full flex-col rounded-[20px] bg-white p-6 text-neutral-grey-1 shadow-none md:p-8">
+    <div
+      ref={containerRef}
+      className="flex w-full flex-col rounded-[20px] bg-white p-6 text-neutral-grey-1 shadow-none md:p-8"
+    >
       <h3 className="heading-24-bold mb-4 block text-[#005943]">Score breakdown</h3>
 
       <div className="grid grid-cols-1 items-center gap-6 lg:grid-cols-[auto_1fr] lg:gap-12">
-        <div className="flex justify-center">
-          <BatteryWheelChart
-            score={average ?? null}
-            items={areas.map((a) => ({
-              area: a.area,
-              label: a.area,
-              score: percentOf(a),
-              vsPreviousMonth: null,
-              vsFirstCheck: null,
-            }))}
-            size={280}
-          />
+        <div className="flex min-h-[280px] justify-center">
+          {isActive ? (
+            <BatteryWheelChart
+              score={average ?? null}
+              items={areas.map((a) => ({
+                area: a.area,
+                label: a.area,
+                score: percentOf(a),
+                vsPreviousMonth: null,
+                vsFirstCheck: null,
+              }))}
+              size={280}
+              animate={true}
+            />
+          ) : (
+            <div className="h-[280px] w-[280px]" />
+          )}
         </div>
 
         <div className="flex flex-col gap-3.5">
@@ -50,34 +82,17 @@ export function BatteryScoreBreakdown({
             const label = area === 'Physical' ? 'Physical health' : area;
 
             return (
-              <div key={item.area} className="flex flex-col">
-                <div className="mb-2 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div
-                      className={cn(
-                        'flex h-6 w-6 shrink-0 items-center justify-center rounded-full',
-                        badgeBg,
-                      )}
-                    >
-                      <Icon size={12} color={iconColor} aria-hidden="true" />
-                    </div>
-                    <span className="body-16-medium text-neutral-grey-1">{label}</span>
-                  </div>
-                  <div className="flex items-center gap-1 text-[16px] font-black leading-none text-neutral-grey-1">
-                    <span>{item.answer ?? itemScore ?? '—'}</span>
-                    <BoltIcon size={14} aria-hidden="true" />
-                  </div>
-                </div>
-
-                <div className={cn('h-2 w-full overflow-hidden rounded-full', badgeBg)}>
-                  <div
-                    className={cn('h-full rounded-full transition-all duration-500', barColor)}
-                    style={{
-                      width: `${Math.min(100, Math.max(0, itemScore ?? 0))}%`,
-                    }}
-                  />
-                </div>
-              </div>
+              <AreaScoreProgressBar
+                key={item.area}
+                label={label}
+                badgeBg={badgeBg}
+                iconColor={iconColor}
+                barColor={barColor}
+                score={itemScore}
+                displayValue={item.answer}
+                Icon={Icon}
+                active={isActive}
+              />
             );
           })}
         </div>

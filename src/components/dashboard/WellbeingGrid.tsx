@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+
 import { BaseCard, BaseTrend } from '@/components/base';
 import { BoltIcon } from '@/components/icons';
 import {
@@ -30,6 +32,13 @@ export function WellbeingGrid({
   title?: string;
   className?: string;
 }) {
+  const [active, setActive] = useState(false);
+
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setActive(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
+
   if (!areas || areas.length === 0) {
     return <BaseCard title={title} isEmpty className={className} />;
   }
@@ -78,10 +87,10 @@ export function WellbeingGrid({
               >
                 <div
                   className={cn(
-                    'h-full rounded-full',
+                    'h-full rounded-full transition-all duration-[1000ms] ease-out',
                     AREA_BAR_COLORS[areaKey] ?? 'bg-brand-green-2',
                   )}
-                  style={{ width: `${Math.min(100, Math.max(0, score ?? 0))}%` }}
+                  style={{ width: active ? `${Math.min(100, Math.max(0, score ?? 0))}%` : '0%' }}
                 />
               </div>
             </div>

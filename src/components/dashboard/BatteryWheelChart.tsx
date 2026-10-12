@@ -1,8 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Cell, Pie, PieChart, Sector, Tooltip } from 'recharts';
-import type { PieSectorShapeProps } from 'recharts';
+import { Cell, Pie, PieChart, Tooltip } from 'recharts';
 
 import { BadgeStarIcon } from '@/components/icons';
 import { AREA_COLOR, FIXED_WELLBEING_AREAS } from '@/constants/dashboard';
@@ -18,6 +17,7 @@ export interface BatteryWheelChartProps {
   showScore?: boolean;
   scoreClassName?: string;
   percentClassName?: string;
+  animate?: boolean;
 }
 
 /**
@@ -47,6 +47,7 @@ export function BatteryWheelChart({
   showScore = true,
   scoreClassName,
   percentClassName,
+  animate = true,
 }: BatteryWheelChartProps) {
   const cx = size / 2;
   const cy = size / 2;
@@ -85,33 +86,12 @@ export function BatteryWheelChart({
     });
   }, [items, rMax]);
 
-  const renderCustomSector = (props: PieSectorShapeProps) => {
-    const { cx: sectorCx, cy: sectorCy, startAngle, endAngle, payload, ...rest } = props;
-    delete (rest as { key?: unknown }).key;
-    const petal = payload as PetalData | undefined;
-    const sectorOuterRadius = petal?.outerRadius ?? rMax;
-
-    return (
-      <Sector
-        {...rest}
-        cx={sectorCx ?? cx}
-        cy={sectorCy ?? cy}
-        innerRadius={0}
-        outerRadius={sectorOuterRadius}
-        startAngle={startAngle}
-        endAngle={endAngle}
-        fill={petal?.color}
-        stroke="#ffffff"
-        strokeWidth={2}
-        cornerRadius={4}
-        className="cursor-pointer transition-all duration-300 hover:opacity-95"
-      />
-    );
-  };
-
   const badgeSize = Math.round(size * 0.42);
   const roundedScore = score === null || score === undefined ? null : Math.round(score);
   const scoreDigits = roundedScore === null ? 0 : String(Math.abs(roundedScore)).length;
+
+  let currentStartAngle = 0;
+  const anglePerSlice = 360 / 8;
 
   return (
     <div
@@ -142,26 +122,34 @@ export function BatteryWheelChart({
           }}
           wrapperStyle={{ zIndex: 50, pointerEvents: 'none', transition: 'none' }}
         />
-        <Pie
-          data={data}
-          dataKey="value"
-          nameKey="label"
-          cx={cx}
-          cy={cy}
-          innerRadius={0}
-          outerRadius={(entry: { outerRadius?: number }) => entry.outerRadius ?? rMax}
-          paddingAngle={2.5}
-          startAngle={0}
-          endAngle={-360}
-          shape={renderCustomSector}
-          isAnimationActive={false}
-          stroke="#ffffff"
-          strokeWidth={2}
-        >
-          {data.map((entry) => (
-            <Cell key={entry.key} fill={entry.color} stroke="#ffffff" strokeWidth={2} />
-          ))}
-        </Pie>
+        {data.map((entry, index) => {
+          const pieStartAngle = currentStartAngle;
+          const pieEndAngle = currentStartAngle + anglePerSlice;
+          currentStartAngle += anglePerSlice;
+
+          return (
+            <Pie
+              key={`slice-${entry.key || index}`}
+              data={[entry]}
+              dataKey="value"
+              cx={cx}
+              cy={cy}
+              startAngle={pieStartAngle + 1.25}
+              endAngle={pieEndAngle - 1.25}
+              innerRadius={0}
+              outerRadius={entry.outerRadius}
+              isAnimationActive={animate}
+              animationDuration={1500}
+              animationEasing="ease-out"
+              cornerRadius={4}
+              stroke="#ffffff"
+              strokeWidth={2}
+              className="cursor-pointer transition-all duration-300 hover:opacity-95"
+            >
+              <Cell fill={entry.color} />
+            </Pie>
+          );
+        })}
       </PieChart>
 
       {/* Center badge showing the battery score */}

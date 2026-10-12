@@ -1,7 +1,7 @@
 import { ClientDepartmentHeader } from '@/components/clients';
 import { BatteryIcon, Gx7BadgeLogo, HeartIcon, ResultDecorBlob } from '@/components/icons';
-import { AREA_BADGE, AREA_COLOR, AREA_ICON_MAP } from '@/constants/dashboard';
-import { ZONE_COLORS } from '@/constants/tokens';
+import { AREA_BAR_COLORS, AREA_ICON_MAP, AREA_LIGHT_COLOR } from '@/constants/dashboard';
+import { DASHBOARD_COLORS, ZONE_COLORS } from '@/constants/tokens';
 import { normalizeAreaLabel, resolveZoneKey } from '@/lib/battery';
 import { cn } from '@/lib/utils';
 import type { BatteryAreaResultDto } from '@/types/battery';
@@ -74,16 +74,16 @@ export function BatteryResultsHero({
               {strongestAreas.map((item) => {
                 const area = normalizeAreaLabel(item.area);
                 const Icon = AREA_ICON_MAP[area] ?? HeartIcon;
-                const badgeBg = AREA_BADGE[area] ?? 'bg-neutral-grey-7';
-                const iconColor = AREA_COLOR[area];
+                const badgeBg = AREA_BAR_COLORS[area] ?? 'bg-neutral-grey-7';
+                const iconColor = AREA_LIGHT_COLOR[area] ?? DASHBOARD_COLORS.neutral.whiteSolid;
                 return (
                   <div
                     key={item.area}
-                    className="flex h-[112px] w-[104px] max-w-[104px] shrink-0 flex-col items-center justify-center gap-2 rounded-xl bg-brand-green-1 px-2 py-2.5"
+                    className="flex h-[88px] w-[104px] max-w-[104px] shrink-0 flex-col items-center justify-center gap-1.5 rounded-xl bg-brand-green-1 p-2"
                   >
                     <div
                       className={cn(
-                        'flex h-[48px] w-[48px] items-center justify-center rounded-full',
+                        'flex h-[48px] w-[48px] shrink-0 items-center justify-center rounded-full',
                         badgeBg,
                       )}
                     >

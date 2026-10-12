@@ -119,6 +119,9 @@ export function HistoricalTrendChart({
               stroke={lineColor}
               strokeWidth={3}
               connectNulls
+              isAnimationActive
+              animationDuration={1500}
+              animationEasing="ease-out"
               dot={{ r: 5, fill: '#FFFFFF', stroke: dotColor ?? lineColor, strokeWidth: 2.5 }}
               activeDot={{ r: 7, fill: '#FFFFFF', stroke: dotColor ?? lineColor, strokeWidth: 3 }}
             />

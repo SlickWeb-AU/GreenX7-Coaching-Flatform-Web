@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect, useRef, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 
 import { BaseLoading } from '@/components/base';
@@ -30,16 +30,27 @@ function BatteryCheckPageContent() {
     enabled: Boolean(clientSlug && departmentSlug && deviceId),
   });
 
-  // BC/E7: trạng thái (đóng / đã nộp / mở) xét LÚC MỞ LINK. Đã vào luồng làm bài thì
-  // giữ nguyên trạng thái lúc đó: query tự gọi lại khi quay về tab, và ngay sau khi
-  // nộp server đã trả "already submitted" — trước đây màn kết quả bị thay bằng màn
-  // đã nộp chỉ vì người dùng sang tab khác rồi quay lại. Nộp khi kỳ vừa đóng thì
-  // API submit vẫn từ chối và luồng tự hiện màn đóng.
-  const lockedState = useRef<typeof freshState>(undefined);
-  if (!lockedState.current && freshState?.state === BATTERY_CHECK_STATES.OPEN) {
-    lockedState.current = freshState;
+  // Status is evaluated on initial load. Once in the check flow,
+  // lockedState preserves the in-progress session across tab switches.
+  const [lockedState] = useState<typeof freshState>(undefined);
+  const stateData = lockedState ?? freshState;
+
+  const isClosed =
+    stateData?.state === BATTERY_CHECK_STATES.CLOSED ||
+    stateData?.state === BATTERY_CHECK_STATES.NOT_CONFIGURED;
+
+  if (isClosed) {
+    return (
+      <BatteryStatusScreen
+        variant="closed"
+        clientName={stateData?.branding?.clientName}
+        departmentName={stateData?.branding?.departmentName}
+        clientLogoUrl={stateData?.branding?.darkLogoUrl || stateData?.branding?.whiteLogoUrl}
+        nextOpensAt={stateData?.nextOpensAt}
+        timeZone={stateData?.timezone}
+      />
+    );
   }
-  const stateData = lockedState.current ?? freshState;
 
   if (isLoading || !stateData) {
     if (isError) {
@@ -60,22 +71,6 @@ function BatteryCheckPageContent() {
       );
     }
     return <BaseLoading message="Loading battery check..." fullScreen />;
-  }
-
-  if (
-    stateData.state === BATTERY_CHECK_STATES.CLOSED ||
-    stateData.state === BATTERY_CHECK_STATES.NOT_CONFIGURED
-  ) {
-    return (
-      <BatteryStatusScreen
-        variant="closed"
-        clientName={stateData.branding.clientName}
-        departmentName={stateData.branding.departmentName}
-        clientLogoUrl={stateData.branding.darkLogoUrl || stateData.branding.whiteLogoUrl}
-        nextOpensAt={stateData.nextOpensAt}
-        timeZone={stateData.timezone}
-      />
-    );
   }
 
   if (stateData.state === BATTERY_CHECK_STATES.ALREADY_SUBMITTED) {
