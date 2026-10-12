@@ -48,8 +48,8 @@ export function BatteryResultsView({
 
       {/* Score Breakdown Section */}
       <section className="relative w-full overflow-hidden bg-brand-green-2">
-        <div className="pointer-events-none absolute bottom-0 right-0 z-0 select-none opacity-40 lg:hidden">
-          <BreakdownDecorWheel className="h-[380px] w-auto max-w-[85vw] translate-x-1/4 translate-y-1/4 object-contain" />
+        <div className="pointer-events-none absolute left-1/2 top-[20%] z-0 -translate-x-1/2 select-none opacity-100 lg:hidden">
+          <BreakdownDecorWheel className="h-auto w-auto max-w-none rotate-[15deg] md:scale-[2.5]" />
         </div>
         <div className="relative z-10 mx-auto w-full max-w-[1256px]">
           <div className="p-4 sm:p-6 md:p-8">

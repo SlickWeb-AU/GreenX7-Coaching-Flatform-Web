@@ -63,7 +63,7 @@ export function BatteryLanding({
             <button
               type="button"
               onClick={onHowItWorks}
-              className="hidden font-bold text-brand-green-5 underline underline-offset-4 transition-colors hover:text-white md:inline"
+              className="relative hidden flex-col items-center font-bold text-brand-green-5 transition-colors after:h-[1.5px] after:w-[92%] after:bg-current hover:text-white md:inline-flex"
             >
               How it works?
             </button>
@@ -83,7 +83,7 @@ export function BatteryLanding({
             <button
               type="button"
               onClick={onHowItWorks}
-              className="body-18-bold mt-4 text-brand-green-5 underline underline-offset-4 transition-colors hover:text-white md:hidden"
+              className="body-18-bold relative mt-4 inline-flex flex-col items-center text-brand-green-5 transition-colors after:h-[1.5px] after:w-[92%] after:bg-current hover:text-white md:hidden"
             >
               How it works?
             </button>
