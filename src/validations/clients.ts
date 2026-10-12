@@ -65,7 +65,7 @@ export const clientFormSchema = z
     status: z
       .enum([CLIENT_STATUSES.ACTIVE, CLIENT_STATUSES.INACTIVE])
       .default(CLIENT_STATUSES.ACTIVE),
-    contacts: z.array(clientContactSchema).default([]),
+    contacts: z.array(clientContactSchema).min(1, 'At least one contact is required.').default([]),
     departments: z
       .array(clientDepartmentSchema)
       .min(1, 'Please add at least one department.')
