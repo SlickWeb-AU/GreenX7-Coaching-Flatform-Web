@@ -33,7 +33,7 @@ export function BatteryEmailCard({ onSubmitEmail, isPending, disabled }: Battery
   };
 
   return (
-    <section className="w-full bg-brand-green-1 px-[40px] py-[40px] text-white shadow-none">
+    <section className="w-full bg-brand-green-1 px-[40px] py-[40px] text-white shadow-none md:px-10 md:py-12">
       <Send size={32} className="mb-4 -rotate-12 text-secondary-yellow-1" />
 
       <h3 className="text-[24px] font-bold leading-tight text-white">
@@ -54,37 +54,29 @@ export function BatteryEmailCard({ onSubmitEmail, isPending, disabled }: Battery
         ) : (
           <form onSubmit={handleSubmit} noValidate>
             <div className="flex items-center gap-2.5">
-              <div className="relative flex h-14 flex-1 flex-col justify-center rounded-xl border border-brand-green-3/40 bg-[#00271E] px-4 py-2 transition-colors focus-within:border-brand-green-3">
-                <label
-                  htmlFor="battery-result-email"
-                  className="mb-0.5 block text-[11px] font-medium leading-none text-white/70"
-                >
-                  Email
-                </label>
-                <input
-                  id="battery-result-email"
-                  type="email"
-                  placeholder="name@email.com.au"
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    if (emailError) setEmailError(null);
-                  }}
-                  disabled={isPending || disabled}
-                  className="body-16-medium w-full bg-transparent leading-none text-white placeholder-white/30 outline-none"
-                />
-              </div>
+              <input
+                id="battery-result-email"
+                type="email"
+                placeholder="name@example.com"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (emailError) setEmailError(null);
+                }}
+                disabled={isPending || disabled}
+                className="body-16-medium h-14 flex-1 rounded-xl border border-brand-green-3/40 bg-brand-green-2 px-4 text-white placeholder-white/40 outline-none transition-colors focus:border-brand-green-3"
+              />
 
               <button
                 type="submit"
                 disabled={isPending || disabled || !email.trim()}
                 aria-label="Send results email"
-                className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-brand-green-2 text-white transition-opacity hover:opacity-90 disabled:opacity-40"
+                className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-brand-green-3/40 text-white transition-opacity hover:opacity-90 disabled:opacity-40"
               >
                 {isPending ? (
-                  <Loader2 className="h-6 w-6 animate-spin" />
+                  <Loader2 className="h-6 w-6 animate-spin text-white" />
                 ) : (
-                  <ArrowRight className="h-6 w-6" />
+                  <ArrowRight className="h-6 w-6 text-white" />
                 )}
               </button>
             </div>

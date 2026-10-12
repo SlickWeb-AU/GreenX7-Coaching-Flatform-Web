@@ -4,6 +4,7 @@ import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { batteryCheckApi } from '@/features/battery-check/battery-check.api';
 import type { BatterySubmitResult } from '@/types/battery';
+import { BreakdownDecorWheel } from '@/components/icons';
 import { BatteryEmailCard } from './BatteryEmailCard';
 import { BatteryRechargeAccordion } from './BatteryRechargeAccordion';
 import { BatteryResultsHero } from './BatteryResultsHero';
@@ -30,7 +31,7 @@ export function BatteryResultsView({
   return (
     <main className="min-h-screen w-full overflow-x-clip text-neutral-grey-1">
       <section className="w-full bg-brand-green-2">
-        <div className="mx-auto w-full max-w-md">
+        <div className="mx-auto w-full max-w-[1256px]">
           <BatteryResultsHero
             average={result.batteryScore}
             zoneKey={result.zoneKey}
@@ -45,20 +46,29 @@ export function BatteryResultsView({
         </div>
       </section>
 
-      <section className="w-full bg-forest-light">
-        <div className="mx-auto w-full max-w-md">
-          <div className="p-4">
+      {/* Score Breakdown Section */}
+      <section className="relative w-full overflow-hidden bg-brand-green-2">
+        <div className="pointer-events-none absolute bottom-0 right-0 z-0 select-none opacity-40 lg:hidden">
+          <BreakdownDecorWheel className="h-[380px] w-auto max-w-[85vw] translate-x-1/4 translate-y-1/4 object-contain" />
+        </div>
+        <div className="relative z-10 mx-auto w-full max-w-[1256px]">
+          <div className="p-4 sm:p-6 md:p-8">
             <BatteryScoreBreakdown areas={result.areaScores} average={result.batteryScore} />
           </div>
+        </div>
+      </section>
 
-          <div className="px-[40px] pb-[40px]">
+      {/* Recharge Tips Section */}
+      <section className="w-full bg-forest-light">
+        <div className="mx-auto w-full max-w-full md:max-w-none lg:max-w-2xl xl:max-w-3xl">
+          <div className="px-[40px] py-[40px] md:px-10 md:py-10">
             <BatteryRechargeAccordion tips={result.rechargeTips} />
           </div>
         </div>
       </section>
 
       <section className="w-full bg-brand-green-1">
-        <div className="mx-auto w-full max-w-md">
+        <div className="mx-auto w-full max-w-full md:max-w-none lg:max-w-2xl xl:max-w-3xl">
           <BatteryEmailCard
             onSubmitEmail={async (email) => {
               await emailMutation.mutateAsync(email);

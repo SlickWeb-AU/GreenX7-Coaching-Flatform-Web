@@ -5,6 +5,7 @@ import { BaseButton, BaseIconButton } from '@/components/base';
 import { ClientDepartmentHeader } from '@/components/clients';
 import {
   GreenX7LogoDark,
+  Gx7BadgeLogo,
   HowItWorksStep1Icon,
   HowItWorksStep2Icon,
   HowItWorksStep3Icon,
@@ -98,20 +99,23 @@ export function BatteryOnboardingModal({
         <HowItWorksWheelLgIcon className="h-[250px] w-auto min-w-[630px] object-contain opacity-70" />
       </div>
 
-      <div className="mx-auto flex min-h-screen w-full max-w-1600 flex-col justify-between px-6 pt-8 md:px-12 md:pt-12 lg:px-16 lg:pt-16">
-        <header className="mb-8 flex w-full items-center justify-center md:mb-[60px] md:items-center md:justify-between">
-          <GreenX7LogoDark className="hidden h-auto w-auto md:block md:h-[28px] lg:h-[58px]" />
+      <div className="mx-auto flex min-h-screen w-full max-w-1600 flex-col justify-between px-6 pb-8 pt-8 md:px-12 md:pb-12 md:pt-12 lg:px-16 lg:pb-16 lg:pt-16">
+        <header className="mb-8 flex w-full items-center justify-between md:mb-[60px]">
           <ClientDepartmentHeader
             clientName={clientName}
             departmentName={departmentName}
             clientLogoUrl={clientLogoUrl}
             align="left"
-            className="items-center text-center md:items-end md:text-right"
-            logoWrapperClassName="justify-center md:justify-end"
+            className="items-start text-left"
+            logoWrapperClassName="justify-start"
             logoClassName="h-8 md:h-10"
             nameClassName="heading-24-bold text-neutral-grey-1"
             departmentClassName="text-neutral-grey-1"
           />
+          <div className="flex shrink-0 items-center">
+            <Gx7BadgeLogo className="text-brand-green-2 md:hidden" width={60} height={58} />
+            <GreenX7LogoDark className="hidden h-auto w-auto md:block md:h-[48px]" />
+          </div>
         </header>
 
         <section className="relative my-auto flex w-full flex-col items-center justify-center">
@@ -224,13 +228,6 @@ export function BatteryOnboardingModal({
             </div>
           </div>
         </section>
-
-        <div className="md:hidden">
-          <footer className="flex w-full flex-col items-center justify-center pt-8">
-            <GreenX7LogoDark className="h-10 w-auto" />
-          </footer>
-          <div aria-hidden className="h-[50px]" />
-        </div>
       </div>
     </div>
   );

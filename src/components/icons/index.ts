@@ -52,3 +52,4 @@ export * from './BatteryStatusTopLeftWave';
 export * from './BatteryStatusBottomRightWave';
 export * from './BatteryStatusCheckIcon';
 export * from './BatteryStatusCalendarIcon';
+export * from './BreakdownDecorWheel';
