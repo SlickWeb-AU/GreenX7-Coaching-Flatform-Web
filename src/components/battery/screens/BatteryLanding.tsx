@@ -28,7 +28,7 @@ export function BatteryLanding({
 }: BatteryLandingProps) {
   return (
     <main className="relative flex h-dvh w-full flex-col justify-between overflow-hidden bg-brand-green-2 text-white">
-      <div className="relative z-10 mx-auto flex w-full max-w-1600 flex-1 flex-col justify-between px-[60px] pb-6 pt-9 md:px-[80px]">
+      <div className="relative z-10 mx-auto flex w-full max-w-1440 flex-1 flex-col justify-between px-[60px] pb-6 pt-9 md:px-[80px]">
         <div className="pointer-events-none absolute -top-8 left-0 z-0 w-full md:hidden">
           <WheelXsIcon className="h-auto w-full object-cover opacity-60" />
         </div>
@@ -55,10 +55,10 @@ export function BatteryLanding({
 
         <section className="relative z-10 my-auto flex w-full flex-col items-center py-2 text-center md:items-start md:py-6 md:text-left lg:w-3/5">
           <div className="mb-3 flex w-full items-center justify-center md:mb-5 md:justify-start">
-            <HowsYourBatterySticker className="h-[240px] w-[250px] object-contain drop-shadow-md md:h-[270px] md:w-[280px]" />
+            <HowsYourBatterySticker className="h-[240px] w-[250px] object-contain drop-shadow-md md:h-auto md:w-[320px]" />
           </div>
 
-          <p className="body-18-medium md:body-20-medium mb-4 max-w-[400px] leading-relaxed text-brand-green-5 md:mb-11">
+          <p className="body-18-medium md:body-24-medium mb-9 max-w-[400px] leading-relaxed text-brand-green-5 md:mb-11 md:max-w-[480px]">
             Take 60 seconds to bring awareness to your wellbeing.{' '}
             <button
               type="button"
@@ -75,7 +75,7 @@ export function BatteryLanding({
               size="large"
               pill
               onClick={onStart}
-              className="min-w-[240px] bg-brand-green-3 px-8 text-brand-green-2 transition-all hover:opacity-90 active:scale-[0.99]"
+              className="md:body-24-medium min-w-[240px] bg-brand-green-3 px-8 text-brand-green-2 transition-all hover:opacity-90 active:scale-[0.99]"
             >
               Start Battery Check
             </BaseButton>
@@ -83,7 +83,7 @@ export function BatteryLanding({
             <button
               type="button"
               onClick={onHowItWorks}
-              className="body-18-bold relative mt-4 inline-flex flex-col items-center text-brand-green-5 transition-colors after:h-[1.5px] after:w-[92%] after:bg-current hover:text-white md:hidden"
+              className="body-18-bold relative mt-8 inline-flex flex-col items-center text-brand-green-5 transition-colors after:h-[1.5px] after:w-[92%] after:bg-current hover:text-white md:hidden"
             >
               How it works?
             </button>
