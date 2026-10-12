@@ -82,7 +82,7 @@ export function BatteryQuestionStep({
           <h2 className="heading-36-bold md:heading-48-black mb-2 leading-tight text-black md:mb-4">
             {title}
           </h2>
-          <p className="body-18-medium md:body-24-medium min-h-[56px] text-black md:min-h-[90px]">
+          <p className="body-18-medium md:body-24-medium min-h-[72px] text-black md:min-h-[90px]">
             {prompt.question}
           </p>
         </div>

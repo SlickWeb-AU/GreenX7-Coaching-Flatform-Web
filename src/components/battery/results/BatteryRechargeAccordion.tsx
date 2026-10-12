@@ -65,9 +65,8 @@ export function BatteryRechargeAccordion({ tips }: BatteryRechargeAccordionProps
 
   return (
     <section className="w-full">
-      <h2 className="mb-2 mt-8 text-left text-[30px] font-bold leading-tight text-brand-green-1">
-        Ways to recharge
-        <br />
+      <h2 className="heading-30-bold lg:heading-48-black mb-6 mt-8 text-left leading-tight text-brand-green-1">
+        Ways to recharge <br className="sm:hidden" />
         your battery
       </h2>
 

@@ -49,13 +49,13 @@ export function AuthProvider({
 
   // Khi refresh token cũng hết hạn, axios báo về đây để dọn state và đưa về màn đăng nhập
   useEffect(() => {
-    setSessionExpiredHandler(() => {
+    setSessionExpiredHandler((reason = 'session_expired') => {
       setUser(null);
       queryClient.clear();
       if (typeof window !== 'undefined') {
-        window.location.href = '/api/auth/logout?reason=session_expired';
+        window.location.href = `/api/auth/logout?reason=${reason}`;
       } else {
-        router.replace(ROUTES.login);
+        router.replace(`${ROUTES.login}?error=${reason}`);
       }
     });
   }, [queryClient, router]);

@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers';
 import { type NextRequest, NextResponse } from 'next/server';
 
+import { ENV } from '@/constants/env';
 import { ROUTES } from '@/config/routes';
 import { backendFetch } from '@/lib/backend';
 import { clearAuthCookies, COOKIE_NAMES } from '@/lib/cookies';
@@ -37,7 +38,7 @@ export async function GET(request: NextRequest) {
   }
 
   const reason = request.nextUrl.searchParams.get('reason');
-  const loginUrl = new URL(ROUTES.login, request.url);
+  const loginUrl = new URL(ROUTES.login, ENV.APP_URL);
   if (reason) {
     loginUrl.searchParams.set('error', reason);
   }

@@ -32,7 +32,7 @@ export interface BatteryCheckFlowProps {
 export function BatteryCheckFlow({ clientSlug, departmentSlug, stateData }: BatteryCheckFlowProps) {
   const clientName = stateData?.branding.clientName ?? formatSlugLabel(clientSlug);
   const departmentName = stateData?.branding.departmentName ?? formatSlugLabel(departmentSlug);
-  const clientLogoUrl = stateData?.branding.darkLogoUrl ?? null;
+  const clientLogoUrl = stateData?.branding.darkLogoUrl || stateData?.branding.whiteLogoUrl || null;
 
   const prompts = useMemo(
     () =>

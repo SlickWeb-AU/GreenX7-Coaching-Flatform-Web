@@ -591,7 +591,6 @@ export function EditClientForm({
                           icon={<Trash2 size={20} aria-hidden />}
                           disabled={
                             departmentFields.length <= 1 ||
-                            Boolean((field as { isCompanyWide?: boolean }).isCompanyWide) ||
                             persist.busyKey === deptDeleteKey(field.id)
                           }
                           className="text-neutral-grey-3 hover:text-secondary-red-4"
