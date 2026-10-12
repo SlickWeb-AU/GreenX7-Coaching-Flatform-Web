@@ -64,6 +64,8 @@ export interface ClientDetail {
   checkInStartDay: number;
   checkInEndDay: number;
   timezone: string;
+  /** Kỳ check-in đang mở; null nếu không có. Mốc đã chốt lúc sinh kỳ, không theo lịch hiện tại. */
+  openPeriod?: { opensAt: string; closesAt: string } | null;
   autoSendReport: boolean;
   contacts: ClientContact[];
   departments: ClientDepartment[];

@@ -69,6 +69,13 @@ export interface EditClientFormProps {
   scrollTo?: string;
   /** When true, append one draft department row on mount. */
   autoAddDepartment?: boolean;
+  /**
+   * closesAt của kỳ đang mở (ISO) — dòng "open until" đọc từ bản ghi kỳ, không từ
+   * lịch client: sửa lịch giữa kỳ không đổi kỳ đang chạy.
+   */
+  openUntil?: string | null;
+  /** Múi giờ của client, để in ngày đóng kỳ theo giờ của họ */
+  timezone?: string;
 }
 
 export function EditClientForm({
@@ -85,6 +92,8 @@ export function EditClientForm({
   submitLabel = 'Save changes',
   scrollTo,
   autoAddDepartment = false,
+  openUntil = null,
+  timezone,
 }: EditClientFormProps) {
   const persist = useClientRowPersistence(clientId);
 
@@ -103,16 +112,13 @@ export function EditClientForm({
     defaultValues: initial,
   });
 
-  const todayDay = new Date().getDate();
-  const currentStartDay = initial?.checkInStartDay;
-  const currentEndDay = initial?.checkInEndDay;
-  const isWindowOpen =
-    currentStartDay !== undefined &&
-    currentStartDay !== null &&
-    currentEndDay !== undefined &&
-    currentEndDay !== null &&
-    todayDay >= currentStartDay &&
-    todayDay <= currentEndDay;
+  const openUntilLabel = openUntil
+    ? new Date(openUntil).toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'long',
+        timeZone: timezone,
+      })
+    : null;
 
   const {
     fields: contactFields,
@@ -634,10 +640,10 @@ export function EditClientForm({
         prefixIcon={<MonthlyScheduleIcon label="Monthly schedule icon" />}
       >
         <div className="space-y-4">
-          {isWindowOpen && currentEndDay && (
+          {openUntilLabel && (
             <div className="body-14-medium rounded-lg border border-neutral-grey-5 bg-white p-3.5 text-secondary-orange-1">
-              The current check-in window is open until {formatDayOfMonth(currentEndDay)}. Schedule
-              changes will apply from the next period.
+              The current check-in window is open until {openUntilLabel}. Changes to the schedule
+              will apply from the next period.
             </div>
           )}
 
@@ -649,7 +655,6 @@ export function EditClientForm({
                 <BaseDatePicker
                   label="Start day"
                   size="mediumPlus"
-                  disabled={isWindowOpen}
                   maxDay={CLIENT_CHECK_IN_DAY_MAX}
                   format={formatDayOfMonth}
                   value={field.value}
@@ -668,7 +673,6 @@ export function EditClientForm({
                 <BaseDatePicker
                   label="End day"
                   size="mediumPlus"
-                  disabled={isWindowOpen}
                   maxDay={CLIENT_CHECK_IN_DAY_MAX}
                   format={formatDayOfMonth}
                   value={field.value}

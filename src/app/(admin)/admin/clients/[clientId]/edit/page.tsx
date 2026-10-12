@@ -145,6 +145,8 @@ export default function EditClientPage() {
         showSubmitAction={false}
         scrollTo={scrollTo}
         autoAddDepartment={autoAddDepartment}
+        openUntil={data.openPeriod?.closesAt ?? null}
+        timezone={data.timezone}
         onCancel={() => router.push(ROUTES.admin.clientDetail(clientId))}
         isSubmitting={update.isPending}
         onSubmit={(values) => {
