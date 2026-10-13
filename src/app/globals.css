@@ -37,6 +37,9 @@
   .heading-80-bold {
     @apply text-[5rem] font-bold leading-[1.0] tracking-tight-4;
   }
+  .heading-72-black {
+    @apply text-[4.5rem] font-black leading-[1.0] tracking-tight-4;
+  }
   .heading-64-bold {
     @apply text-[4rem]/[4.25rem] font-bold tracking-tight-3;
   }

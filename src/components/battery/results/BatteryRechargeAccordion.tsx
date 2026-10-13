@@ -91,7 +91,7 @@ export function BatteryRechargeAccordion({ tips }: BatteryRechargeAccordionProps
                 <div className="mb-2 flex w-full items-center justify-between">
                   <span
                     className={cn(
-                      'caption-12-bold rounded-full px-2.5 py-0.5 text-neutral-600',
+                      'body-14-regular rounded-full px-2.5 py-0.5 text-neutral-600',
                       AREA_BADGE[area],
                     )}
                   >
@@ -103,7 +103,9 @@ export function BatteryRechargeAccordion({ tips }: BatteryRechargeAccordionProps
                     <ChevronDown size={32} className="text-neutral-600" />
                   )}
                 </div>
-                <h3 className="text-left text-[18px] font-bold text-black">{tip.title}</h3>
+                <h3 className="body-18-bold lg:body-20-bold text-left text-neutral-grey-1">
+                  {tip.title}
+                </h3>
               </button>
 
               {isOpen && (
