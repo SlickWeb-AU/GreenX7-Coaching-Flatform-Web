@@ -1,6 +1,8 @@
 /**
  * Slide 04 — Take a Moment (Reflect & Breakdown)
  */
+import { useEffect, useState } from 'react';
+
 import { BatteryIcon, BoltIcon, CardDecorBlob, Gx7BadgeLogo, HeartIcon } from '@/components/icons';
 import { AreaScoreProgressBar, BatteryWheelChart } from '@/components/dashboard';
 import {
@@ -18,10 +20,20 @@ import { StandardSlideLayout } from '@/components/presentation/StandardSlideLayo
 import { StaticSlide } from '@/components/presentation/StaticSlide';
 
 export function TakeAMomentSlide({ ...slideProps }: BaseSlideProps = {}) {
+  const [active, setActive] = useState(false);
   const pres = usePresentation();
   const rawScore = pres.score;
   const displayScore = rawScore !== null ? Math.round(rawScore) : null;
   const displayItems = pres.items;
+
+  useEffect(() => {
+    setActive(false);
+    const timer = setTimeout(() => {
+      setActive(true);
+    }, 50);
+    return () => clearTimeout(timer);
+  }, [displayScore]);
+
   const strongest = [...displayItems]
     .filter((i) => i.score !== null && i.score !== undefined)
     .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
@@ -62,7 +74,7 @@ export function TakeAMomentSlide({ ...slideProps }: BaseSlideProps = {}) {
                   <span className="body-20-bold text-brand-green-5">Your battery score:</span>
                   <div className="relative mt-2 flex items-center justify-center">
                     <BatteryIcon
-                      percentage={displayScore ?? 0}
+                      percentage={active ? (displayScore ?? 0) : 0}
                       width={132}
                       height={64}
                       className="h-[64px] w-[132px]"
@@ -116,7 +128,17 @@ export function TakeAMomentSlide({ ...slideProps }: BaseSlideProps = {}) {
             <div className="flex h-fit w-80 translate-y-[50px] flex-col rounded-[20px] border border-neutral-grey-6 bg-white p-5 text-neutral-grey-1 transition-transform duration-500">
               <span className="body-16-bold block text-brand-green-1">Score breakdown</span>
               <div className="flex justify-center py-1">
-                <BatteryWheelChart score={rawScore ?? null} items={displayItems} size={200} />
+                {active ? (
+                  <BatteryWheelChart
+                    score={rawScore ?? null}
+                    items={displayItems}
+                    size={200}
+                    animate={true}
+                    animationDuration={1500}
+                  />
+                ) : (
+                  <div className="h-[200px] w-[200px]" />
+                )}
               </div>
 
               <div className="flex flex-col border-t border-neutral-grey-6/40 pt-1">
@@ -138,6 +160,7 @@ export function TakeAMomentSlide({ ...slideProps }: BaseSlideProps = {}) {
                       score={itemScore ?? 0}
                       displayValue={itemScore ?? '—'}
                       Icon={Icon}
+                      active={active}
                       size="sm"
                       className="py-1.5"
                     />

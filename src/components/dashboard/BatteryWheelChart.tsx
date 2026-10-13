@@ -18,6 +18,7 @@ export interface BatteryWheelChartProps {
   scoreClassName?: string;
   percentClassName?: string;
   animate?: boolean;
+  animationDuration?: number;
 }
 
 /**
@@ -48,6 +49,7 @@ export function BatteryWheelChart({
   scoreClassName,
   percentClassName,
   animate = true,
+  animationDuration = 1500,
 }: BatteryWheelChartProps) {
   const cx = size / 2;
   const cy = size / 2;
@@ -139,7 +141,7 @@ export function BatteryWheelChart({
               innerRadius={0}
               outerRadius={entry.outerRadius}
               isAnimationActive={animate}
-              animationDuration={1500}
+              animationDuration={animationDuration}
               animationEasing="ease-out"
               cornerRadius={4}
               stroke="#ffffff"

@@ -1,3 +1,7 @@
+'use client';
+
+import { useEffect, useRef, useState } from 'react';
+
 import { BoltIcon } from '@/components/icons';
 import type { AreaIcon } from '@/constants/dashboard';
 import { cn } from '@/lib/utils';
@@ -13,6 +17,7 @@ export interface AreaScoreProgressBarProps {
   active?: boolean;
   size?: 'sm' | 'md';
   className?: string;
+  duration?: number;
 }
 
 export function AreaScoreProgressBar({
@@ -26,8 +31,41 @@ export function AreaScoreProgressBar({
   active = true,
   size = 'md',
   className,
+  duration = 1500,
 }: AreaScoreProgressBarProps) {
   const isSm = size === 'sm';
+  const numericTarget = typeof displayValue === 'number' ? displayValue : null;
+  const [currentVal, setCurrentVal] = useState<number | null>(() => (active ? numericTarget : 0));
+  const rafRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (numericTarget === null) return;
+    if (!active) {
+      setCurrentVal(0);
+      return;
+    }
+
+    const startTime = performance.now();
+    const animate = (now: number) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      // ease-out cubic
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+      const val = numericTarget * easeOut;
+      setCurrentVal(Number(val.toFixed(Number.isInteger(numericTarget) ? 0 : 1)));
+
+      if (progress < 1) {
+        rafRef.current = requestAnimationFrame(animate);
+      } else {
+        setCurrentVal(numericTarget);
+      }
+    };
+
+    rafRef.current = requestAnimationFrame(animate);
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+  }, [active, numericTarget, duration]);
 
   return (
     <div className={cn('flex flex-col', className)}>
@@ -52,16 +90,17 @@ export function AreaScoreProgressBar({
             isSm ? 'body-14-bold' : 'text-[16px] font-black',
           )}
         >
-          <span>{displayValue ?? score ?? '—'}</span>
+          <span>{currentVal ?? displayValue ?? score ?? '—'}</span>
           <BoltIcon size={isSm ? 12 : 14} aria-hidden="true" />
         </div>
       </div>
 
       <div className={cn('w-full overflow-hidden rounded-full', isSm ? 'h-1.5' : 'h-2', badgeBg)}>
         <div
-          className={cn('h-full rounded-full transition-all duration-[1500ms] ease-out', barColor)}
+          className={cn('h-full rounded-full transition-all ease-out', barColor)}
           style={{
             width: active ? `${Math.min(100, Math.max(0, score))}%` : '0%',
+            transitionDuration: `${duration}ms`,
           }}
         />
       </div>
