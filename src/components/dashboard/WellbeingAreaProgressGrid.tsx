@@ -1,13 +1,22 @@
+import { useEffect, useRef, useState } from 'react';
+
 import { BaseCard, BaseTrend } from '@/components/base';
 import { BoltIcon, HeartIcon } from '@/components/icons';
 import { cn } from '@/lib/utils';
 import type { WellbeingItemData } from '@/types';
-import { AREA_BADGE, AREA_BAR_COLORS, AREA_COLOR, AREA_ICON_MAP } from '@/constants/dashboard';
+import {
+  ANIMATION_DURATION_MS,
+  AREA_BADGE,
+  AREA_BAR_COLORS,
+  AREA_COLOR,
+  AREA_ICON_MAP,
+} from '@/constants/dashboard';
 
 export interface WellbeingAreaProgressGridProps {
   items: WellbeingItemData[];
   previousMonthLabel?: string | null;
   className?: string;
+  active?: boolean;
 }
 
 function TrendIndicator({ value, label }: { value: number | null; label: string }) {
@@ -22,9 +31,11 @@ function TrendIndicator({ value, label }: { value: number | null; label: string 
 function AreaProgressRow({
   item,
   previousMonthLabel,
+  active = true,
 }: {
   item: WellbeingItemData;
   previousMonthLabel?: string | null;
+  active?: boolean;
 }) {
   const Icon = AREA_ICON_MAP[item.area] ?? HeartIcon;
   const barColor = AREA_BAR_COLORS[item.area] ?? 'bg-brand-green-2';
@@ -32,6 +43,36 @@ function AreaProgressRow({
   const iconColor = AREA_COLOR[item.area];
   const displayScore =
     item.score === null || item.score === undefined ? null : Math.round(item.score);
+  const [currentVal, setCurrentVal] = useState<number | null>(() => (active ? displayScore : 0));
+  const rafRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (displayScore === null) return;
+    if (!active) {
+      setCurrentVal(0);
+      return;
+    }
+
+    const duration = ANIMATION_DURATION_MS;
+    const startTime = performance.now();
+    const animate = (now: number) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+      setCurrentVal(Math.round(displayScore * easeOut));
+
+      if (progress < 1) {
+        rafRef.current = requestAnimationFrame(animate);
+      } else {
+        setCurrentVal(displayScore);
+      }
+    };
+
+    rafRef.current = requestAnimationFrame(animate);
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+  }, [active, displayScore]);
 
   return (
     <div className="flex w-full flex-col py-2">
@@ -48,15 +89,15 @@ function AreaProgressRow({
           <span className="body-16-bold text-neutral-grey-1">{item.label ?? item.area}</span>
         </div>
         <div className="flex items-center gap-1 text-neutral-grey-1">
-          <span className="body-18-bold leading-none">{displayScore ?? '—'}</span>
+          <span className="body-18-bold leading-none">{currentVal ?? displayScore ?? '—'}</span>
           <BoltIcon size={14} aria-hidden="true" />
         </div>
       </div>
 
       <div className={cn('h-1.5 w-full overflow-hidden rounded-full', badgeBg)}>
         <div
-          className={cn('h-full rounded-full transition-all duration-500', barColor)}
-          style={{ width: `${Math.min(100, Math.max(0, displayScore ?? 0))}%` }}
+          className={cn('h-full rounded-full transition-all duration-[3000ms] ease-out', barColor)}
+          style={{ width: active ? `${Math.min(100, Math.max(0, displayScore ?? 0))}%` : '0%' }}
         />
       </div>
 
@@ -75,6 +116,7 @@ export function WellbeingAreaProgressGrid({
   items,
   previousMonthLabel,
   className,
+  active = true,
 }: WellbeingAreaProgressGridProps) {
   if (!items || items.length === 0) {
     return <BaseCard title="Wellbeing areas" isEmpty className={className} />;
@@ -83,7 +125,12 @@ export function WellbeingAreaProgressGrid({
   return (
     <div className={cn('grid w-full grid-cols-1 gap-x-6 gap-y-1 lg:grid-cols-2', className)}>
       {items.map((item) => (
-        <AreaProgressRow key={item.area} item={item} previousMonthLabel={previousMonthLabel} />
+        <AreaProgressRow
+          key={item.area}
+          item={item}
+          previousMonthLabel={previousMonthLabel}
+          active={active}
+        />
       ))}
     </div>
   );

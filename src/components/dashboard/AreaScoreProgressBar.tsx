@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { BoltIcon } from '@/components/icons';
-import type { AreaIcon } from '@/constants/dashboard';
+import { ANIMATION_DURATION_MS, type AreaIcon } from '@/constants/dashboard';
 import { cn } from '@/lib/utils';
 
 export interface AreaScoreProgressBarProps {
@@ -31,7 +31,7 @@ export function AreaScoreProgressBar({
   active = true,
   size = 'md',
   className,
-  duration = 1500,
+  duration = ANIMATION_DURATION_MS,
 }: AreaScoreProgressBarProps) {
   const isSm = size === 'sm';
   const numericTarget = typeof displayValue === 'number' ? displayValue : null;
@@ -87,7 +87,7 @@ export function AreaScoreProgressBar({
         <div
           className={cn(
             'flex items-center gap-1 leading-none text-neutral-grey-1',
-            isSm ? 'body-14-bold' : 'text-[16px] font-black',
+            isSm ? 'body-14-bold' : 'body-16-black',
           )}
         >
           <span>{currentVal ?? displayValue ?? score ?? '—'}</span>

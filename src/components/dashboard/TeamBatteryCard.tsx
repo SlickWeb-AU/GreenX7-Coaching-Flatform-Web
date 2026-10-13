@@ -16,6 +16,7 @@ export interface TeamBatteryCardProps {
    */
   compact?: boolean;
   className?: string;
+  active?: boolean;
 }
 
 export function TeamBatteryCard({
@@ -24,6 +25,7 @@ export function TeamBatteryCard({
   previousMonthLabel,
   compact = false,
   className,
+  active = true,
 }: TeamBatteryCardProps) {
   const wheel = compact ? 200 : 280;
   const { strengths, focus } = calculateStrengthsAndFocus(items);
@@ -42,7 +44,11 @@ export function TeamBatteryCard({
         )}
       >
         <div className="w-full" style={{ maxWidth: wheel }}>
-          <BatteryWheelChart score={score} items={items} size={wheel} />
+          {active ? (
+            <BatteryWheelChart score={score} items={items} size={wheel} animate={true} />
+          ) : (
+            <div style={{ width: wheel, height: wheel }} />
+          )}
         </div>
         <div className="flex flex-col justify-center">
           <WellbeingStrengthsFocusCards strengths={strengths} focus={focus} />
@@ -50,7 +56,11 @@ export function TeamBatteryCard({
       </div>
 
       <div>
-        <WellbeingAreaProgressGrid items={items} previousMonthLabel={previousMonthLabel} />
+        <WellbeingAreaProgressGrid
+          items={items}
+          previousMonthLabel={previousMonthLabel}
+          active={active}
+        />
       </div>
     </BaseCard>
   );

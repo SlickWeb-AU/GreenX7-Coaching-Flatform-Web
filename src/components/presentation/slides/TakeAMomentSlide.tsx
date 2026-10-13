@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { BatteryIcon, BoltIcon, CardDecorBlob, Gx7BadgeLogo, HeartIcon } from '@/components/icons';
 import { AreaScoreProgressBar, BatteryWheelChart } from '@/components/dashboard';
 import {
+  ANIMATION_DURATION_MS,
   AREA_BADGE,
   AREA_BAR_COLORS,
   AREA_COLOR,
@@ -13,6 +14,7 @@ import {
   AREA_LIGHT_COLOR,
 } from '@/constants/dashboard';
 import { SCORE_ZONE_COPY, zoneKeyForScore, type ScoreZoneKey } from '@/constants/presentation';
+import { useCountUp } from '@/hooks/useCountUp';
 import { cn } from '@/lib/utils';
 import type { BaseSlideProps } from '@/types';
 import { usePresentation } from '@/components/presentation/PresentationContext';
@@ -24,6 +26,7 @@ export function TakeAMomentSlide({ ...slideProps }: BaseSlideProps = {}) {
   const pres = usePresentation();
   const rawScore = pres.score;
   const displayScore = rawScore !== null ? Math.round(rawScore) : null;
+  const animatedScore = useCountUp(displayScore, { active, duration: ANIMATION_DURATION_MS });
   const displayItems = pres.items;
 
   useEffect(() => {
@@ -81,16 +84,16 @@ export function TakeAMomentSlide({ ...slideProps }: BaseSlideProps = {}) {
                       aria-hidden="true"
                     />
                     <span className="body-32-black absolute inset-0 flex items-center justify-center pr-3 leading-none text-white drop-shadow-sm">
-                      {displayScore ?? '—'}
+                      {animatedScore ?? displayScore ?? '—'}
                       {displayScore !== null && (
-                        <span className="self-start pt-3 text-[16px] font-black">%</span>
+                        <span className="body-16-black self-start pt-3">%</span>
                       )}
                     </span>
                   </div>
                 </div>
 
                 <div className="mt-[85px] flex flex-col gap-2.5">
-                  <div className="text-[32px] font-black leading-[1.15]">
+                  <div className="body-32-black">
                     <span className="block">You are in the</span>
                     {/* Màu chữ giữ như cũ (cam) — chỉ nội dung đổi theo zone (bug 371) */}
                     <span className="block text-secondary-orange-1">{copy?.zone ?? '—'}</span>
@@ -134,7 +137,6 @@ export function TakeAMomentSlide({ ...slideProps }: BaseSlideProps = {}) {
                     items={displayItems}
                     size={200}
                     animate={true}
-                    animationDuration={1500}
                   />
                 ) : (
                   <div className="h-[200px] w-[200px]" />

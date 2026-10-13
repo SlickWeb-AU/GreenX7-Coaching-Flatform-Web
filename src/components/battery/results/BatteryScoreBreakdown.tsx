@@ -4,7 +4,13 @@ import { useEffect, useRef, useState } from 'react';
 
 import { AreaScoreProgressBar, BatteryWheelChart } from '@/components/dashboard';
 import { HeartIcon } from '@/components/icons';
-import { AREA_BADGE, AREA_BAR_COLORS, AREA_COLOR, AREA_ICON_MAP } from '@/constants/dashboard';
+import {
+  ANIMATION_DURATION_MS,
+  AREA_BADGE,
+  AREA_BAR_COLORS,
+  AREA_COLOR,
+  AREA_ICON_MAP,
+} from '@/constants/dashboard';
 import { useViewport } from '@/hooks/useViewport';
 import { normalizeAreaLabel } from '@/lib/battery';
 import { SCORE_INPUT_TYPE, formatScoreToPercent, type ScoreInputType } from '@/lib/utils';
@@ -67,7 +73,7 @@ export function BatteryScoreBreakdown({
               }))}
               size={280}
               animate={true}
-              animationDuration={1800}
+              animationDuration={ANIMATION_DURATION_MS}
             />
           ) : (
             <div className="h-[280px] w-[280px]" />
@@ -95,7 +101,7 @@ export function BatteryScoreBreakdown({
                 displayValue={item.answer}
                 Icon={Icon}
                 active={isActive}
-                duration={1800}
+                duration={ANIMATION_DURATION_MS}
               />
             );
           })}

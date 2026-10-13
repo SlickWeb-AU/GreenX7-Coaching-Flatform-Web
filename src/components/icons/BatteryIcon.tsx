@@ -23,7 +23,7 @@ export function BatteryIcon({ percentage = 0, animate = true, ...props }: Batter
             height="37"
             rx="10"
             fill="#9ACC63"
-            className={animate ? 'transition-all duration-[1200ms] ease-out' : undefined}
+            className={animate ? 'transition-all duration-[3000ms] ease-out' : undefined}
           />
         </svg>
       </g>
