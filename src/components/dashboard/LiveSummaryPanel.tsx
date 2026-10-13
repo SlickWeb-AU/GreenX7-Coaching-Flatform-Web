@@ -55,7 +55,7 @@ export function LiveSummaryPanel({
           <span className="body-20-medium text-neutral-grey-8">{departmentName ?? '—'}</span>
         </div>
 
-        <h1 className="heading-48-bold mt-2 leading-tight text-white">
+        <h1 className="heading-48-bold mt-2 text-white">
           How is <span className="text-secondary-orange-1">your</span>
           <br />
           <span className="text-secondary-orange-1">battery</span> today?

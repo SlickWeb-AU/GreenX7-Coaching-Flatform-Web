@@ -117,3 +117,11 @@ export const AREA_ICON_MAP: Record<string, AreaIcon> = {
   Relationships: RelationshipsIcon,
   Purpose: PurposeIcon,
 };
+
+/**
+ * Unified animation duration across all charts, bars, numbers, and batteries.
+ * Matches the legacy project's ANIMATE_DURATION (3000ms).
+ * ponytail: Tailwind classes can't interpolate this — literal `duration-[3000ms]`
+ * in JSX must be updated by hand if this value changes.
+ */
+export const ANIMATION_DURATION_MS = 3000;

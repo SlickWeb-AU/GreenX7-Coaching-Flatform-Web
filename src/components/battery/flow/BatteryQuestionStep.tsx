@@ -53,7 +53,8 @@ export function BatteryQuestionStep({
           />
           <h1 className="body-16-medium md:body-20-bold text-black">Battery Check</h1>
           <div className="body-16-regular md:body-24-regular text-black">
-            <span className="md:body-24-black font-black text-black">{index + 1}</span> of {total}
+            <span className="body-16-black md:body-24-black text-black">{index + 1}</span> of{' '}
+            {total}
           </div>
         </div>
 
@@ -79,9 +80,7 @@ export function BatteryQuestionStep({
               <Icon size={60} color={theme.color} className="hidden md:block" />
             </div>
           )}
-          <h2 className="heading-36-bold md:heading-48-black mb-2 leading-tight text-black md:mb-4">
-            {title}
-          </h2>
+          <h2 className="heading-36-bold md:heading-48-black mb-2 text-black md:mb-4">{title}</h2>
           <p className="body-18-medium md:body-24-medium min-h-[72px] text-black md:min-h-[90px]">
             {prompt.question}
           </p>

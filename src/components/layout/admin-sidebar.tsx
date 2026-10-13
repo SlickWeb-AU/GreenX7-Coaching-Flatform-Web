@@ -82,10 +82,10 @@ function SidebarContent({ onNavigate }: SidebarBodyProps) {
             <div className="flex items-center gap-3 px-4">
               <CircleUser size={32} className="shrink-0 text-neutral-grey-3" aria-hidden />
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-bold text-neutral-grey-1" title={displayName}>
+                <p className="body-14-bold truncate text-neutral-grey-1" title={displayName}>
                   {displayName}
                 </p>
-                <p className="truncate text-xs text-neutral-grey-3">
+                <p className="body-12-medium truncate text-neutral-grey-3">
                   {(user?.role && USER_ROLE_LABELS[user.role]) || user?.role || '—'}
                 </p>
               </div>

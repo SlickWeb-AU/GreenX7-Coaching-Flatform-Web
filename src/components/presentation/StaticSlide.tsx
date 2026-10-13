@@ -44,7 +44,7 @@ export function StaticSlide({
             <span className="sr-only">+ How&apos;s Your Battery? ™</span>
             <HowsYourBatterySticker className="h-auto w-[280px] drop-shadow-2xl" />
           </div>
-          <div className="heading-96-black uppercase leading-[0.92]">{headline}</div>
+          <div className="heading-96-black uppercase">{headline}</div>
           {body && <div className="body-18-medium mt-6 text-white/80">{body}</div>}
         </div>
 

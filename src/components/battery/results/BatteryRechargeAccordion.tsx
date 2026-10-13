@@ -65,7 +65,7 @@ export function BatteryRechargeAccordion({ tips }: BatteryRechargeAccordionProps
 
   return (
     <section className="w-full">
-      <h2 className="heading-30-bold lg:heading-48-black mb-6 text-left leading-tight text-brand-green-1">
+      <h2 className="heading-30-bold lg:heading-48-black mb-6 text-left text-brand-green-1">
         Ways to recharge <br className="sm:hidden" />
         your battery
       </h2>
@@ -91,7 +91,7 @@ export function BatteryRechargeAccordion({ tips }: BatteryRechargeAccordionProps
                 <div className="mb-2 flex w-full items-center justify-between">
                   <span
                     className={cn(
-                      'caption-12-bold rounded-full px-2.5 py-0.5 text-neutral-600',
+                      'body-14-regular rounded-full px-2.5 py-0.5 text-neutral-600',
                       AREA_BADGE[area],
                     )}
                   >
@@ -103,12 +103,14 @@ export function BatteryRechargeAccordion({ tips }: BatteryRechargeAccordionProps
                     <ChevronDown size={32} className="text-neutral-600" />
                   )}
                 </div>
-                <h3 className="text-left text-[18px] font-bold text-black">{tip.title}</h3>
+                <h3 className="body-18-bold lg:body-20-bold text-left text-neutral-grey-1">
+                  {tip.title}
+                </h3>
               </button>
 
               {isOpen && (
                 <div className="pt-2">
-                  <p className="body-16-regular leading-relaxed text-neutral-grey-2">{desc}</p>
+                  <p className="body-16-regular text-neutral-grey-2">{desc}</p>
                   <div className="mt-2 flex flex-wrap items-center gap-3">
                     {elements.map((el) => (
                       <ElementTag key={el} name={el} />

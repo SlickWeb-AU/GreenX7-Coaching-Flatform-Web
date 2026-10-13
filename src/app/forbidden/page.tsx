@@ -11,7 +11,7 @@ export default function ForbiddenPage() {
       <div className="rounded-full bg-secondary-red-2 p-4">
         <ShieldOff className="h-8 w-8 text-secondary-red-4" aria-hidden />
       </div>
-      <h1 className="text-2xl font-semibold text-neutral-grey-1">Access Denied</h1>
+      <h1 className="heading-24-bold text-neutral-grey-1">Access Denied</h1>
       <p className="max-w-md text-neutral-grey-3">
         This area is restricted to authorized accounts only. If you believe this is an error, please
         contact your administrator.

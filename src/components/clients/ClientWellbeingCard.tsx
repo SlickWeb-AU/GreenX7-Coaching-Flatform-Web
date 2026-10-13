@@ -113,7 +113,7 @@ export function ClientWellbeingCard({
                       >
                         <div
                           className={cn(
-                            'h-full rounded-full transition-all duration-[1000ms] ease-out',
+                            'h-full rounded-full transition-all duration-[3000ms] ease-out',
                             AREA_BAR_COLORS[areaKey] ?? 'bg-brand-green-2',
                           )}
                           style={{

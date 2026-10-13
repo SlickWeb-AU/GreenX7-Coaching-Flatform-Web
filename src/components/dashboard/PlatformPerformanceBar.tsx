@@ -50,7 +50,7 @@ export function PlatformPerformanceBar({
             return (
               <div
                 key={item.key}
-                className={cn('h-full transition-all duration-[1000ms] ease-out', zone.bgClass)}
+                className={cn('h-full transition-all duration-[3000ms] ease-out', zone.bgClass)}
                 style={{ width: active ? `${percentage}%` : '0%' }}
                 title={`${zone.label}: ${percentage}%`}
               />

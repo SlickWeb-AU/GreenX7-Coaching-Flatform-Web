@@ -141,7 +141,7 @@ export function PresentationMobileWarning({
         ) : null}
 
         {helperNotice ? (
-          <div className="mt-[12px] w-full rounded-xl bg-neutral-grey-7 p-3 text-xs font-medium text-neutral-grey-2">
+          <div className="body-12-medium mt-[12px] w-full rounded-xl bg-neutral-grey-7 p-3 text-neutral-grey-2">
             {helperNotice}
           </div>
         ) : null}

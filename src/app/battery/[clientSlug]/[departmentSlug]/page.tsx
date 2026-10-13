@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { useParams } from 'next/navigation';
 
 import { BaseLoading } from '@/components/base';
@@ -30,10 +30,15 @@ function BatteryCheckPageContent() {
     enabled: Boolean(clientSlug && departmentSlug && deviceId),
   });
 
-  // Status is evaluated on initial load. Once in the check flow,
-  // lockedState preserves the in-progress session across tab switches.
-  const [lockedState] = useState<typeof freshState>(undefined);
-  const stateData = lockedState ?? freshState;
+  // BC/E7: state (closed/submitted/open) is evaluated once when the link opens and
+  // locked afterwards — the query refetches on tab return, which used to swap the
+  // results screen for the "already submitted" screen. Submitting a closed check is
+  // still rejected by the API and shows the closed screen.
+  const lockedState = useRef<typeof freshState>(undefined);
+  if (!lockedState.current && freshState?.state === BATTERY_CHECK_STATES.OPEN) {
+    lockedState.current = freshState;
+  }
+  const stateData = lockedState.current ?? freshState;
 
   const isClosed =
     stateData?.state === BATTERY_CHECK_STATES.CLOSED ||

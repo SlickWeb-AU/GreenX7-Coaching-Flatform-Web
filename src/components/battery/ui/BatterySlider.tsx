@@ -1,3 +1,4 @@
+import { cn } from '@/lib/utils';
 import { useId } from 'react';
 
 interface BatterySliderProps {
@@ -29,14 +30,14 @@ export function BatterySlider({
   for (let s = min + 1; s <= max - 1; s += 1) ticks.push(s);
 
   return (
-    <div className={`relative w-full select-none pt-12 md:pt-14 ${className}`}>
+    <div className={cn('relative w-full select-none pt-14', className)}>
       {hasValue && (
         <div
           className="pointer-events-none absolute top-0 -translate-x-1/2 transition-all duration-75"
           style={{ left: `${percentage}%` }}
         >
-          <div className="relative flex h-10 min-w-10 items-center justify-center rounded-lg bg-white p-2 shadow-[0px_0px_24px_0px_#00000029] md:h-12 md:min-w-12">
-            <span className="body-32-black leading-none md:text-[36px]" style={{ color }}>
+          <div className="relative flex h-12 min-w-12 items-center justify-center rounded-lg bg-white p-2 shadow-[0px_0px_24px_0px_#00000029]">
+            <span className="body-32-black md:heading-36-black leading-none" style={{ color }}>
               {displayValue}
             </span>
             <div className="absolute -bottom-1.5 left-1/2 h-0 w-0 -translate-x-1/2 border-x-4 border-t-[6px] border-x-transparent border-t-white" />

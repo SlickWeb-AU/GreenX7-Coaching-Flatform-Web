@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 
+import { ANIMATION_DURATION_MS } from '@/constants/dashboard';
+
 interface BatteryAnimationProps {
   percentage: number;
   disableAnimate?: boolean;
@@ -25,7 +27,7 @@ export function BatteryAnimation({
       return;
     }
 
-    const duration = 1200;
+    const duration = ANIMATION_DURATION_MS;
     const start = performance.now();
     let raf = 0;
 

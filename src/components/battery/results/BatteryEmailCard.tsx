@@ -36,9 +36,7 @@ export function BatteryEmailCard({ onSubmitEmail, isPending, disabled }: Battery
     <section className="w-full bg-brand-green-1 px-[40px] py-[40px] text-white shadow-none md:px-10 md:py-12">
       <Send size={32} className="mb-4 -rotate-12 text-secondary-yellow-1" />
 
-      <h3 className="text-[24px] font-bold leading-tight text-white">
-        Want a copy of your results?
-      </h3>
+      <h3 className="heading-24-bold text-white">Want a copy of your results?</h3>
       <p className="body-14-regular mt-1 text-white">
         We don&apos;t store your email - used only to send your report.
       </p>

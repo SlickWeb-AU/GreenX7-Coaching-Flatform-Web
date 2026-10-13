@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 
 import { BatteryIcon } from '@/components/icons';
+import { ANIMATION_DURATION_MS } from '@/constants/dashboard';
+import { useCountUp } from '@/hooks/useCountUp';
 import { cn, formatNumber, formatScoreToPercent } from '@/lib/utils';
 
 import type { DashboardOverviewDto } from '@/types';
@@ -24,6 +26,7 @@ export function BatteryScoreBanner({
   }, []);
 
   const score = formatScoreToPercent(overview?.averageBatteryScore);
+  const animatedScore = useCountUp(score, { active, duration: ANIMATION_DURATION_MS });
   const rawChange = overview?.change ?? null;
   const change = rawChange !== null && rawChange !== undefined ? Math.round(rawChange) : null;
   const isPositive = (change ?? 0) >= 0;
@@ -42,8 +45,10 @@ export function BatteryScoreBanner({
           <div className="mb-4 flex items-center gap-4">
             <BatteryIcon percentage={active ? (score ?? 0) : 0} aria-hidden="true" />
             <div className="flex items-stretch gap-1">
-              <span className="heading-48-bold leading-none text-white">{score ?? '—'}</span>
-              <span className="self-start text-3xl font-bold leading-none text-white">%</span>
+              <span className="heading-48-bold leading-none text-white">
+                {animatedScore ?? score ?? '—'}
+              </span>
+              <span className="heading-30-bold self-start leading-none text-white">%</span>
               <span className="body-16-medium self-end leading-none text-white">/100</span>
             </div>
           </div>

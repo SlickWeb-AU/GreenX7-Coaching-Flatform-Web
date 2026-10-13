@@ -159,15 +159,15 @@ export function BatteryOnboardingModal({
                 direction === 'right' ? 'animate-slide-left' : 'animate-slide-right',
               )}
             >
-              <div className="mb-4 flex h-[160px] w-full items-center justify-center md:h-[200px] md:justify-start">
+              <div className="mb-4 flex h-[160px] w-full items-center justify-center md:justify-start lg:mb-8 lg:h-[120px]">
                 {index === 0 && (
-                  <HowItWorksStep1Icon className="h-[148px] w-[148px] object-contain md:h-[200px] md:w-[200px]" />
+                  <HowItWorksStep1Icon className="h-[148px] w-[148px] object-contain lg:h-[120px] lg:w-[120px]" />
                 )}
                 {index === 1 && (
-                  <HowItWorksStep2Icon className="h-auto max-h-[84px] w-auto max-w-[183px] object-contain md:max-h-[104px] md:max-w-[228px]" />
+                  <HowItWorksStep2Icon className="h-auto max-h-[84px] w-auto max-w-[183px] object-contain lg:max-h-[64px] lg:max-w-[140px]" />
                 )}
                 {index === 2 && (
-                  <HowItWorksStep3Icon className="h-[148px] w-[148px] object-contain md:h-[200px] md:w-[200px]" />
+                  <HowItWorksStep3Icon className="h-[148px] w-[148px] object-contain lg:h-[120px] lg:w-[120px]" />
                 )}
               </div>
 
@@ -176,7 +176,7 @@ export function BatteryOnboardingModal({
                   How it works
                 </p>
 
-                <h2 className="heading-48-black mb-2 w-full text-left leading-tight">
+                <h2 className="heading-48-black mb-2 w-full text-left">
                   <span className="text-brand-green-2">{STEPS[index].line1}</span>
                   <br />
                   <span className="text-secondary-orange-1">{STEPS[index].line2}</span>

@@ -1,11 +1,12 @@
 'use client';
 
-import { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { Cell, Pie, PieChart, Tooltip } from 'recharts';
 
 import { BadgeStarIcon } from '@/components/icons';
-import { AREA_COLOR, FIXED_WELLBEING_AREAS } from '@/constants/dashboard';
+import { ANIMATION_DURATION_MS, AREA_COLOR, FIXED_WELLBEING_AREAS } from '@/constants/dashboard';
 import { DASHBOARD_COLORS } from '@/constants/tokens';
+import { useCountUp } from '@/hooks/useCountUp';
 import { cn, formatScoreToPercent } from '@/lib/utils';
 import type { WellbeingItemData } from '@/types';
 
@@ -18,6 +19,7 @@ export interface BatteryWheelChartProps {
   scoreClassName?: string;
   percentClassName?: string;
   animate?: boolean;
+  animationDuration?: number;
 }
 
 /**
@@ -39,7 +41,68 @@ interface PetalData {
   outerRadius: number;
 }
 
-export function BatteryWheelChart({
+interface CenterScoreBadgeProps {
+  score: number | null;
+  badgeSize: number;
+  animate: boolean;
+  duration: number;
+  scoreClassName?: string;
+  percentClassName?: string;
+}
+
+/**
+ * The count-up state lives here, at module level, not in BatteryWheelChart:
+ * recharts v3 restarts the Pie entrance animation on every re-render of its
+ * parent (animationInput is the props object, reference-compared), so any
+ * per-frame state above the chart freezes the petals until counting stops.
+ */
+function CenterScoreBadge({
+  score,
+  badgeSize,
+  animate,
+  duration,
+  scoreClassName,
+  percentClassName,
+}: CenterScoreBadgeProps) {
+  const roundedScore = score === null || score === undefined ? null : Math.round(score);
+  const animatedScore = useCountUp(roundedScore, { active: animate, duration });
+  const displayScore = animate ? animatedScore : roundedScore;
+  const scoreDigits = displayScore === null ? 0 : String(Math.abs(displayScore)).length;
+
+  return (
+    <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+      <div className="relative flex items-center justify-center">
+        <BadgeStarIcon size={badgeSize} />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="flex items-center gap-0.5">
+            <span
+              className={cn(
+                scoreDigits >= 3 ? 'body-32-black' : 'heading-40-black',
+                'leading-none text-black',
+                scoreClassName,
+              )}
+            >
+              {roundedScore === null ? '—' : displayScore}
+            </span>
+            {roundedScore !== null && (
+              <span
+                className={cn(
+                  scoreDigits >= 3 ? 'caption-12-bold' : 'body-16-black',
+                  'font-black leading-none text-black',
+                  percentClassName,
+                )}
+              >
+                %
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export const BatteryWheelChart = memo(function BatteryWheelChart({
   score,
   items,
   size = 220,
@@ -48,6 +111,7 @@ export function BatteryWheelChart({
   scoreClassName,
   percentClassName,
   animate = true,
+  animationDuration = ANIMATION_DURATION_MS,
 }: BatteryWheelChartProps) {
   const cx = size / 2;
   const cy = size / 2;
@@ -87,8 +151,6 @@ export function BatteryWheelChart({
   }, [items, rMax]);
 
   const badgeSize = Math.round(size * 0.42);
-  const roundedScore = score === null || score === undefined ? null : Math.round(score);
-  const scoreDigits = roundedScore === null ? 0 : String(Math.abs(roundedScore)).length;
 
   let currentStartAngle = 0;
   const anglePerSlice = 360 / 8;
@@ -110,7 +172,7 @@ export function BatteryWheelChart({
             if (active && payload && payload.length) {
               const entry = payload[0].payload as { label: string; score: number | null };
               return (
-                <div className="pointer-events-none select-none rounded-lg bg-brand-green-2 px-2.5 py-1 text-xs font-medium text-white shadow-md">
+                <div className="body-12-medium pointer-events-none select-none rounded-lg bg-brand-green-2 px-2.5 py-1 text-white shadow-md">
                   <span className="font-bold">{entry.label}: </span>
                   <span>
                     {entry.score !== null && entry.score !== undefined ? `${entry.score}%` : '—'}
@@ -139,7 +201,8 @@ export function BatteryWheelChart({
               innerRadius={0}
               outerRadius={entry.outerRadius}
               isAnimationActive={animate}
-              animationDuration={1500}
+              animationBegin={0}
+              animationDuration={animationDuration}
               animationEasing="ease-out"
               cornerRadius={4}
               stroke="#ffffff"
@@ -154,36 +217,15 @@ export function BatteryWheelChart({
 
       {/* Center badge showing the battery score */}
       {showScore && (
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-          <div className="relative flex items-center justify-center">
-            <BadgeStarIcon size={badgeSize} />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="flex items-center gap-0.5">
-                <span
-                  className={cn(
-                    scoreDigits >= 3 ? 'body-32-black' : 'heading-40-black',
-                    'leading-none text-black',
-                    scoreClassName,
-                  )}
-                >
-                  {score === null || score === undefined ? '—' : roundedScore}
-                </span>
-                {score !== null && score !== undefined && (
-                  <span
-                    className={cn(
-                      scoreDigits >= 3 ? 'caption-12-bold' : 'body-16-black',
-                      'font-black leading-none text-black',
-                      percentClassName,
-                    )}
-                  >
-                    %
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
+        <CenterScoreBadge
+          score={score ?? null}
+          badgeSize={badgeSize}
+          animate={animate}
+          duration={animationDuration}
+          scoreClassName={scoreClassName}
+          percentClassName={percentClassName}
+        />
       )}
     </div>
   );
-}
+});

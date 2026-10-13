@@ -48,7 +48,7 @@ export function BasePillTabs({ items, activeKey, onChange, className }: BasePill
             {tab.count !== undefined && (
               <span
                 className={cn(
-                  'ml-1.5 text-xs',
+                  'ml-1.5',
                   isActive
                     ? 'body-12-bold text-brand-green-2/80'
                     : 'body-12-medium text-neutral-grey-3',

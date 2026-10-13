@@ -4,7 +4,14 @@ import { useEffect, useRef, useState } from 'react';
 
 import { AreaScoreProgressBar, BatteryWheelChart } from '@/components/dashboard';
 import { HeartIcon } from '@/components/icons';
-import { AREA_BADGE, AREA_BAR_COLORS, AREA_COLOR, AREA_ICON_MAP } from '@/constants/dashboard';
+import {
+  ANIMATION_DURATION_MS,
+  AREA_BADGE,
+  AREA_BAR_COLORS,
+  AREA_COLOR,
+  AREA_ICON_MAP,
+} from '@/constants/dashboard';
+import { useViewport } from '@/hooks/useViewport';
 import { normalizeAreaLabel } from '@/lib/battery';
 import { SCORE_INPUT_TYPE, formatScoreToPercent, type ScoreInputType } from '@/lib/utils';
 import type { BatteryAreaResultDto } from '@/types/battery';
@@ -22,6 +29,7 @@ export function BatteryScoreBreakdown({
 }: BatteryScoreBreakdownProps) {
   const [isActive, setIsActive] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const { isDesktop } = useViewport();
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -32,12 +40,12 @@ export function BatteryScoreBreakdown({
           setIsActive(true);
         }
       },
-      { threshold: 0.2 },
+      { threshold: isDesktop ? 0.4 : 0.1 },
     );
 
     observer.observe(containerRef.current);
     return () => observer.disconnect();
-  }, []);
+  }, [isDesktop]);
 
   const percentOf = (a: BatteryAreaResultDto) =>
     calculateBy === SCORE_INPUT_TYPE.ANSWER
@@ -65,6 +73,7 @@ export function BatteryScoreBreakdown({
               }))}
               size={280}
               animate={true}
+              animationDuration={ANIMATION_DURATION_MS}
             />
           ) : (
             <div className="h-[280px] w-[280px]" />
@@ -92,6 +101,7 @@ export function BatteryScoreBreakdown({
                 displayValue={item.answer}
                 Icon={Icon}
                 active={isActive}
+                duration={ANIMATION_DURATION_MS}
               />
             );
           })}

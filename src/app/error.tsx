@@ -21,13 +21,14 @@ export default function ErrorPage({ error, reset }: ErrorProps) {
       <div className="rounded-full bg-secondary-red-2 p-4">
         <AlertTriangle className="h-8 w-8 text-secondary-red-4" aria-hidden />
       </div>
-      <h1 className="text-2xl font-semibold text-neutral-grey-1">Something went wrong</h1>
+      <h1 className="heading-24-bold text-neutral-grey-1">Something went wrong</h1>
       <p className="max-w-md text-neutral-grey-3">
         An unexpected error occurred. Please try again or contact support if the issue persists.
       </p>
-      {error.digest && <code className="text-xs text-neutral-grey-3">Error ID: {error.digest}</code>}
+      {error.digest && (
+        <code className="body-12-medium text-neutral-grey-3">Error ID: {error.digest}</code>
+      )}
       <BaseButton onClick={reset}>Try again</BaseButton>
     </main>
   );
 }
-

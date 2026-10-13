@@ -58,7 +58,7 @@ export function BatteryLanding({
             <HowsYourBatterySticker className="h-[240px] w-[250px] object-contain drop-shadow-md md:h-auto md:w-[320px]" />
           </div>
 
-          <p className="body-18-medium md:body-24-medium mb-9 max-w-[400px] leading-relaxed text-brand-green-5 md:mb-11 md:max-w-[480px]">
+          <p className="body-18-medium md:body-24-medium mb-9 max-w-[400px] text-brand-green-5 md:mb-11 md:max-w-[480px]">
             Take 60 seconds to bring awareness to your wellbeing.{' '}
             <button
               type="button"
@@ -104,7 +104,7 @@ export function BatteryLanding({
       </div>
 
       <footer className="relative z-10 w-full bg-[#004030] py-4">
-        <div className="mx-auto flex w-full max-w-1600 items-center justify-center px-[60px] sm:justify-start md:px-[80px]">
+        <div className="mx-auto flex w-full max-w-1440 items-center justify-center px-[60px] sm:justify-start md:px-[80px]">
           <a
             href={ENV.GREENX7_URL}
             target="_blank"

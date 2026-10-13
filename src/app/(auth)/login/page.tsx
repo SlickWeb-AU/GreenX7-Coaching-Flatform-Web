@@ -173,7 +173,7 @@ export default function LoginPage() {
                   </span>
                 </div>
                 <h1 className="heading-28-bold text-neutral-grey-1">Sign in to GreenX7</h1>
-                <p className="body-16-medium mb-10 mt-2 leading-relaxed text-neutral-grey-2">
+                <p className="body-16-medium mb-10 mt-2 text-neutral-grey-2">
                   Enter your work email. We&apos;ll send you a six-digit verification code.
                 </p>
                 <form onSubmit={handleEmailSubmit} action="#" method="post" noValidate>
