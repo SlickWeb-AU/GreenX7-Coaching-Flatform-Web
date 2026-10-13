@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 
 import { BaseTag } from '@/components/base';
 import { BatteryIcon } from '@/components/icons';
+import { ANIMATION_DURATION_MS } from '@/constants/dashboard';
+import { useCountUp } from '@/hooks/useCountUp';
 import { cn, formatScoreToPercent } from '@/lib/utils';
 
 export interface ClientBatteryCardProps {
@@ -50,6 +52,7 @@ export function ClientBatteryCard({
   }, [score]);
 
   const displayScore = formatScoreToPercent(score);
+  const animatedScore = useCountUp(displayScore, { active, duration: ANIMATION_DURATION_MS });
   const hasLastMonth = changeVsLastMonth !== null && changeVsLastMonth !== undefined;
   const roundedLastMonth = hasLastMonth ? Math.round(changeVsLastMonth) : null;
   const isLastMonthPositive = (roundedLastMonth ?? 0) >= 0;
@@ -77,8 +80,10 @@ export function ClientBatteryCard({
           <div className="flex items-center gap-3">
             <BatteryIcon percentage={active ? (displayScore ?? 0) : 0} aria-hidden="true" />
             <div className="flex items-stretch gap-1">
-              <span className="heading-48-bold leading-none text-white">{displayScore ?? '—'}</span>
-              <span className="self-start text-3xl font-bold leading-none text-white">%</span>
+              <span className="heading-48-bold leading-none text-white">
+                {animatedScore ?? displayScore ?? '—'}
+              </span>
+              <span className="heading-30-bold self-start leading-none text-white">%</span>
               <span className="body-16-medium self-end leading-none text-white">/100</span>
             </div>
           </div>
@@ -154,8 +159,10 @@ export function ClientBatteryCard({
         <div className="flex items-center gap-3">
           <BatteryIcon percentage={active ? (displayScore ?? 0) : 0} aria-hidden="true" />
           <div className="flex items-stretch gap-1">
-            <span className="heading-48-bold leading-none text-white">{displayScore ?? '—'}</span>
-            <span className="self-start text-3xl font-bold leading-none text-white">%</span>
+            <span className="heading-48-bold leading-none text-white">
+              {animatedScore ?? displayScore ?? '—'}
+            </span>
+            <span className="heading-30-bold self-start leading-none text-white">%</span>
             <span className="body-16-medium self-end leading-none text-white">/100</span>
           </div>
         </div>

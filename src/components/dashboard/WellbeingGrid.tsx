@@ -75,9 +75,7 @@ export function WellbeingGrid({
                     <Icon size={20} color={AREA_COLOR[areaKey]} aria-hidden="true" />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <div className="body-16-bold leading-snug text-neutral-grey-1">
-                      {item.label}
-                    </div>
+                    <div className="body-16-bold text-neutral-grey-1">{item.label}</div>
                     <BaseTrend value={change} />
                   </div>
                 </div>
@@ -94,7 +92,7 @@ export function WellbeingGrid({
               >
                 <div
                   className={cn(
-                    'h-full rounded-full transition-all duration-[1000ms] ease-out',
+                    'h-full rounded-full transition-all duration-[3000ms] ease-out',
                     AREA_BAR_COLORS[areaKey] ?? 'bg-brand-green-2',
                   )}
                   style={{ width: active ? `${Math.min(100, Math.max(0, score ?? 0))}%` : '0%' }}

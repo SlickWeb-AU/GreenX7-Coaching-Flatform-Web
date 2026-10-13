@@ -30,11 +30,10 @@ function BatteryCheckPageContent() {
     enabled: Boolean(clientSlug && departmentSlug && deviceId),
   });
 
-  // BC/E7: trạng thái (đóng / đã nộp / mở) xét LÚC MỞ LINK. Đã vào luồng làm bài thì
-  // giữ nguyên trạng thái lúc đó: query tự gọi lại khi quay về tab, và ngay sau khi
-  // nộp server đã trả "already submitted" — trước đây màn kết quả bị thay bằng màn
-  // đã nộp chỉ vì người dùng sang tab khác rồi quay lại. Nộp khi kỳ vừa đóng thì
-  // API submit vẫn từ chối và luồng tự hiện màn đóng.
+  // BC/E7: state (closed/submitted/open) is evaluated once when the link opens and
+  // locked afterwards — the query refetches on tab return, which used to swap the
+  // results screen for the "already submitted" screen. Submitting a closed check is
+  // still rejected by the API and shows the closed screen.
   const lockedState = useRef<typeof freshState>(undefined);
   if (!lockedState.current && freshState?.state === BATTERY_CHECK_STATES.OPEN) {
     lockedState.current = freshState;

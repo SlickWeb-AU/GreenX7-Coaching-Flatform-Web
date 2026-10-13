@@ -58,7 +58,7 @@ export function BatteryLanding({
             <HowsYourBatterySticker className="h-[240px] w-[250px] object-contain drop-shadow-md md:h-auto md:w-[320px]" />
           </div>
 
-          <p className="body-18-medium md:body-24-medium mb-9 max-w-[400px] leading-relaxed text-brand-green-5 md:mb-11 md:max-w-[480px]">
+          <p className="body-18-medium md:body-24-medium mb-9 max-w-[400px] text-brand-green-5 md:mb-11 md:max-w-[480px]">
             Take 60 seconds to bring awareness to your wellbeing.{' '}
             <button
               type="button"

@@ -65,7 +65,7 @@ export function BatteryRechargeAccordion({ tips }: BatteryRechargeAccordionProps
 
   return (
     <section className="w-full">
-      <h2 className="heading-30-bold lg:heading-48-black mb-6 text-left leading-tight text-brand-green-1">
+      <h2 className="heading-30-bold lg:heading-48-black mb-6 text-left text-brand-green-1">
         Ways to recharge <br className="sm:hidden" />
         your battery
       </h2>
@@ -110,7 +110,7 @@ export function BatteryRechargeAccordion({ tips }: BatteryRechargeAccordionProps
 
               {isOpen && (
                 <div className="pt-2">
-                  <p className="body-16-regular leading-relaxed text-neutral-grey-2">{desc}</p>
+                  <p className="body-16-regular text-neutral-grey-2">{desc}</p>
                   <div className="mt-2 flex flex-wrap items-center gap-3">
                     {elements.map((el) => (
                       <ElementTag key={el} name={el} />

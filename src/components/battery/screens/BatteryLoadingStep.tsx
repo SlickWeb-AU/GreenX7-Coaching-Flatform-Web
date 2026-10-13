@@ -8,6 +8,7 @@ import {
   HowsYourBatterySticker,
   LoadingFlowerIcon,
 } from '@/components/icons';
+import { ANIMATION_DURATION_MS } from '@/constants/dashboard';
 
 interface BatteryLoadingStepProps {
   score: number;
@@ -27,7 +28,7 @@ export function BatteryLoadingStep({
   const [currentScore, setCurrentScore] = useState(0);
 
   useEffect(() => {
-    const duration = 1500;
+    const duration = ANIMATION_DURATION_MS;
     const start = performance.now();
     let raf = 0;
 
@@ -70,8 +71,8 @@ export function BatteryLoadingStep({
           </div>
 
           <div className="mt-[72px] w-full max-w-[320px] text-left sm:mx-auto sm:max-w-[425px]">
-            <p className="body-16-bold text-brand-green-dark sm:text-lg">Loading...</p>
-            <h1 className="heading-40-black mt-2 leading-tight text-brand-green-2">
+            <p className="body-16-bold sm:body-18-bold text-brand-green-dark">Loading...</p>
+            <h1 className="heading-40-black mt-2 text-brand-green-2">
               Sit tight while we calculate your score
             </h1>
           </div>

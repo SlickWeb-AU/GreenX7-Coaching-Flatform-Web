@@ -176,7 +176,7 @@ export function BatteryOnboardingModal({
                   How it works
                 </p>
 
-                <h2 className="heading-48-black mb-2 w-full text-left leading-tight">
+                <h2 className="heading-48-black mb-2 w-full text-left">
                   <span className="text-brand-green-2">{STEPS[index].line1}</span>
                   <br />
                   <span className="text-secondary-orange-1">{STEPS[index].line2}</span>

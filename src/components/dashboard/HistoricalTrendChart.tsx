@@ -12,6 +12,7 @@ import {
 } from 'recharts';
 
 import { BaseCard } from '@/components/base';
+import { ANIMATION_DURATION_MS } from '@/constants/dashboard';
 import { cn, formatScoreToPercent } from '@/lib/utils';
 
 import type { DashboardTrendPointDto } from '@/types';
@@ -104,7 +105,7 @@ export function HistoricalTrendChart({
                 if (active && payload && payload.length) {
                   const value = payload[0].value;
                   return (
-                    <div className="rounded-lg bg-brand-green-2 px-3 py-1.5 text-xs font-medium text-white shadow-none">
+                    <div className="body-12-medium rounded-lg bg-brand-green-2 px-3 py-1.5 text-white shadow-none">
                       <span className="font-bold">{label}: </span>
                       <span>{value === null || value === undefined ? '—' : `${value}%`}</span>
                     </div>
@@ -120,7 +121,7 @@ export function HistoricalTrendChart({
               strokeWidth={3}
               connectNulls
               isAnimationActive
-              animationDuration={1500}
+              animationDuration={ANIMATION_DURATION_MS}
               animationEasing="ease-out"
               dot={{ r: 5, fill: '#FFFFFF', stroke: dotColor ?? lineColor, strokeWidth: 2.5 }}
               activeDot={{ r: 7, fill: '#FFFFFF', stroke: dotColor ?? lineColor, strokeWidth: 3 }}

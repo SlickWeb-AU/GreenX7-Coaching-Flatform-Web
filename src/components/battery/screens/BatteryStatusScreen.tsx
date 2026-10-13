@@ -135,7 +135,7 @@ export function BatteryStatusScreen({
         </p>
 
         {/* Secondary Message: directly below, Body/12px/Medium, grey 2 */}
-        <p className="body-12-medium mt-1.5 max-w-[320px] leading-relaxed text-neutral-grey-2">
+        <p className="body-12-medium mt-1.5 max-w-[320px] text-neutral-grey-2">
           {isSubmitted ? checkInTarget : 'Please return when the next check-in opens.'}
         </p>
 

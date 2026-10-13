@@ -37,7 +37,7 @@ export function BatterySlider({
           style={{ left: `${percentage}%` }}
         >
           <div className="relative flex h-12 min-w-12 items-center justify-center rounded-lg bg-white p-2 shadow-[0px_0px_24px_0px_#00000029]">
-            <span className="body-32-black leading-none md:text-[36px]" style={{ color }}>
+            <span className="body-32-black md:heading-36-black leading-none" style={{ color }}>
               {displayValue}
             </span>
             <div className="absolute -bottom-1.5 left-1/2 h-0 w-0 -translate-x-1/2 border-x-4 border-t-[6px] border-x-transparent border-t-white" />
