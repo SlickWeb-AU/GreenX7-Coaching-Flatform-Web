@@ -21,3 +21,4 @@ export * from './BasePillTabs';
 export * from './BaseTag';
 export * from './BasePopover';
 export * from './BaseTrend';
+export * from './AnimatedNumber';

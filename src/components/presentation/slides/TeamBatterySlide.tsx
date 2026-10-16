@@ -1,36 +1,19 @@
-import { useEffect, useState } from 'react';
-
+import { AnimatedNumber } from '@/components/base';
 import { BatteryIcon } from '@/components/icons';
 import { DeltaRow } from '@/components/dashboard/DeltaRow';
 import { TeamBatteryCard } from '@/components/dashboard/TeamBatteryCard';
 import { usePresentation } from '@/components/presentation/PresentationContext';
 import { StandardSlideLayout } from '@/components/presentation/StandardSlideLayout';
 import { StaticSlide } from '@/components/presentation/StaticSlide';
-import { ANIMATION_DURATION_MS } from '@/constants/dashboard';
 import { SCORE_ZONE_COPY, type ScoreZoneKey } from '@/constants/presentation';
-import { useCountUp } from '@/hooks/useCountUp';
+import { useAnimationTrigger } from '@/hooks/useAnimationTrigger';
 import type { BaseSlideProps } from '@/types';
 
 export function TeamBatterySlide({ ...layoutProps }: BaseSlideProps = {}) {
-  const [active, setActive] = useState(false);
   const pres = usePresentation();
   const items = pres.items;
   const score = pres.score;
-  const animatedScore = useCountUp(
-    score !== null && score !== undefined ? Math.round(score) : null,
-    {
-      active,
-      duration: ANIMATION_DURATION_MS,
-    },
-  );
-
-  useEffect(() => {
-    setActive(false);
-    const timer = setTimeout(() => {
-      setActive(true);
-    }, 50);
-    return () => clearTimeout(timer);
-  }, [score]);
+  const active = useAnimationTrigger([score]);
   const previousMonthLabel = pres.previousMonthLabel;
   const vsPreviousChange = pres.data?.vsPrevious?.change ?? null;
   const vsFirstCheckChange = pres.data?.vsFirstCheck?.change ?? null;
@@ -58,7 +41,7 @@ export function TeamBatterySlide({ ...layoutProps }: BaseSlideProps = {}) {
               {/* Design: nhãn hai dòng canh giữa theo số, chữ trắng (bug 372) */}
               <div className="flex items-center gap-3">
                 <span className="heading-48-bold leading-none text-white">
-                  {score == null ? '—' : (animatedScore ?? Math.round(score))}
+                  <AnimatedNumber value={score} active={active} />
                 </span>
                 <div className="flex flex-col">
                   <span className="caption-12-medium text-white">Battery score</span>
@@ -73,8 +56,9 @@ export function TeamBatterySlide({ ...layoutProps }: BaseSlideProps = {}) {
               <DeltaRow
                 value={vsPreviousChange}
                 label={previousMonthLabel ? `vs ${previousMonthLabel}` : 'vs previous'}
+                active={active}
               />
-              <DeltaRow value={vsFirstCheckChange} label="since first check" />
+              <DeltaRow value={vsFirstCheckChange} label="since first check" active={active} />
             </div>
           </div>
         }

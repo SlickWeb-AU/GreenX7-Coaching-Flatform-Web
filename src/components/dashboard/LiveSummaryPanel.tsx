@@ -1,4 +1,6 @@
+import { AnimatedNumber } from '@/components/base';
 import { BatteryIcon } from '@/components/icons';
+import { useAnimationTrigger } from '@/hooks/useAnimationTrigger';
 import { cn, resolveImageUrl } from '@/lib/utils';
 import { DeltaRow } from './DeltaRow';
 import { LiveIndicator } from './LiveIndicator';
@@ -16,6 +18,7 @@ export interface LiveSummaryPanelProps {
   /** Kỳ đã đóng thì truyền 'Closed on …' — thay cho chấm live + "Updated just now" */
   closedLabel?: string | null;
   className?: string;
+  active?: boolean;
 }
 
 export function LiveSummaryPanel({
@@ -30,7 +33,9 @@ export function LiveSummaryPanel({
   changeVsFirstCheck,
   closedLabel,
   className,
+  active: controlledActive,
 }: LiveSummaryPanelProps) {
+  const active = useAnimationTrigger([score], controlledActive);
   const logoUrl = resolveImageUrl(clientLogoUrl);
 
   return (
@@ -62,11 +67,13 @@ export function LiveSummaryPanel({
         </h1>
 
         <div className="mt-8 flex flex-col gap-2">
-          <BatteryIcon percentage={score ?? 0} />
+          <BatteryIcon percentage={active ? (score ?? 0) : 0} aria-hidden="true" />
           <div className="flex items-center gap-2">
-            <span className="heading-48-bold leading-none text-white">
-              {score === null || score === undefined ? '—' : Math.round(score)}
-            </span>
+            <AnimatedNumber
+              value={score}
+              active={active}
+              className="heading-48-bold leading-none text-white"
+            />
             <div className="flex flex-col gap-[0.125rem]">
               <span className="body-16-medium leading-none text-white/80">Battery score</span>
               <span className="body-16-bold leading-none text-secondary-orange-1">
@@ -82,15 +89,20 @@ export function LiveSummaryPanel({
           <DeltaRow
             value={changeVsPreviousMonth ?? null}
             label={previousMonthLabel ? `vs ${previousMonthLabel}` : 'vs previous'}
+            active={active}
           />
-          <DeltaRow value={changeVsFirstCheck ?? null} label="since first check" />
+          <DeltaRow value={changeVsFirstCheck ?? null} label="since first check" active={active} />
         </div>
       </div>
 
       <div className="flex items-center gap-2 pt-6">
         {!closedLabel && <LiveIndicator />}
         <div className="flex items-center gap-1.5">
-          <span className="body-14-bold text-white">{participantCount ?? '—'}</span>
+          <AnimatedNumber
+            value={participantCount}
+            active={active}
+            className="body-14-bold text-white"
+          />
           <span className="body-14-medium text-white">Participants</span>
           <span className="body-14-medium text-white/80">
             {closedLabel ? `(${closedLabel})` : '(Updated just now)'}

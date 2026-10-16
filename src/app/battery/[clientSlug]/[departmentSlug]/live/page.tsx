@@ -9,6 +9,7 @@ import { LiveSummaryPanel } from '@/components/dashboard/LiveSummaryPanel';
 import { TeamBatteryCard } from '@/components/dashboard/TeamBatteryCard';
 import { PresentationMobileWarning } from '@/components/presentation/PresentationMobileWarning';
 import { useBatteryLive } from '@/features/battery-check';
+import { useAnimationTrigger } from '@/hooks/useAnimationTrigger';
 import {
   resolveClosedLabel,
   resolveLiveLogoUrl,
@@ -23,6 +24,7 @@ function LiveDashboardContent() {
     departmentSlug: string;
   }>();
   const { data, score, items, isLoading } = useBatteryLive(clientSlug, departmentSlug);
+  const active = useAnimationTrigger([score]);
 
   if (isLoading && !data) {
     return <BaseLoading message="Loading live dashboard..." fullScreen />;
@@ -64,8 +66,14 @@ function LiveDashboardContent() {
             changeVsFirstCheck={data?.vsFirstCheck?.change}
             previousMonthLabel={previousMonthLabel}
             closedLabel={closedLabel}
+            active={active}
           />
-          <TeamBatteryCard score={score} items={items} previousMonthLabel={previousMonthLabel} />
+          <TeamBatteryCard
+            score={score}
+            items={items}
+            previousMonthLabel={previousMonthLabel}
+            active={active}
+          />
         </main>
 
         <footer className="w-full border-t border-white/10 bg-brand-green-1 px-10 py-2 text-left">

@@ -1,12 +1,10 @@
 /**
  * Slide 04 — Take a Moment (Reflect & Breakdown)
  */
-import { useEffect, useState } from 'react';
-
-import { BatteryIcon, BoltIcon, CardDecorBlob, Gx7BadgeLogo, HeartIcon } from '@/components/icons';
+import { AnimatedNumber } from '@/components/base';
+import { BatteryIcon, CardDecorBlob, Gx7BadgeLogo, HeartIcon } from '@/components/icons';
 import { AreaScoreProgressBar, BatteryWheelChart } from '@/components/dashboard';
 import {
-  ANIMATION_DURATION_MS,
   AREA_BADGE,
   AREA_BAR_COLORS,
   AREA_COLOR,
@@ -14,28 +12,18 @@ import {
   AREA_LIGHT_COLOR,
 } from '@/constants/dashboard';
 import { SCORE_ZONE_COPY, zoneKeyForScore, type ScoreZoneKey } from '@/constants/presentation';
-import { useCountUp } from '@/hooks/useCountUp';
-import { cn } from '@/lib/utils';
+import { useAnimationTrigger } from '@/hooks/useAnimationTrigger';
 import type { BaseSlideProps } from '@/types';
 import { usePresentation } from '@/components/presentation/PresentationContext';
 import { StandardSlideLayout } from '@/components/presentation/StandardSlideLayout';
 import { StaticSlide } from '@/components/presentation/StaticSlide';
 
 export function TakeAMomentSlide({ ...slideProps }: BaseSlideProps = {}) {
-  const [active, setActive] = useState(false);
   const pres = usePresentation();
   const rawScore = pres.score;
   const displayScore = rawScore !== null ? Math.round(rawScore) : null;
-  const animatedScore = useCountUp(displayScore, { active, duration: ANIMATION_DURATION_MS });
+  const active = useAnimationTrigger([displayScore]);
   const displayItems = pres.items;
-
-  useEffect(() => {
-    setActive(false);
-    const timer = setTimeout(() => {
-      setActive(true);
-    }, 50);
-    return () => clearTimeout(timer);
-  }, [displayScore]);
 
   const strongest = [...displayItems]
     .filter((i) => i.score !== null && i.score !== undefined)
@@ -84,7 +72,7 @@ export function TakeAMomentSlide({ ...slideProps }: BaseSlideProps = {}) {
                       aria-hidden="true"
                     />
                     <span className="body-32-black absolute inset-0 flex items-center justify-center pr-3 leading-none text-white drop-shadow-sm">
-                      {animatedScore ?? displayScore ?? '—'}
+                      <AnimatedNumber value={displayScore} active={active} />
                       {displayScore !== null && (
                         <span className="body-16-black self-start pt-3">%</span>
                       )}

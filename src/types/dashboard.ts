@@ -42,6 +42,17 @@ export interface DashboardTrendPointDto {
   score: number | null;
 }
 
+export interface AvailablePeriodDto {
+  year: number;
+  month: number;
+  label?: string;
+}
+
+export interface AvailablePeriodsDto {
+  earliest: AvailablePeriodDto;
+  latest: AvailablePeriodDto;
+}
+
 export interface DashboardQuery {
   month: number;
   year: number;
@@ -54,6 +65,7 @@ export interface AdminDashboardDto {
     month: number;
     industryId: string | null;
   };
+  availablePeriods?: AvailablePeriodsDto;
   averageBatteryScore?: number | null;
   zone?: DashboardZoneSummaryDto;
   vsPrevious?: DashboardVsChangeDto;

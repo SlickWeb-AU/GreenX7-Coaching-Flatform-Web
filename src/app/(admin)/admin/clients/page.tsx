@@ -15,6 +15,7 @@ import { useDebounced } from '@/hooks/useDebounced';
 import { buildClientsQuery } from '@/lib/clients';
 import { queryKeys } from '@/lib/query-client';
 import { mergeSearchParams } from '@/lib/search-params';
+import { sortIndustryOptions } from '@/lib/period';
 import type { ClientsSortField } from '@/types';
 import {
   ALL_FILTER_VALUE,
@@ -84,15 +85,15 @@ function ClientsContent() {
     retry: false,
   });
 
-  const industryOptions = useMemo(
-    () => [
+  const industryOptions = useMemo(() => {
+    const raw = [
       { value: ALL_FILTER_VALUE, label: 'All industries' },
       ...(industriesQuery.data ?? [])
         .filter((item) => item.isActive || item.id === industry)
         .map((item) => ({ value: item.id, label: item.name })),
-    ],
-    [industriesQuery.data, industry],
-  );
+    ];
+    return sortIndustryOptions(raw);
+  }, [industriesQuery.data, industry]);
 
   const rows = data?.items ?? [];
   const totalPages = data?.meta.totalPages ?? 1;

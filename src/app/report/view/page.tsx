@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
-import { BaseButton, BaseLoading } from '@/components/base';
+import { AnimatedNumber, BaseButton, BaseLoading } from '@/components/base';
 import { ClientBatteryCard } from '@/components/clients/ClientBatteryCard';
 import { ClientCurrentZoneCard } from '@/components/clients/ClientCurrentZoneCard';
 import { ClientPeriodFilter } from '@/components/clients/ClientPeriodFilter';
@@ -16,6 +16,7 @@ import { GreenX7LogoLight } from '@/components/icons';
 import { MONTH_NAMES } from '@/constants';
 import { CHART_COLORS } from '@/constants/tokens';
 import { reportApi } from '@/features/report';
+import { useAnimationTrigger } from '@/hooks/useAnimationTrigger';
 import { useExportPdf } from '@/hooks/useExportPdf';
 import { toApiError } from '@/lib/api-error';
 import { toInsightItems } from '@/lib/insights';
@@ -109,6 +110,14 @@ function ReportViewContent() {
     : activeTab === OVERALL
       ? content.overall
       : (content.departments.find((d) => d.departmentId === activeTab) ?? null);
+
+  const active = useAnimationTrigger([
+    activeTab,
+    content?.periodYear,
+    content?.periodMonth,
+    data?.batteryScore,
+    data?.participantCount,
+  ]);
 
   if (!content || !data) {
     return <BaseLoading message="Loading report..." fullScreen />;
@@ -281,6 +290,7 @@ function ReportViewContent() {
                   changeVsLastMonth={data.vsPrevious?.changePercent ?? null}
                   lastMonthLabel={MONTH_NAMES[prevMonth - 1]}
                   changeVsFirstCheck={data.vsFirstCheck?.changePercent ?? null}
+                  active={active}
                   className="h-full"
                 />
               ) : (
@@ -295,6 +305,7 @@ function ReportViewContent() {
                       ? `${MONTH_NAMES[data.firstCheck.month - 1]} ${data.firstCheck.year}`
                       : null
                   }
+                  active={active}
                   className="h-full"
                 />
               )}
@@ -315,7 +326,9 @@ function ReportViewContent() {
               />
             </div>
             <div className="flex h-full min-h-[120px] flex-col items-center justify-center gap-2 rounded-2xl bg-white p-4 min-[1360px]:col-span-2">
-              <div className="body-32-bold text-brand-green-2">{data.participantCount}</div>
+              <div className="body-32-bold text-brand-green-2">
+                <AnimatedNumber value={data.participantCount} active={active} />
+              </div>
               <div className="body-14-medium text-neutral-grey-3">Participants</div>
             </div>
           </div>
@@ -328,6 +341,7 @@ function ReportViewContent() {
                     items={wellbeingItems}
                     previousMonthLabel={MONTH_NAMES[prevMonth - 1]}
                     deltaVariant="pill"
+                    active={active}
                     className="h-full"
                   />
                 </div>
@@ -336,12 +350,14 @@ function ReportViewContent() {
                     title="Strongest areas"
                     titleColorClass="text-secondary-green-4"
                     items={strengths}
+                    active={active}
                     className="h-full"
                   />
                   <DepartmentInsightListCard
                     title="Requires attention"
                     titleColorClass="text-secondary-red-4"
                     items={focus}
+                    active={active}
                     className="h-full"
                   />
                 </div>
@@ -355,6 +371,7 @@ function ReportViewContent() {
                   items={wellbeingItems}
                   previousMonthLabel={MONTH_NAMES[prevMonth - 1]}
                   deltaVariant="pill"
+                  active={active}
                   className="h-full"
                 />
               </div>

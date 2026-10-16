@@ -3,7 +3,7 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { Download } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { Suspense, useEffect, useMemo } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
 import { BaseButton, BaseHeader, BaseLoading, BaseSelectInside } from '@/components/base';
@@ -20,14 +20,16 @@ import {
 import { dashboardApi } from '@/features/admin-dashboard';
 import { settingsApi } from '@/features/admin-settings';
 import { buildDashboardQuery } from '@/lib/dashboard';
+import { ALL_FILTER_VALUE, FIXED_WELLBEING_AREAS, FIXED_ZONES } from '@/constants';
 import {
-  ALL_FILTER_VALUE,
-  FIXED_WELLBEING_AREAS,
-  FIXED_ZONES,
-  MONTH_OPTIONS,
-  YEAR_OPTIONS,
-} from '@/constants';
+  clampMonthToAvailableRange,
+  clampYearToAvailableRange,
+  getAvailableMonthOptions,
+  getAvailableYearOptions,
+  sortIndustryOptions,
+} from '@/lib/period';
 import { queryKeys } from '@/lib/query-client';
+import { mergeSearchParams } from '@/lib/search-params';
 
 function DashboardContent() {
   const router = useRouter();
@@ -37,11 +39,14 @@ function DashboardContent() {
   const year = Number(searchParams.get('year')) || new Date().getFullYear();
   const industry = searchParams.get('industry') || ALL_FILTER_VALUE;
 
-  const setParam = (key: string, value: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set(key, value);
-    router.replace(`${pathname}?${params.toString()}`);
-  };
+  const setParam = useCallback(
+    (key: string, value: string) => {
+      const next = mergeSearchParams(searchParams.toString(), { [key]: value });
+      if (next === null) return;
+      router.replace(next ? `${pathname}?${next}` : pathname);
+    },
+    [pathname, router, searchParams],
+  );
 
   const industriesQuery = useQuery({
     queryKey: queryKeys.industries.all,
@@ -54,7 +59,7 @@ function DashboardContent() {
       value: ind.id,
       label: ind.name,
     }));
-    return [{ value: ALL_FILTER_VALUE, label: 'All Industries' }, ...list];
+    return sortIndustryOptions([{ value: ALL_FILTER_VALUE, label: 'All Industries' }, ...list]);
   }, [industriesQuery.data]);
 
   const selectedIndustryLabel = useMemo(() => {
@@ -148,9 +153,48 @@ function DashboardContent() {
     });
   }, [data?.zoneDistribution]);
 
+  const availablePeriods = data?.availablePeriods;
+
+  const yearOptions = useMemo(() => getAvailableYearOptions(availablePeriods), [availablePeriods]);
+
+  const monthOptions = useMemo(
+    () => getAvailableMonthOptions(year, availablePeriods),
+    [year, availablePeriods],
+  );
+
+  const handleYearChange = (newYear: string) => {
+    const clampedYear = clampYearToAvailableRange(Number(newYear), availablePeriods);
+    const clamped = clampMonthToAvailableRange(month, clampedYear, availablePeriods);
+    const next = mergeSearchParams(searchParams.toString(), {
+      year: String(clampedYear),
+      month: String(clamped),
+    });
+    if (next === null) return;
+    router.replace(next ? `${pathname}?${next}` : pathname);
+  };
+
+  useEffect(() => {
+    if (!availablePeriods) return;
+    const clampedYear = clampYearToAvailableRange(year, availablePeriods);
+    const clamped = clampMonthToAvailableRange(month, clampedYear, availablePeriods);
+    if (clampedYear !== year || clamped !== month) {
+      const next = mergeSearchParams(searchParams.toString(), {
+        year: String(clampedYear),
+        month: String(clamped),
+      });
+      if (next === null) return;
+      router.replace(next ? `${pathname}?${next}` : pathname);
+    }
+  }, [availablePeriods, month, year, pathname, router, searchParams]);
+
+  const [trendYear, setTrendYear] = useState<number>(() => year);
+  useEffect(() => {
+    setTrendYear((prev) => (prev === year ? prev : year));
+  }, [year]);
+
   const historicalTrend = useMemo(
-    () => (data?.historicalTrend ?? []).filter((point) => point.year === year),
-    [data?.historicalTrend, year],
+    () => (data?.historicalTrend ?? []).filter((point) => point.year === trendYear),
+    [data?.historicalTrend, trendYear],
   );
 
   if (isLoading && !data) {
@@ -167,15 +211,15 @@ function DashboardContent() {
               label="Month"
               placeholder="Select month"
               value={String(month)}
-              options={MONTH_OPTIONS}
+              options={monthOptions}
               onChange={(v) => setParam('month', v)}
             />
             <BaseSelectInside
               label="Year"
               placeholder="Select year"
               value={String(year)}
-              options={YEAR_OPTIONS}
-              onChange={(v) => setParam('year', v)}
+              options={yearOptions}
+              onChange={handleYearChange}
             />
             <BaseSelectInside
               label="Industry"
@@ -218,7 +262,13 @@ function DashboardContent() {
         </div>
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <PlatformPerformanceBar distribution={zoneDistribution} />
-          <HistoricalTrendChart data={historicalTrend} title="Platform Historical Trend" />
+          <HistoricalTrendChart
+            data={historicalTrend}
+            title="Platform Historical Trend"
+            selectedYear={trendYear}
+            onYearChange={(y) => setTrendYear(Number(y))}
+            yearOptions={yearOptions}
+          />
         </div>
       </div>
     </>

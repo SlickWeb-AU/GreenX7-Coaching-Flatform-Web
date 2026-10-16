@@ -13,6 +13,7 @@ import { EditClientForm } from '@/components/clients';
 import { clientsApi } from '@/features/admin-clients';
 import { settingsApi } from '@/features/admin-settings';
 import { toApiError } from '@/lib/api-error';
+import { sortIndustryOptions } from '@/lib/period';
 import { queryKeys } from '@/lib/query-client';
 import type { ClientFormValues } from '@/validations';
 
@@ -37,9 +38,12 @@ export default function EditClientPage() {
     retry: false,
   });
   const currentIndustryId = typeof data?.industry === 'object' ? data.industry.id : undefined;
-  const industryOptions = (industriesQuery.data ?? [])
-    .filter((industry) => industry.isActive || industry.id === currentIndustryId)
-    .map((industry) => ({ value: industry.id, label: industry.name }));
+  const industryOptions = useMemo(() => {
+    const raw = (industriesQuery.data ?? [])
+      .filter((industry) => industry.isActive || industry.id === currentIndustryId)
+      .map((industry) => ({ value: industry.id, label: industry.name }));
+    return sortIndustryOptions(raw);
+  }, [industriesQuery.data, currentIndustryId]);
 
   const initialValues = useMemo(() => {
     if (!data) return undefined;

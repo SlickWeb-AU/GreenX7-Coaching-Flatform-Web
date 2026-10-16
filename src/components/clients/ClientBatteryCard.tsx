@@ -1,11 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-
-import { BaseTag } from '@/components/base';
+import { AnimatedNumber, BaseTag } from '@/components/base';
 import { BatteryIcon } from '@/components/icons';
-import { ANIMATION_DURATION_MS } from '@/constants/dashboard';
-import { useCountUp } from '@/hooks/useCountUp';
+import { useAnimationTrigger } from '@/hooks/useAnimationTrigger';
 import { cn, formatScoreToPercent } from '@/lib/utils';
 
 export interface ClientBatteryCardProps {
@@ -23,6 +20,7 @@ export interface ClientBatteryCardProps {
    */
   layout?: 'inline' | 'stacked';
   className?: string;
+  active?: boolean;
 }
 
 export function ClientBatteryCard({
@@ -36,23 +34,10 @@ export function ClientBatteryCard({
   firstCheckLabel = null,
   layout = 'inline',
   className,
+  active: controlledActive,
 }: ClientBatteryCardProps) {
-  const [active, setActive] = useState(false);
-
-  useEffect(() => {
-    if (score === null || score === undefined) {
-      setActive(false);
-      return;
-    }
-    setActive(false);
-    const timer = setTimeout(() => {
-      setActive(true);
-    }, 50);
-    return () => clearTimeout(timer);
-  }, [score]);
-
+  const active = useAnimationTrigger([score], controlledActive);
   const displayScore = formatScoreToPercent(score);
-  const animatedScore = useCountUp(displayScore, { active, duration: ANIMATION_DURATION_MS });
   const hasLastMonth = changeVsLastMonth !== null && changeVsLastMonth !== undefined;
   const roundedLastMonth = hasLastMonth ? Math.round(changeVsLastMonth) : null;
   const isLastMonthPositive = (roundedLastMonth ?? 0) >= 0;
@@ -81,7 +66,7 @@ export function ClientBatteryCard({
             <BatteryIcon percentage={active ? (displayScore ?? 0) : 0} aria-hidden="true" />
             <div className="flex items-stretch gap-1">
               <span className="heading-48-bold leading-none text-white">
-                {animatedScore ?? displayScore ?? '—'}
+                <AnimatedNumber value={displayScore} active={active} />
               </span>
               <span className="heading-30-bold self-start leading-none text-white">%</span>
               <span className="body-16-medium self-end leading-none text-white">/100</span>
@@ -160,7 +145,7 @@ export function ClientBatteryCard({
           <BatteryIcon percentage={active ? (displayScore ?? 0) : 0} aria-hidden="true" />
           <div className="flex items-stretch gap-1">
             <span className="heading-48-bold leading-none text-white">
-              {animatedScore ?? displayScore ?? '—'}
+              <AnimatedNumber value={displayScore} active={active} />
             </span>
             <span className="heading-30-bold self-start leading-none text-white">%</span>
             <span className="body-16-medium self-end leading-none text-white">/100</span>

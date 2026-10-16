@@ -11,6 +11,7 @@ import { MONTH_NAMES } from '@/constants';
 import { CLIENT_STATUSES } from '@/constants/clients';
 import { CHART_COLORS } from '@/constants/tokens';
 import { clientsApi, useDepartmentShareLinks } from '@/features/admin-clients';
+import { useAnimationTrigger } from '@/hooks/useAnimationTrigger';
 import { useExportPdf } from '@/hooks/useExportPdf';
 import { queryKeys } from '@/lib/query-client';
 import { toInsightItems } from '@/lib/insights';
@@ -169,6 +170,8 @@ export default function DepartmentDetailPage() {
     actions: headerActions,
   });
 
+  const active = useAnimationTrigger([selectedMonth, selectedYear, deptDashboard?.batteryScore]);
+
   if (isClientLoading || isDeptDashboardLoading) {
     return <BaseLoading message="Loading department..." fullScreen />;
   }
@@ -212,6 +215,7 @@ export default function DepartmentDetailPage() {
             lastMonthLabel={previousMonthName}
             changeVsFirstCheck={deptDashboard?.vsFirstCheck?.change ?? null}
             firstCheckLabel={deptDashboard?.firstCheck?.label}
+            active={active}
             className="h-full py-4"
           />
         </div>
@@ -224,6 +228,7 @@ export default function DepartmentDetailPage() {
           <DepartmentLiveDataCard
             participantCount={effectiveParticipants}
             dashboardHref={liveUrl}
+            active={active}
             className="h-full"
           />
         </div>
@@ -234,6 +239,7 @@ export default function DepartmentDetailPage() {
             onMonthChange={setSelectedMonth}
             selectedYear={selectedYear}
             onYearChange={setSelectedYear}
+            availablePeriods={deptDashboard?.availablePeriods}
             className="h-full"
           />
         </div>
@@ -244,6 +250,7 @@ export default function DepartmentDetailPage() {
           <ClientWellbeingCard
             items={effectiveWellbeing}
             previousMonthLabel={previousMonthName}
+            active={active}
             className="h-full"
           />
         </div>
@@ -253,12 +260,14 @@ export default function DepartmentDetailPage() {
             title="Our Strengths"
             titleColorClass="text-secondary-green-4"
             items={effectiveStrengths}
+            active={active}
             className="flex-1"
           />
           <DepartmentInsightListCard
             title="Our Focus"
             titleColorClass="text-secondary-red-4"
             items={effectiveFocus}
+            active={active}
             className="flex-1"
           />
         </div>
