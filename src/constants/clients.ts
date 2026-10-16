@@ -109,14 +109,14 @@ export const CLIENT_TABS = {
 export type ClientTab = (typeof CLIENT_TABS)[keyof typeof CLIENT_TABS];
 
 export const CLIENT_STATE_OPTIONS = [
+  { value: 'ACT', label: 'Australian Capital Territory' },
   { value: 'NSW', label: 'New South Wales' },
-  { value: 'VIC', label: 'Victoria' },
+  { value: 'NT', label: 'Northern Territory' },
   { value: 'QLD', label: 'Queensland' },
-  { value: 'WA', label: 'Western Australia' },
   { value: 'SA', label: 'South Australia' },
   { value: 'TAS', label: 'Tasmania' },
-  { value: 'ACT', label: 'Australian Capital Territory' },
-  { value: 'NT', label: 'Northern Territory' },
+  { value: 'VIC', label: 'Victoria' },
+  { value: 'WA', label: 'Western Australia' },
 ];
 
 export const MONTH_DAY_OPTIONS = Array.from({ length: 31 }, (_, index) => ({

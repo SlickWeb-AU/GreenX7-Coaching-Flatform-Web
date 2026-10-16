@@ -11,7 +11,7 @@ import {
   YAxis,
 } from 'recharts';
 
-import { BaseCard } from '@/components/base';
+import { BaseCard, BaseSelectInside, type SelectOption } from '@/components/base';
 import { ANIMATION_DURATION_MS } from '@/constants/dashboard';
 import { cn, formatScoreToPercent } from '@/lib/utils';
 
@@ -47,23 +47,48 @@ function getMonthLabel(point: DashboardTrendPointDto): string {
   return '';
 }
 
-export function HistoricalTrendChart({
-  data,
-  title = 'Platform Historical Trend',
-  subtitle,
-  lineColor = '#005943',
-  dotColor,
-  footerNote,
-  className,
-}: {
+export interface HistoricalTrendChartProps {
   data?: DashboardTrendPointDto[];
   title?: string;
   subtitle?: string;
+  actions?: ReactNode;
+  selectedYear?: number | string;
+  onYearChange?: (year: string) => void;
+  yearOptions?: SelectOption[];
   lineColor?: string;
   dotColor?: string;
   footerNote?: ReactNode;
   className?: string;
-}) {
+}
+
+export function HistoricalTrendChart({
+  data,
+  title = 'Platform Historical Trend',
+  subtitle,
+  actions,
+  selectedYear,
+  onYearChange,
+  yearOptions,
+  lineColor = '#005943',
+  dotColor,
+  footerNote,
+  className,
+}: HistoricalTrendChartProps) {
+  const renderedActions =
+    actions ??
+    (yearOptions && yearOptions.length > 0 && onYearChange && selectedYear ? (
+      <BaseSelectInside
+        label="Year"
+        placeholder="Year"
+        value={String(selectedYear)}
+        options={yearOptions}
+        onChange={onYearChange}
+        variant="secondary"
+        compact
+        className="w-28"
+      />
+    ) : undefined);
+
   const chartData = useMemo(
     () =>
       (data ?? []).map((point) => ({
@@ -84,6 +109,7 @@ export function HistoricalTrendChart({
       <BaseCard
         title={title}
         subtitle={subtitle}
+        actions={renderedActions}
         isEmpty
         className={cn('flex h-full min-h-[260px] flex-col', className)}
       />
@@ -91,7 +117,12 @@ export function HistoricalTrendChart({
   }
 
   return (
-    <BaseCard title={title} subtitle={subtitle} className={cn('flex h-full flex-col', className)}>
+    <BaseCard
+      title={title}
+      subtitle={subtitle}
+      actions={renderedActions}
+      className={cn('flex h-full flex-col', className)}
+    >
       <div className="h-52 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart

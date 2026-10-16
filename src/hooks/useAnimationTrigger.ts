@@ -31,6 +31,23 @@ export function useAnimationTrigger(
     typeof optionsOrDelayMs === 'object' ? (optionsOrDelayMs.threshold ?? 0.15) : 0.15;
   const once = typeof optionsOrDelayMs === 'object' ? (optionsOrDelayMs.once ?? true) : true;
 
+  // Track dependency changes safely without dynamic useEffect deps array size
+  const [triggerCount, setTriggerCount] = useState(0);
+  const prevDepsRef = useRef<DependencyList | null>(null);
+
+  if (prevDepsRef.current === null) {
+    prevDepsRef.current = deps;
+  } else {
+    const prev = prevDepsRef.current;
+    const hasChanged =
+      prev.length !== deps.length || deps.some((val, idx) => !Object.is(val, prev[idx]));
+
+    if (hasChanged) {
+      prevDepsRef.current = deps;
+      setTriggerCount((c) => c + 1);
+    }
+  }
+
   useEffect(() => {
     setInternalActive(false);
 
@@ -70,8 +87,7 @@ export function useAnimationTrigger(
       setInternalActive(true);
     }, delayMs);
     return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, deps);
+  }, [triggerCount, delayMs, observerRef, threshold, once]);
 
   return controlledActive ?? internalActive;
 }

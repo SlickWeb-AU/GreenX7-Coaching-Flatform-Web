@@ -1,8 +1,8 @@
 'use client';
 
+import { useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-
 import { AnimatedNumber } from '@/components/base';
 import { HistoricalTrendChart } from '@/components/dashboard';
 import { MONTH_NAMES } from '@/constants';
@@ -10,6 +10,7 @@ import { CHART_COLORS } from '@/constants/tokens';
 import { clientsApi } from '@/features/admin-clients';
 import { useAnimationTrigger } from '@/hooks/useAnimationTrigger';
 import { queryKeys } from '@/lib/query-client';
+import { mergeSearchParams } from '@/lib/search-params';
 import type { AreaScoreDto, WellbeingItemData } from '@/types';
 
 import { ClientBatteryCard } from './ClientBatteryCard';
@@ -49,13 +50,20 @@ export function ClientDashboardTab({
   const searchParams = useSearchParams();
   const selectedMonth = searchParams.get('month') || String(now.getMonth() + 1);
   const selectedYear = searchParams.get('year') || String(now.getFullYear());
-  const setPeriod = (key: 'month' | 'year', value: string) => {
-    const next = new URLSearchParams(searchParams.toString());
-    next.set(key, value);
-    router.replace(`${pathname}?${next.toString()}`, { scroll: false });
-  };
-  const setSelectedMonth = (v: string) => setPeriod('month', v);
-  const setSelectedYear = (v: string) => setPeriod('year', v);
+  const setPeriod = useCallback(
+    (patch: { month?: string; year?: string }) => {
+      const next = mergeSearchParams(searchParams.toString(), patch);
+      if (next === null) return;
+      router.replace(next ? `${pathname}?${next}` : pathname, { scroll: false });
+    },
+    [pathname, router, searchParams],
+  );
+  const setSelectedMonth = useCallback((v: string) => setPeriod({ month: v }), [setPeriod]);
+  const setSelectedYear = useCallback((v: string) => setPeriod({ year: v }), [setPeriod]);
+  const setSelectedPeriod = useCallback(
+    (next: { year: string; month: string }) => setPeriod(next),
+    [setPeriod],
+  );
 
   const { data } = useQuery({
     queryKey: queryKeys.adminClients.dashboard(clientId, selectedYear, selectedMonth),
@@ -118,6 +126,8 @@ export function ClientDashboardTab({
             onMonthChange={setSelectedMonth}
             selectedYear={selectedYear}
             onYearChange={setSelectedYear}
+            onPeriodChange={setSelectedPeriod}
+            availablePeriods={data?.availablePeriods}
             className="h-full"
           />
         </div>

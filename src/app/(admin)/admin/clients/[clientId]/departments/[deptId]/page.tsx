@@ -239,6 +239,7 @@ export default function DepartmentDetailPage() {
             onMonthChange={setSelectedMonth}
             selectedYear={selectedYear}
             onYearChange={setSelectedYear}
+            availablePeriods={deptDashboard?.availablePeriods}
             className="h-full"
           />
         </div>

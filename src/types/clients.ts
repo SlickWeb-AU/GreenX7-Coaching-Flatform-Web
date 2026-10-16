@@ -5,6 +5,7 @@ import type {
   SortOrder,
   WellbeingArea,
 } from '@/constants/clients';
+import type { AvailablePeriodsDto } from './dashboard';
 
 export type { CheckinStatus, ClientStatus, ReportStatus, SortOrder, WellbeingArea };
 export type { ClientsSortField } from '@/constants/clients';
@@ -162,6 +163,7 @@ export interface ClientDashboardDto {
   businessName: string;
   status: string;
   filters: { year: number; month: number };
+  availablePeriods?: AvailablePeriodsDto;
   batteryScore: number | null;
   zone: ZoneDto | null;
   vsPrevious: DeltaDto;

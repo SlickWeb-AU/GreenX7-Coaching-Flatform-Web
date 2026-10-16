@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 
@@ -12,6 +13,7 @@ import { CreateClientForm } from '@/components/clients';
 import { clientsApi } from '@/features/admin-clients';
 import { settingsApi } from '@/features/admin-settings';
 import { toApiError } from '@/lib/api-error';
+import { sortIndustryOptions } from '@/lib/period';
 import { queryKeys } from '@/lib/query-client';
 import type { ClientFormValues } from '@/validations';
 
@@ -24,9 +26,12 @@ export default function NewClientPage() {
     queryFn: settingsApi.getIndustries,
     retry: false,
   });
-  const industryOptions = (industriesQuery.data ?? [])
-    .filter((industry) => industry.isActive)
-    .map((industry) => ({ value: industry.id, label: industry.name }));
+  const industryOptions = useMemo(() => {
+    const raw = (industriesQuery.data ?? [])
+      .filter((industry) => industry.isActive)
+      .map((industry) => ({ value: industry.id, label: industry.name }));
+    return sortIndustryOptions(raw);
+  }, [industriesQuery.data]);
 
   const create = useMutation({
     mutationFn: async (values: ClientFormValues) => {
