@@ -3,6 +3,7 @@
 import { ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 
+import { AnimatedNumber } from '@/components/base';
 import { LiveIndicator } from '@/components/dashboard';
 import { cn } from '@/lib/utils';
 
@@ -10,12 +11,14 @@ export interface DepartmentLiveDataCardProps {
   participantCount?: number | null;
   dashboardHref?: string;
   className?: string;
+  active?: boolean;
 }
 
 export function DepartmentLiveDataCard({
   participantCount = null,
   dashboardHref,
   className,
+  active,
 }: DepartmentLiveDataCardProps) {
   return (
     <div
@@ -33,8 +36,7 @@ export function DepartmentLiveDataCard({
 
         <div className="body-14-bold flex flex-col items-center justify-center text-center text-neutral-grey-1">
           <span>
-            {participantCount !== null && participantCount !== undefined ? participantCount : '—'}{' '}
-            participants
+            <AnimatedNumber value={participantCount} active={active} /> participants
           </span>
           <span>received</span>
         </div>

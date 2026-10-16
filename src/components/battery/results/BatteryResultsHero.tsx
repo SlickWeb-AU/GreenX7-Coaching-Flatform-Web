@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-
+import { AnimatedNumber } from '@/components/base';
 import { ClientDepartmentHeader } from '@/components/clients';
 import {
   BatteryIcon,
@@ -10,14 +9,9 @@ import {
   HeartIcon,
   ResultDecorBlob,
 } from '@/components/icons';
-import {
-  ANIMATION_DURATION_MS,
-  AREA_BAR_COLORS,
-  AREA_ICON_MAP,
-  AREA_LIGHT_COLOR,
-} from '@/constants/dashboard';
+import { AREA_BAR_COLORS, AREA_ICON_MAP, AREA_LIGHT_COLOR } from '@/constants/dashboard';
 import { DASHBOARD_COLORS, ZONE_COLORS } from '@/constants/tokens';
-import { useCountUp } from '@/hooks/useCountUp';
+import { useAnimationTrigger } from '@/hooks/useAnimationTrigger';
 import { normalizeAreaLabel, resolveZoneKey } from '@/lib/battery';
 import { cn } from '@/lib/utils';
 import type { BatteryAreaResultDto } from '@/types/battery';
@@ -45,18 +39,8 @@ export function BatteryResultsHero({
   departmentName,
   clientLogoUrl,
 }: BatteryResultsHeroProps) {
-  const [active, setActive] = useState(false);
-
-  useEffect(() => {
-    setActive(false);
-    const timer = setTimeout(() => {
-      setActive(true);
-    }, 50);
-    return () => clearTimeout(timer);
-  }, [average]);
-
+  const active = useAnimationTrigger([average]);
   const displayScore = Math.round(average);
-  const animatedScore = useCountUp(displayScore, { active, duration: ANIMATION_DURATION_MS });
   const resolvedKey = resolveZoneKey(zoneKey) ?? resolveZoneKey(zoneLabel);
   const zoneColor = resolvedKey ? ZONE_COLORS[resolvedKey].color : '#63D556';
 
@@ -152,7 +136,7 @@ export function BatteryResultsHero({
                     aria-hidden="true"
                   />
                   <span className="body-32-black absolute inset-0 flex items-center justify-center pr-3 leading-none text-white drop-shadow-sm">
-                    {animatedScore ?? displayScore}%
+                    <AnimatedNumber value={displayScore} active={active} suffix="%" />
                   </span>
                 </div>
               </div>

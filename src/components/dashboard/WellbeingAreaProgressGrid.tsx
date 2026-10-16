@@ -1,16 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
-
-import { BaseCard, BaseTrend } from '@/components/base';
+import { AnimatedNumber, BaseCard, BaseTrend } from '@/components/base';
 import { BoltIcon, HeartIcon } from '@/components/icons';
+import { AREA_BADGE, AREA_BAR_COLORS, AREA_COLOR, AREA_ICON_MAP } from '@/constants/dashboard';
 import { cn } from '@/lib/utils';
 import type { WellbeingItemData } from '@/types';
-import {
-  ANIMATION_DURATION_MS,
-  AREA_BADGE,
-  AREA_BAR_COLORS,
-  AREA_COLOR,
-  AREA_ICON_MAP,
-} from '@/constants/dashboard';
 
 export interface WellbeingAreaProgressGridProps {
   items: WellbeingItemData[];
@@ -19,10 +11,18 @@ export interface WellbeingAreaProgressGridProps {
   active?: boolean;
 }
 
-function TrendIndicator({ value, label }: { value: number | null; label: string }) {
+function TrendIndicator({
+  value,
+  label,
+  active,
+}: {
+  value: number | null;
+  label: string;
+  active?: boolean;
+}) {
   return (
     <span className="inline-flex items-center gap-1">
-      <BaseTrend value={value} />
+      <BaseTrend value={value} active={active} />
       <span className="body-14-medium text-neutral-grey-2">{label}</span>
     </span>
   );
@@ -43,36 +43,6 @@ function AreaProgressRow({
   const iconColor = AREA_COLOR[item.area];
   const displayScore =
     item.score === null || item.score === undefined ? null : Math.round(item.score);
-  const [currentVal, setCurrentVal] = useState<number | null>(() => (active ? displayScore : 0));
-  const rafRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    if (displayScore === null) return;
-    if (!active) {
-      setCurrentVal(0);
-      return;
-    }
-
-    const duration = ANIMATION_DURATION_MS;
-    const startTime = performance.now();
-    const animate = (now: number) => {
-      const elapsed = now - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      const easeOut = 1 - Math.pow(1 - progress, 3);
-      setCurrentVal(Math.round(displayScore * easeOut));
-
-      if (progress < 1) {
-        rafRef.current = requestAnimationFrame(animate);
-      } else {
-        setCurrentVal(displayScore);
-      }
-    };
-
-    rafRef.current = requestAnimationFrame(animate);
-    return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    };
-  }, [active, displayScore]);
 
   return (
     <div className="flex w-full flex-col py-2">
@@ -89,14 +59,16 @@ function AreaProgressRow({
           <span className="body-16-bold text-neutral-grey-1">{item.label ?? item.area}</span>
         </div>
         <div className="flex items-center gap-1 text-neutral-grey-1">
-          <span className="body-18-bold leading-none">{currentVal ?? displayScore ?? '—'}</span>
+          <span className="body-18-bold tabular-nums leading-none">
+            <AnimatedNumber value={displayScore} active={active} />
+          </span>
           <BoltIcon size={14} aria-hidden="true" />
         </div>
       </div>
 
       <div className={cn('h-1.5 w-full overflow-hidden rounded-full', badgeBg)}>
         <div
-          className={cn('h-full rounded-full transition-all duration-[3000ms] ease-out', barColor)}
+          className={cn('linear h-full rounded-full transition-all duration-[3000ms]', barColor)}
           style={{ width: active ? `${Math.min(100, Math.max(0, displayScore ?? 0))}%` : '0%' }}
         />
       </div>
@@ -105,8 +77,9 @@ function AreaProgressRow({
         <TrendIndicator
           value={item.vsPreviousMonth}
           label={previousMonthLabel ? `vs ${previousMonthLabel}` : 'vs previous'}
+          active={active}
         />
-        <TrendIndicator value={item.vsFirstCheck} label="since first check" />
+        <TrendIndicator value={item.vsFirstCheck} label="since first check" active={active} />
       </div>
     </div>
   );

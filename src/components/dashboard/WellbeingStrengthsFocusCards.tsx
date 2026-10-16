@@ -1,18 +1,23 @@
+'use client';
+
+import { AnimatedNumber } from '@/components/base';
 import { HeartIcon } from '@/components/icons';
+import { AREA_COLOR, AREA_ICON_MAP } from '@/constants/dashboard';
 import { cn } from '@/lib/utils';
 import type { InsightBadgeItem } from '@/types/presentation';
-import { AREA_COLOR, AREA_ICON_MAP } from '@/constants/dashboard';
 
 export interface WellbeingStrengthsFocusCardsProps {
   strengths: InsightBadgeItem[];
   focus: InsightBadgeItem[];
   className?: string;
+  active?: boolean;
 }
 
 export function WellbeingStrengthsFocusCards({
   strengths,
   focus,
   className,
+  active,
 }: WellbeingStrengthsFocusCardsProps) {
   if (strengths.length === 0 && focus.length === 0) {
     return null;
@@ -25,12 +30,14 @@ export function WellbeingStrengthsFocusCards({
         titleClassName="text-brand-green-2"
         cardClassName="bg-secondary-green-2"
         items={strengths}
+        active={active}
       />
       <InsightGroup
         title="Our Focus"
         titleClassName="text-secondary-orange-1"
         cardClassName="bg-secondary-orange-2"
         items={focus}
+        active={active}
       />
     </div>
   );
@@ -41,11 +48,13 @@ function InsightGroup({
   titleClassName,
   cardClassName,
   items,
+  active,
 }: {
   title: string;
   titleClassName?: string;
   cardClassName?: string;
   items: InsightBadgeItem[];
+  active?: boolean;
 }) {
   return (
     <div className={cn('flex flex-col rounded-2xl p-6', cardClassName)}>
@@ -53,16 +62,17 @@ function InsightGroup({
       <div className="mt-8 flex flex-nowrap items-center">
         {items.map((item, idx) => {
           const Icon = AREA_ICON_MAP[item.area] ?? HeartIcon;
-          const displayScore =
-            item.score === null || item.score === undefined ? '—' : Math.round(item.score);
-
           return (
             <div key={item.area} className="flex items-center">
               <div className="flex items-center gap-2">
                 <Icon size={20} color={AREA_COLOR[item.area]} aria-hidden="true" />
                 <span className="body-16-regular whitespace-nowrap text-neutral-grey-1">
                   {item.label}:{' '}
-                  <span className="body-16-bold text-neutral-grey-1">{displayScore}</span>
+                  <AnimatedNumber
+                    value={item.score}
+                    active={active}
+                    className="body-16-bold text-neutral-grey-1"
+                  />
                 </span>
               </div>
               {idx < items.length - 1 && (

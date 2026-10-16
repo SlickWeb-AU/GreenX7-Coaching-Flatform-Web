@@ -51,7 +51,7 @@ export function TeamBatteryCard({
           )}
         </div>
         <div className="flex flex-col justify-center">
-          <WellbeingStrengthsFocusCards strengths={strengths} focus={focus} />
+          <WellbeingStrengthsFocusCards strengths={strengths} focus={focus} active={active} />
         </div>
       </div>
 

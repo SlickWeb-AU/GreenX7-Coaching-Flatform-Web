@@ -97,7 +97,7 @@ export function AreaScoreProgressBar({
 
       <div className={cn('w-full overflow-hidden rounded-full', isSm ? 'h-1.5' : 'h-2', badgeBg)}>
         <div
-          className={cn('h-full rounded-full transition-all ease-out', barColor)}
+          className={cn('linear h-full rounded-full transition-all', barColor)}
           style={{
             width: active ? `${Math.min(100, Math.max(0, score))}%` : '0%',
             transitionDuration: `${duration}ms`,

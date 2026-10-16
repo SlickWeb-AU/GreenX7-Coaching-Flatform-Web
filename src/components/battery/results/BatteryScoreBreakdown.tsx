@@ -1,7 +1,5 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-
 import { AreaScoreProgressBar, BatteryWheelChart } from '@/components/dashboard';
 import { HeartIcon } from '@/components/icons';
 import {
@@ -11,6 +9,7 @@ import {
   AREA_COLOR,
   AREA_ICON_MAP,
 } from '@/constants/dashboard';
+import { useInViewTrigger } from '@/hooks/useAnimationTrigger';
 import { useViewport } from '@/hooks/useViewport';
 import { normalizeAreaLabel } from '@/lib/battery';
 import { SCORE_INPUT_TYPE, formatScoreToPercent, type ScoreInputType } from '@/lib/utils';
@@ -27,25 +26,8 @@ export function BatteryScoreBreakdown({
   average,
   calculateBy = SCORE_INPUT_TYPE.ANSWER,
 }: BatteryScoreBreakdownProps) {
-  const [isActive, setIsActive] = useState(false);
-  const containerRef = useRef<HTMLDivElement | null>(null);
   const { isDesktop } = useViewport();
-
-  useEffect(() => {
-    if (!containerRef.current) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsActive(true);
-        }
-      },
-      { threshold: isDesktop ? 0.4 : 0.1 },
-    );
-
-    observer.observe(containerRef.current);
-    return () => observer.disconnect();
-  }, [isDesktop]);
+  const [containerRef, isActive] = useInViewTrigger(isDesktop ? 0.4 : 0.1, [isDesktop]);
 
   const percentOf = (a: BatteryAreaResultDto) =>
     calculateBy === SCORE_INPUT_TYPE.ANSWER

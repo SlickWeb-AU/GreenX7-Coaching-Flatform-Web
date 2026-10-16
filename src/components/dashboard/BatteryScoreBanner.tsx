@@ -1,10 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-
+import { AnimatedNumber } from '@/components/base';
 import { BatteryIcon } from '@/components/icons';
-import { ANIMATION_DURATION_MS } from '@/constants/dashboard';
-import { useCountUp } from '@/hooks/useCountUp';
+import { useAnimationTrigger } from '@/hooks/useAnimationTrigger';
 import { cn, formatNumber, formatScoreToPercent } from '@/lib/utils';
 
 import type { DashboardOverviewDto } from '@/types';
@@ -18,22 +16,18 @@ export function BatteryScoreBanner({
   industryName?: string | null;
   industryCount?: number | null;
 }) {
-  const [active, setActive] = useState(false);
-
-  useEffect(() => {
-    const id = requestAnimationFrame(() => setActive(true));
-    return () => cancelAnimationFrame(id);
-  }, []);
-
   const score = formatScoreToPercent(overview?.averageBatteryScore);
-  const animatedScore = useCountUp(score, { active, duration: ANIMATION_DURATION_MS });
   const rawChange = overview?.change ?? null;
   const change = rawChange !== null && rawChange !== undefined ? Math.round(rawChange) : null;
   const isPositive = (change ?? 0) >= 0;
   const hasChange = change !== null && change !== undefined;
+
   const clientCount = overview?.clientCount ?? null;
   const participantCount = overview?.participantCount ?? null;
   const departmentCount = overview?.departmentCount ?? null;
+
+  const active = useAnimationTrigger([score, clientCount, participantCount]);
+
   const industryLabel = industryName || `${formatNumber(industryCount)} Industries`;
   const clientLabel = industryName ? `Clients in ${industryName}` : 'Total Clients';
 
@@ -45,9 +39,11 @@ export function BatteryScoreBanner({
           <div className="mb-4 flex items-center gap-4">
             <BatteryIcon percentage={active ? (score ?? 0) : 0} aria-hidden="true" />
             <div className="flex items-stretch gap-1">
-              <span className="heading-48-bold leading-none text-white">
-                {animatedScore ?? score ?? '—'}
-              </span>
+              <AnimatedNumber
+                value={score}
+                active={active}
+                className="heading-48-bold leading-none text-white"
+              />
               <span className="heading-30-bold self-start leading-none text-white">%</span>
               <span className="body-16-medium self-end leading-none text-white">/100</span>
             </div>
@@ -59,7 +55,7 @@ export function BatteryScoreBanner({
                 hasChange && !isPositive ? 'bg-secondary-red-4' : 'bg-secondary-green-4',
               )}
             >
-              {hasChange ? (isPositive ? `+${change}%` : `${change}%`) : '—'}
+              {hasChange ? `${isPositive ? '+' : ''}${change}%` : '—'}
             </span>
             <span className="body-14-medium text-white/60">from previous period</span>
           </div>
@@ -67,15 +63,21 @@ export function BatteryScoreBanner({
         <div className="grid grid-cols-3 border-t border-white/20 pt-6 lg:col-span-7 lg:border-l lg:border-t-0 lg:pt-0">
           <div className="flex h-full flex-col justify-end gap-2 px-4 lg:px-6">
             <div className="body-14-medium min-h-[20px] text-white/60">{industryLabel}</div>
-            <div className="body-32-bold text-white">{formatNumber(clientCount)}</div>
+            <div className="body-32-bold text-white">
+              <AnimatedNumber value={clientCount} active={active} formatter={formatNumber} />
+            </div>
             <div className="body-16-medium text-white/80">{clientLabel}</div>
           </div>
           <div className="flex h-full flex-col justify-end gap-2 border-l border-white/20 px-4 lg:px-6">
-            <div className="body-32-bold text-white">{formatNumber(participantCount)}</div>
+            <div className="body-32-bold text-white">
+              <AnimatedNumber value={participantCount} active={active} formatter={formatNumber} />
+            </div>
             <div className="body-16-medium text-white/80">Participants</div>
           </div>
           <div className="flex h-full flex-col justify-end gap-2 border-l border-white/20 px-4 lg:px-6">
-            <div className="body-32-bold text-white">{formatNumber(departmentCount)}</div>
+            <div className="body-32-bold text-white">
+              <AnimatedNumber value={departmentCount} active={active} formatter={formatNumber} />
+            </div>
             <div className="body-16-medium text-white/80">Departments</div>
           </div>
         </div>

@@ -74,6 +74,11 @@ export function HistoricalTrendChart({
     [data],
   );
 
+  const chartKey = useMemo(
+    () => chartData.map((p) => `${p.label ?? p.month}-${p.score}`).join(','),
+    [chartData],
+  );
+
   if (!data || data.length === 0) {
     return (
       <BaseCard
@@ -89,7 +94,11 @@ export function HistoricalTrendChart({
     <BaseCard title={title} subtitle={subtitle} className={cn('flex h-full flex-col', className)}>
       <div className="h-52 w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chartData} margin={{ top: 10, right: 16, left: 16, bottom: 0 }}>
+          <LineChart
+            key={chartKey}
+            data={chartData}
+            margin={{ top: 10, right: 16, left: 16, bottom: 0 }}
+          >
             <CartesianGrid vertical={false} stroke="#CBD1CD" strokeWidth={1} />
             <XAxis
               dataKey="displayLabel"
@@ -122,7 +131,7 @@ export function HistoricalTrendChart({
               connectNulls
               isAnimationActive
               animationDuration={ANIMATION_DURATION_MS}
-              animationEasing="ease-out"
+              animationEasing="linear"
               dot={{ r: 5, fill: '#FFFFFF', stroke: dotColor ?? lineColor, strokeWidth: 2.5 }}
               activeDot={{ r: 7, fill: '#FFFFFF', stroke: dotColor ?? lineColor, strokeWidth: 3 }}
             />

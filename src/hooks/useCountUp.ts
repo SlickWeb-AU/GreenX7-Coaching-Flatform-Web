@@ -11,7 +11,8 @@ export interface UseCountUpOptions {
 }
 
 /**
- * Animates a numeric value counting up from 0 to target value with cubic ease-out.
+ * Animates a numeric value counting up from 0 to target value with linear progression,
+ * matching the 3000ms duration of progress bars and charts exactly.
  */
 export function useCountUp(
   target: number | null | undefined,
@@ -38,8 +39,7 @@ export function useCountUp(
     const animate = (now: number) => {
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
-      const easeOut = 1 - Math.pow(1 - progress, 3);
-      const val = numericTarget * easeOut;
+      const val = numericTarget * progress;
 
       setCurrentVal(decimals > 0 ? Number(val.toFixed(decimals)) : Math.round(val));
 

@@ -78,7 +78,7 @@ function CenterScoreBadge({
             <span
               className={cn(
                 scoreDigits >= 3 ? 'body-32-black' : 'heading-40-black',
-                'leading-none text-black',
+                'tabular-nums leading-none text-black',
                 scoreClassName,
               )}
             >
@@ -203,7 +203,7 @@ export const BatteryWheelChart = memo(function BatteryWheelChart({
               isAnimationActive={animate}
               animationBegin={0}
               animationDuration={animationDuration}
-              animationEasing="ease-out"
+              animationEasing="linear"
               cornerRadius={4}
               stroke="#ffffff"
               strokeWidth={2}

@@ -1,9 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-
-import { BaseCard } from '@/components/base';
+import { AnimatedNumber, BaseCard } from '@/components/base';
 import { ZONE_COLORS } from '@/constants/tokens';
+import { useAnimationTrigger } from '@/hooks/useAnimationTrigger';
 import { resolveZoneKey } from '@/lib/battery';
 import { cn } from '@/lib/utils';
 
@@ -12,16 +11,13 @@ import type { DashboardZoneDistributionDto } from '@/types';
 export function PlatformPerformanceBar({
   distribution,
   className,
+  active: controlledActive,
 }: {
   distribution?: DashboardZoneDistributionDto[];
   className?: string;
+  active?: boolean;
 }) {
-  const [active, setActive] = useState(false);
-
-  useEffect(() => {
-    const id = requestAnimationFrame(() => setActive(true));
-    return () => cancelAnimationFrame(id);
-  }, []);
+  const active = useAnimationTrigger([distribution], controlledActive);
 
   if (!distribution || distribution.length === 0) {
     return (
@@ -50,7 +46,7 @@ export function PlatformPerformanceBar({
             return (
               <div
                 key={item.key}
-                className={cn('h-full transition-all duration-[3000ms] ease-out', zone.bgClass)}
+                className={cn('linear h-full transition-all duration-[3000ms]', zone.bgClass)}
                 style={{ width: active ? `${percentage}%` : '0%' }}
                 title={`${zone.label}: ${percentage}%`}
               />
@@ -71,8 +67,7 @@ export function PlatformPerformanceBar({
                 <span className="body-12-medium text-neutral-grey-3">{zone.range}</span>
               </div>
               <span className="body-14-bold text-neutral-grey-1">
-                {item.percentage ?? '—'}
-                {item.percentage !== null && item.percentage !== undefined ? '%' : ''}
+                <AnimatedNumber value={item.percentage} active={active} suffix="%" />
               </span>
             </div>
           );
