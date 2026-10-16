@@ -28,12 +28,12 @@ export function BaseDialog({ title, onClose, children, className }: BaseDialogPr
       role="dialog"
       aria-modal="true"
       onClick={onClose}
-      className="fixed inset-0 z-50 m-0 flex items-center justify-center bg-black/50 p-4 duration-200 animate-in fade-in-0"
+      className="fixed inset-0 z-50 m-0 flex animate-fade-in items-center justify-center bg-black/50 p-4"
     >
       <div
         onClick={(event) => event.stopPropagation()}
         className={cn(
-          'w-full max-w-md rounded-2xl bg-white p-6 duration-200 animate-in fade-in-0 zoom-in-95',
+          'w-full max-w-md animate-dialog-in rounded-2xl bg-white p-6 shadow-xl',
           className,
         )}
       >
