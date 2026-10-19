@@ -30,6 +30,9 @@ export const PERMISSIONS = {
   // Reports
   DASHBOARD_VIEW: 'dashboard:view',
 
+  // Industry list (Settings → Industry management) — both admin roles
+  INDUSTRY_MANAGE: 'industry:manage',
+
   // Administrators (Settings screen)
   ADMIN_READ: 'admin:read',
   ADMIN_MANAGE: 'admin:manage',
