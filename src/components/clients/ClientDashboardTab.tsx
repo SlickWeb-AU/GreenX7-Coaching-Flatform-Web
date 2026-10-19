@@ -111,7 +111,6 @@ export function ClientDashboardTab({
             lastMonthLabel={`${previousMonthName} ${selectedYear}`}
             changeVsFirstCheck={data?.vsFirstCheck?.change ?? null}
             firstCheckLabel={firstCheckLabel}
-            active={active}
             className="h-full"
           />
         </div>

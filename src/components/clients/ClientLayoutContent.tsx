@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronLeft, Download, Pencil, Presentation } from 'lucide-react';
+import { ChevronLeft, Download, Pencil } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import type { ReactNode } from 'react';
 
@@ -15,10 +15,7 @@ import {
 } from '@/components/base';
 import { ROUTES } from '@/config/routes';
 import { CLIENT_STATUSES, CLIENT_TABS } from '@/constants/clients';
-import { useDepartmentShareLinks } from '@/features/admin-clients';
 import { useExportPdf } from '@/hooks/useExportPdf';
-import { normalizeUrl } from '@/lib/utils';
-import { ShareBatteryCheckPopover } from './ShareBatteryCheckPopover';
 import { useClient } from './ClientContext';
 import { useClientHeaderSlot } from './ClientHeaderProvider';
 
@@ -42,14 +39,6 @@ export function ClientLayoutContent({ children }: { children: ReactNode }) {
   // Cùng kỳ với tab Dashboard đang hiện (ClientDashboardTab ghi lên URL)
   const exportMonth = searchParams.get('month') || String(now.getMonth() + 1);
   const exportYear = searchParams.get('year') || String(now.getFullYear());
-  const companyWideDeptId = client?.departments?.find((d) => d.isCompanyWide)?.id ?? '';
-
-  // Hook first — before any early return (Rules of Hooks).
-  // `enabled` inside guards the fetch until ids exist.
-  const { data: companyWideShareLinks, isLoading: isShareLinksLoading } = useDepartmentShareLinks(
-    clientId,
-    companyWideDeptId,
-  );
 
   if (isEdit) {
     return <>{children}</>;
@@ -74,9 +63,6 @@ export function ClientLayoutContent({ children }: { children: ReactNode }) {
       router.replace(`?${nextParams.toString()}`, { scroll: false });
     }
   };
-
-  const companyWideDept = client.departments?.find((d) => d.isCompanyWide);
-  const presentationUrl = companyWideShareLinks?.presentationUrl || '';
 
   const defaultTitle = (
     <div className="flex items-center gap-2">
@@ -117,28 +103,6 @@ export function ClientLayoutContent({ children }: { children: ReactNode }) {
       >
         Edit client
       </BaseButton>
-
-      <BaseButton
-        variant="secondary"
-        size="medium"
-        pill
-        disabled={!presentationUrl}
-        loading={isShareLinksLoading}
-        startIcon={<Presentation size={16} />}
-        onClick={() => {
-          window.open(normalizeUrl(presentationUrl), '_blank', 'noopener,noreferrer');
-        }}
-      >
-        Launch presentation
-      </BaseButton>
-
-      {companyWideDept && (
-        <ShareBatteryCheckPopover
-          departmentName={client.businessName ?? 'Company'}
-          shareLinks={companyWideShareLinks}
-          isLoading={isShareLinksLoading}
-        />
-      )}
     </>
   );
 

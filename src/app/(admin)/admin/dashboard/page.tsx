@@ -3,7 +3,7 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { Download } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
+import { Suspense, useCallback, useEffect, useMemo } from 'react';
 import { toast } from 'sonner';
 
 import { BaseButton, BaseHeader, BaseLoading, BaseSelectInside } from '@/components/base';
@@ -187,14 +187,9 @@ function DashboardContent() {
     }
   }, [availablePeriods, month, year, pathname, router, searchParams]);
 
-  const [trendYear, setTrendYear] = useState<number>(() => year);
-  useEffect(() => {
-    setTrendYear((prev) => (prev === year ? prev : year));
-  }, [year]);
-
   const historicalTrend = useMemo(
-    () => (data?.historicalTrend ?? []).filter((point) => point.year === trendYear),
-    [data?.historicalTrend, trendYear],
+    () => (data?.historicalTrend ?? []).filter((point) => point.year === year),
+    [data?.historicalTrend, year],
   );
 
   if (isLoading && !data) {
@@ -262,13 +257,7 @@ function DashboardContent() {
         </div>
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <PlatformPerformanceBar distribution={zoneDistribution} />
-          <HistoricalTrendChart
-            data={historicalTrend}
-            title="Platform Historical Trend"
-            selectedYear={trendYear}
-            onYearChange={(y) => setTrendYear(Number(y))}
-            yearOptions={yearOptions}
-          />
+          <HistoricalTrendChart data={historicalTrend} title="Platform Historical Trend" />
         </div>
       </div>
     </>

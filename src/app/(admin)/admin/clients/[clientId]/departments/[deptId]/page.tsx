@@ -215,7 +215,6 @@ export default function DepartmentDetailPage() {
             lastMonthLabel={previousMonthName}
             changeVsFirstCheck={deptDashboard?.vsFirstCheck?.change ?? null}
             firstCheckLabel={deptDashboard?.firstCheck?.label}
-            active={active}
             className="h-full py-4"
           />
         </div>
