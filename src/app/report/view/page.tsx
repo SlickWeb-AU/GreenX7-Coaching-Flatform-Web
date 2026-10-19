@@ -290,7 +290,6 @@ function ReportViewContent() {
                   changeVsLastMonth={data.vsPrevious?.changePercent ?? null}
                   lastMonthLabel={MONTH_NAMES[prevMonth - 1]}
                   changeVsFirstCheck={data.vsFirstCheck?.changePercent ?? null}
-                  active={active}
                   className="h-full"
                 />
               ) : (
@@ -305,7 +304,6 @@ function ReportViewContent() {
                       ? `${MONTH_NAMES[data.firstCheck.month - 1]} ${data.firstCheck.year}`
                       : null
                   }
-                  active={active}
                   className="h-full"
                 />
               )}

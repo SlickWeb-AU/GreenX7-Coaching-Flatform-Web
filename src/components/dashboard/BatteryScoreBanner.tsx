@@ -26,7 +26,7 @@ export function BatteryScoreBanner({
   const participantCount = overview?.participantCount ?? null;
   const departmentCount = overview?.departmentCount ?? null;
 
-  const active = useAnimationTrigger([score, clientCount, participantCount]);
+  const active = useAnimationTrigger([clientCount, participantCount, departmentCount]);
 
   const industryLabel = industryName || `${formatNumber(industryCount)} Industries`;
   const clientLabel = industryName ? `Clients in ${industryName}` : 'Total Clients';
@@ -37,13 +37,11 @@ export function BatteryScoreBanner({
         <div className="flex flex-col justify-between lg:col-span-5">
           <div className="body-14-bold mb-2 text-white/80">Average Battery Score</div>
           <div className="mb-4 flex items-center gap-4">
-            <BatteryIcon percentage={active ? (score ?? 0) : 0} aria-hidden="true" />
+            <BatteryIcon percentage={score ?? 0} animate={false} aria-hidden="true" />
             <div className="flex items-stretch gap-1">
-              <AnimatedNumber
-                value={score}
-                active={active}
-                className="heading-48-bold leading-none text-white"
-              />
+              <span className="heading-48-bold tabular-nums leading-none text-white">
+                {score !== null && score !== undefined ? score : '—'}
+              </span>
               <span className="heading-30-bold self-start leading-none text-white">%</span>
               <span className="body-16-medium self-end leading-none text-white">/100</span>
             </div>

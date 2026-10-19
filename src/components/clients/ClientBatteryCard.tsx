@@ -1,8 +1,7 @@
 'use client';
 
-import { AnimatedNumber, BaseTag } from '@/components/base';
+import { BaseTag } from '@/components/base';
 import { BatteryIcon } from '@/components/icons';
-import { useAnimationTrigger } from '@/hooks/useAnimationTrigger';
 import { cn, formatScoreToPercent } from '@/lib/utils';
 
 export interface ClientBatteryCardProps {
@@ -20,7 +19,6 @@ export interface ClientBatteryCardProps {
    */
   layout?: 'inline' | 'stacked';
   className?: string;
-  active?: boolean;
 }
 
 export function ClientBatteryCard({
@@ -34,9 +32,7 @@ export function ClientBatteryCard({
   firstCheckLabel = null,
   layout = 'inline',
   className,
-  active: controlledActive,
 }: ClientBatteryCardProps) {
-  const active = useAnimationTrigger([score], controlledActive);
   const displayScore = formatScoreToPercent(score);
   const hasLastMonth = changeVsLastMonth !== null && changeVsLastMonth !== undefined;
   const roundedLastMonth = hasLastMonth ? Math.round(changeVsLastMonth) : null;
@@ -63,10 +59,10 @@ export function ClientBatteryCard({
         {/* Bottom cluster: Battery Icon, Score & Comparisons */}
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-3">
-            <BatteryIcon percentage={active ? (displayScore ?? 0) : 0} aria-hidden="true" />
+            <BatteryIcon percentage={displayScore ?? 0} animate={false} aria-hidden="true" />
             <div className="flex items-stretch gap-1">
-              <span className="heading-48-bold leading-none text-white">
-                <AnimatedNumber value={displayScore} active={active} />
+              <span className="heading-48-bold tabular-nums leading-none text-white">
+                {displayScore !== null && displayScore !== undefined ? displayScore : '—'}
               </span>
               <span className="heading-30-bold self-start leading-none text-white">%</span>
               <span className="body-16-medium self-end leading-none text-white">/100</span>
@@ -142,10 +138,10 @@ export function ClientBatteryCard({
 
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <BatteryIcon percentage={active ? (displayScore ?? 0) : 0} aria-hidden="true" />
+          <BatteryIcon percentage={displayScore ?? 0} animate={false} aria-hidden="true" />
           <div className="flex items-stretch gap-1">
-            <span className="heading-48-bold leading-none text-white">
-              <AnimatedNumber value={displayScore} active={active} />
+            <span className="heading-48-bold tabular-nums leading-none text-white">
+              {displayScore !== null && displayScore !== undefined ? displayScore : '—'}
             </span>
             <span className="heading-30-bold self-start leading-none text-white">%</span>
             <span className="body-16-medium self-end leading-none text-white">/100</span>
