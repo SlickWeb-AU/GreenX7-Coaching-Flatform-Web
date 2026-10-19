@@ -11,6 +11,8 @@ export interface ConfirmOptions {
   confirmText?: string;
   cancelText?: string;
   variant?: 'primary' | 'danger';
+  /** Popup chỉ báo tin, một nút xác nhận (ví dụ "không xoá được vì đang dùng") */
+  hideCancel?: boolean;
 }
 
 type ConfirmFunction = (options: ConfirmOptions) => Promise<boolean>;
@@ -56,6 +58,7 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
     confirmText = 'Yes',
     cancelText = 'No',
     variant = 'primary',
+    hideCancel = false,
   } = dialogState.options;
 
   return (
@@ -65,9 +68,11 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
         <BaseDialog title={title} onClose={() => handleClose(false)}>
           {message && <div className="body-14-medium mb-6 text-neutral-grey-2">{message}</div>}
           <div className="flex items-center justify-end gap-3">
-            <BaseButton variant="secondary" size="medium" pill onClick={() => handleClose(false)}>
-              {cancelText}
-            </BaseButton>
+            {!hideCancel && (
+              <BaseButton variant="secondary" size="medium" pill onClick={() => handleClose(false)}>
+                {cancelText}
+              </BaseButton>
+            )}
             <BaseButton
               variant="primary"
               size="medium"

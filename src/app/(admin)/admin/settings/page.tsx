@@ -220,7 +220,23 @@ export default function SettingsPage() {
     }
   };
 
-  const handleDeleteIndustry = async (industry: { id: string; name: string }) => {
+  const handleDeleteIndustry = async (industry: {
+    id: string;
+    name: string;
+    clientCount: number;
+  }) => {
+    // Ngành đang có client thì không xoá được (SOW AP/E7): chỉ báo bằng popup,
+    // cùng nội dung với thông báo của BE
+    if (industry.clientCount > 0) {
+      await showConfirm({
+        title: 'Cannot delete industry',
+        message: `${industry.clientCount} client(s) still belong to this industry. Move them to another industry, or deactivate the industry to hide it from the list while keeping existing data.`,
+        confirmText: 'OK',
+        hideCancel: true,
+      });
+      return;
+    }
+
     const confirmed = await showConfirm({
       title: 'Delete industry',
       message: `Are you sure you want to delete "${industry.name}"? This action cannot be undone.`,
@@ -267,54 +283,39 @@ export default function SettingsPage() {
             <p className="body-14-medium text-neutral-grey-3">No industries yet.</p>
           ) : (
             <div className="grid grid-cols-1 gap-x-6 gap-y-2 lg:grid-cols-2">
-              {industries.map((ind) => {
-                // AP/E7: ngành đang có client thì không xoá được — nút mờ kèm lý do
-                const inUse = ind.clientCount > 0;
-                const inUseText = `In use by ${ind.clientCount} client${ind.clientCount === 1 ? '' : 's'} — move them to another industry before deleting.`;
-                return (
-                  <div key={ind.id} className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <BaseInput
-                        value={ind.name}
-                        readOnly
-                        aria-label={`Industry ${ind.name}`}
-                        className="min-w-0 flex-1"
+              {industries.map((ind) => (
+                <div key={ind.id} className="flex items-center gap-2">
+                  <BaseInput
+                    value={ind.name}
+                    readOnly
+                    aria-label={`Industry ${ind.name}`}
+                    className="min-w-0 flex-1"
+                  />
+                  {canManageIndustries && (
+                    <>
+                      <BaseIconButton
+                        aria-label={`Rename ${ind.name}`}
+                        size={40}
+                        icon={<Pencil size={18} aria-hidden />}
+                        className="text-neutral-grey-3 hover:text-brand-green-2"
+                        onClick={() => {
+                          setEditingId(ind.id);
+                          industryForm.reset({ name: ind.name });
+                          setShowIndustry(true);
+                        }}
                       />
-                      {canManageIndustries && (
-                        <>
-                          <BaseIconButton
-                            aria-label={`Rename ${ind.name}`}
-                            size={40}
-                            icon={<Pencil size={18} aria-hidden />}
-                            className="text-neutral-grey-3 hover:text-brand-green-2"
-                            onClick={() => {
-                              setEditingId(ind.id);
-                              industryForm.reset({ name: ind.name });
-                              setShowIndustry(true);
-                            }}
-                          />
-                          {/* span giữ tooltip vì nút disabled không nhận hover */}
-                          <span title={inUse ? inUseText : undefined}>
-                            <BaseIconButton
-                              aria-label={
-                                inUse ? `Delete ${ind.name} (${inUseText})` : `Delete ${ind.name}`
-                              }
-                              size={40}
-                              icon={<Trash2 size={18} aria-hidden />}
-                              className="text-neutral-grey-3 hover:text-secondary-red-4"
-                              disabled={inUse || deleteIndustry.isPending}
-                              onClick={() => handleDeleteIndustry(ind)}
-                            />
-                          </span>
-                        </>
-                      )}
-                    </div>
-                    {canManageIndustries && inUse && (
-                      <p className="body-12-medium pl-1 text-neutral-grey-3">{inUseText}</p>
-                    )}
-                  </div>
-                );
-              })}
+                      <BaseIconButton
+                        aria-label={`Delete ${ind.name}`}
+                        size={40}
+                        icon={<Trash2 size={18} aria-hidden />}
+                        className="text-neutral-grey-3 hover:text-secondary-red-4"
+                        disabled={deleteIndustry.isPending}
+                        onClick={() => void handleDeleteIndustry(ind)}
+                      />
+                    </>
+                  )}
+                </div>
+              ))}
             </div>
           )}
         </div>
