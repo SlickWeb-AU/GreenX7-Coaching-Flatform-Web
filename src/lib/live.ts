@@ -36,14 +36,20 @@ export function resolveLiveNames(
   clientSlug?: string | null,
   departmentSlug?: string | null,
 ): { clientName: string; departmentName: string } {
+  const isCompanyWide =
+    data?.branding?.isCompanyWide ||
+    departmentSlug === 'company-wide' ||
+    (data?.branding && data.branding.departmentName === null);
+
   return {
     clientName:
       data?.branding?.clientName ||
       data?.clientName ||
       data?.businessName ||
       formatSlugLabel(clientSlug),
-    departmentName:
-      data?.branding?.departmentName || data?.departmentName || formatSlugLabel(departmentSlug),
+    departmentName: isCompanyWide
+      ? ''
+      : data?.branding?.departmentName || data?.departmentName || formatSlugLabel(departmentSlug),
   };
 }
 

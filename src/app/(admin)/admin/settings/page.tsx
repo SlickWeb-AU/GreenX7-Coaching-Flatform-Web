@@ -18,8 +18,10 @@ import { queryKeys } from '@/lib/query-client';
 import type { AdminUser } from '@/types';
 import {
   INDUSTRY_NAME_MAX_LENGTH,
+  editAdminSchema,
   industryFormSchema,
   inviteSchema,
+  type EditAdminValues,
   type IndustryFormValues,
   type InviteValues,
 } from '@/validations';
@@ -47,6 +49,7 @@ export default function SettingsPage() {
   const [showIndustry, setShowIndustry] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showInvite, setShowInvite] = useState(false);
+  const [editingAdmin, setEditingAdmin] = useState<AdminUser | null>(null);
   const [busyAdminId, setBusyAdminId] = useState<string | null>(null);
 
   const invalidateIndustries = () =>
@@ -68,6 +71,14 @@ export default function SettingsPage() {
       firstName: '',
       lastName: '',
       email: '',
+    },
+  });
+
+  const editAdminForm = useForm<EditAdminValues>({
+    resolver: zodResolver(editAdminSchema),
+    defaultValues: {
+      firstName: '',
+      lastName: '',
     },
   });
 
@@ -151,6 +162,36 @@ export default function SettingsPage() {
       toast.error(toApiError(e).message);
     },
   });
+
+  const updateAdminName = useMutation({
+    mutationFn: ({
+      id,
+      firstName,
+      lastName,
+    }: {
+      id: string;
+      firstName: string;
+      lastName: string;
+    }) => settingsApi.updateAdminUser(id, { firstName, lastName }),
+    onSuccess: () => {
+      toast.success('Administrator updated successfully');
+      setEditingAdmin(null);
+      editAdminForm.reset();
+      invalidateAdmins();
+    },
+    onError: (e: unknown) => {
+      toast.error(toApiError(e).message);
+    },
+  });
+
+  const handleOpenEditAdmin = (admin: AdminUser) => {
+    setEditingAdmin(admin);
+    const [first, ...rest] = (admin.name || '').split(' ');
+    editAdminForm.reset({
+      firstName: admin.firstName || first || '',
+      lastName: admin.lastName || rest.join(' ') || '',
+    });
+  };
 
   const industries = industriesQuery.data ?? [];
   const admins = adminsQuery.data ?? [];
@@ -348,6 +389,7 @@ export default function SettingsPage() {
             loading={adminsQuery.isLoading || adminsQuery.isFetching}
             currentUserId={user?.id}
             canManage={canManage}
+            onEdit={handleOpenEditAdmin}
             onToggleStatus={handleToggleAdminStatus}
             onDelete={handleDeleteAdmin}
             busyId={busyAdminId}
@@ -420,6 +462,58 @@ export default function SettingsPage() {
             </div>
             <BaseButton type="submit" fullWidth className="mt-4" loading={inviteAdmin.isPending}>
               Send invite
+            </BaseButton>
+          </form>
+        </BaseDialog>
+      )}
+
+      {editingAdmin && canManage && (
+        <BaseDialog
+          title="Edit administrator"
+          onClose={() => {
+            setEditingAdmin(null);
+            editAdminForm.reset();
+          }}
+        >
+          <form
+            onSubmit={editAdminForm.handleSubmit((values) =>
+              updateAdminName.mutate({
+                id: editingAdmin.id,
+                firstName: values.firstName.trim(),
+                lastName: values.lastName.trim(),
+              }),
+            )}
+            noValidate
+          >
+            <div className="flex flex-col gap-3">
+              <BaseInput
+                label="First name"
+                placeholder="Enter first name"
+                error={Boolean(editAdminForm.formState.errors.firstName)}
+                helperText={editAdminForm.formState.errors.firstName?.message}
+                {...editAdminForm.register('firstName')}
+              />
+              <BaseInput
+                label="Last name"
+                placeholder="Enter last name"
+                error={Boolean(editAdminForm.formState.errors.lastName)}
+                helperText={editAdminForm.formState.errors.lastName?.message}
+                {...editAdminForm.register('lastName')}
+              />
+              <BaseInput
+                label="Email"
+                value={editingAdmin.email}
+                disabled
+                helperText="Email is the login identity and cannot be edited."
+              />
+            </div>
+            <BaseButton
+              type="submit"
+              fullWidth
+              className="mt-4"
+              loading={updateAdminName.isPending}
+            >
+              Save changes
             </BaseButton>
           </form>
         </BaseDialog>

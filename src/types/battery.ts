@@ -38,7 +38,8 @@ export interface BatterySubmitResult {
 
 export interface BatteryBrandingDto {
   clientName: string;
-  departmentName: string;
+  departmentName: string | null;
+  isCompanyWide?: boolean;
   darkLogoUrl: string | null;
   whiteLogoUrl: string | null;
 }

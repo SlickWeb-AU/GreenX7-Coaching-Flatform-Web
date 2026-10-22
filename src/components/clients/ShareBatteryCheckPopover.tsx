@@ -10,6 +10,7 @@ import type { DepartmentShareLinksDto } from '@/types';
 
 export interface ShareBatteryCheckPopoverProps {
   departmentName: string;
+  isCompanyWide?: boolean;
   label?: string;
   shareLinks?: DepartmentShareLinksDto;
   isLoading?: boolean;
@@ -18,6 +19,7 @@ export interface ShareBatteryCheckPopoverProps {
 
 export function ShareBatteryCheckPopover({
   departmentName,
+  isCompanyWide = false,
   label = 'Share Battery Check',
   shareLinks,
   isLoading = false,
@@ -88,7 +90,9 @@ export function ShareBatteryCheckPopover({
                   Share {departmentName} Battery Check
                 </h3>
                 <p className="body-14-medium text-neutral-grey-2">
-                  Links are public for this department only.
+                  {isCompanyWide
+                    ? 'Links are public for company-wide Battery Check.'
+                    : 'Links are public for this department only.'}
                 </p>
               </div>
               <BaseIconButton

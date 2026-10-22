@@ -62,16 +62,18 @@ export function ClientHistoryTab({
   return (
     <div className={cn('flex flex-col gap-10', className)}>
       {/* Sub-tab Department Selector */}
-      <div className="overflow-x-auto">
-        <BasePillTabs
-          items={departmentTabs}
-          activeKey={selectedDepartment}
-          onChange={(key) => {
-            setSelectedDepartment(key);
-            setPage(1);
-          }}
-        />
-      </div>
+      {departmentTabs.length > 1 && (
+        <div className="overflow-x-auto">
+          <BasePillTabs
+            items={departmentTabs}
+            activeKey={selectedDepartment}
+            onChange={(key) => {
+              setSelectedDepartment(key);
+              setPage(1);
+            }}
+          />
+        </div>
+      )}
 
       {/* Table with integrated loading, pagination and empty state */}
       <ClientCheckInHistoryTable

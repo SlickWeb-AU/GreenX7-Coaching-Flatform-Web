@@ -30,3 +30,6 @@ export const inviteSchema = z.object({
 });
 
 export type InviteValues = z.infer<typeof inviteSchema>;
+
+export const editAdminSchema = inviteSchema.pick({ firstName: true, lastName: true });
+export type EditAdminValues = z.infer<typeof editAdminSchema>;

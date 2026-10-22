@@ -69,6 +69,7 @@ export interface ClientDetail {
   openPeriod?: { opensAt: string; closesAt: string } | null;
   autoSendReport: boolean;
   contacts: ClientContact[];
+  companyWideDepartmentId?: string | null;
   departments: ClientDepartment[];
 }
 

@@ -31,8 +31,14 @@ export interface BatteryCheckFlowProps {
 }
 
 export function BatteryCheckFlow({ clientSlug, departmentSlug, stateData }: BatteryCheckFlowProps) {
+  const isCompanyWide =
+    stateData?.branding.isCompanyWide ||
+    departmentSlug === 'company-wide' ||
+    stateData?.branding.departmentName === null;
   const clientName = stateData?.branding.clientName ?? formatSlugLabel(clientSlug);
-  const departmentName = stateData?.branding.departmentName ?? formatSlugLabel(departmentSlug);
+  const departmentName = isCompanyWide
+    ? null
+    : (stateData?.branding.departmentName ?? formatSlugLabel(departmentSlug));
   const clientLogoUrl = stateData?.branding.whiteLogoUrl || stateData?.branding.darkLogoUrl || null;
   const statusLogoUrl = stateData?.branding.darkLogoUrl || stateData?.branding.whiteLogoUrl || null;
 

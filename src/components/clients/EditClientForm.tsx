@@ -608,10 +608,7 @@ export function EditClientForm({
                           aria-label="Delete department"
                           size={40}
                           icon={<Trash2 size={20} aria-hidden />}
-                          disabled={
-                            departmentFields.length <= 1 ||
-                            persist.busyKey === deptDeleteKey(field.id)
-                          }
+                          disabled={persist.busyKey === deptDeleteKey(field.id)}
                           className="text-neutral-grey-3 hover:text-secondary-red-4"
                           onClick={() => handleRemoveDept(index, field.id)}
                         />
