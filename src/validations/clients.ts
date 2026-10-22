@@ -68,7 +68,7 @@ export const clientFormSchema = z
     contacts: z.array(clientContactSchema).min(1, 'At least one contact is required.').default([]),
     departments: z
       .array(clientDepartmentSchema)
-      .min(1, 'Please add at least one department.')
+      .max(50, 'You can add up to 50 departments.')
       .default([]),
     darkLogo: clientLogoSchema,
     whiteLogo: clientLogoSchema,
@@ -114,10 +114,16 @@ export const clientFormSchema = z
       path: ['departments'],
     },
   )
-  .refine((data) => data.departments.some((dept) => dept.status === CLIENT_STATUSES.ACTIVE), {
-    message: 'A client must retain at least one active department.',
-    path: ['departments'],
-  });
+  .refine(
+    (data) => {
+      if (data.departments.length === 0) return true;
+      return data.departments.some((dept) => dept.status === CLIENT_STATUSES.ACTIVE);
+    },
+    {
+      message: 'A client must retain at least one active department.',
+      path: ['departments'],
+    },
+  );
 
 export type ClientContactFormValue = z.infer<typeof clientContactSchema>;
 export type ClientDepartmentFormValue = z.infer<typeof clientDepartmentSchema>;

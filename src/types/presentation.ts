@@ -24,6 +24,7 @@ export interface WellbeingItemData {
 export interface BatteryBranding {
   clientName?: string | null;
   departmentName?: string | null;
+  isCompanyWide?: boolean;
   darkLogoUrl?: string | null;
   whiteLogoUrl?: string | null;
 }

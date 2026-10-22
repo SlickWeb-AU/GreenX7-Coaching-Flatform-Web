@@ -45,10 +45,10 @@ export function BatteryStatusScreen({
   // Subtitle resolution for submitted check-in
   const monthName = periodName || getMonthName(periodMonth);
   const periodLabel = [monthName, periodYear].filter(Boolean).join(' ');
-  const targetLabel = [clientName, departmentName].filter(Boolean).join(' ');
+  const targetLabel = clientName || departmentName;
   const checkInTarget = targetLabel
     ? `Your anonymous response is included in ${targetLabel}’s ${periodLabel ? `${periodLabel} ` : ''}check-in.`
-    : 'Your anonymous response is included in this department’s check-in.';
+    : 'Your anonymous response is included in this check-in.';
 
   // Next opening date resolution for closed check-in
   const formattedNextDate = formatCheckInDate(nextOpensAt, timeZone);

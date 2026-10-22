@@ -8,6 +8,7 @@ export interface AdminsTableProps {
   loading?: boolean;
   currentUserId?: string;
   canManage?: boolean;
+  onEdit?: (admin: AdminUser) => void;
   onToggleStatus?: (admin: AdminUser) => void;
   onDelete?: (admin: AdminUser) => void;
   busyId?: string | null;
@@ -18,6 +19,7 @@ export function AdminsTable({
   loading = false,
   currentUserId,
   canManage = false,
+  onEdit,
   onToggleStatus,
   onDelete,
   busyId,
@@ -60,8 +62,8 @@ export function AdminsTable({
         const isSuperAdminRole = record.role === USER_ROLES.SUPER_ADMIN;
         const isSelf = Boolean(currentUserId && record.id === currentUserId);
 
-        // SUPER_ADMIN accounts and self cannot be deactivated or deleted
-        if (isSuperAdminRole || isSelf) {
+        // SUPER_ADMIN accounts cannot be managed by other users
+        if (isSuperAdminRole && !isSelf) {
           return null;
         }
 
@@ -73,19 +75,31 @@ export function AdminsTable({
             <button
               type="button"
               disabled={isBusy}
-              onClick={() => onToggleStatus?.(record)}
-              className="body-14-bold text-brand-green-2 transition-colors hover:underline disabled:cursor-not-allowed disabled:no-underline disabled:opacity-40"
+              onClick={() => onEdit?.(record)}
+              className="body-14-bold text-neutral-grey-2 transition-colors hover:text-neutral-grey-1 hover:underline disabled:cursor-not-allowed disabled:no-underline disabled:opacity-40"
             >
-              {isActive ? 'Deactivate' : 'Activate'}
+              Edit
             </button>
-            <button
-              type="button"
-              disabled={isBusy}
-              onClick={() => onDelete?.(record)}
-              className="body-14-bold text-secondary-red-4 transition-colors hover:underline disabled:cursor-not-allowed disabled:no-underline disabled:opacity-40"
-            >
-              Delete
-            </button>
+            {!isSuperAdminRole && !isSelf && (
+              <>
+                <button
+                  type="button"
+                  disabled={isBusy}
+                  onClick={() => onToggleStatus?.(record)}
+                  className="body-14-bold text-brand-green-2 transition-colors hover:underline disabled:cursor-not-allowed disabled:no-underline disabled:opacity-40"
+                >
+                  {isActive ? 'Deactivate' : 'Activate'}
+                </button>
+                <button
+                  type="button"
+                  disabled={isBusy}
+                  onClick={() => onDelete?.(record)}
+                  className="body-14-bold text-secondary-red-4 transition-colors hover:underline disabled:cursor-not-allowed disabled:no-underline disabled:opacity-40"
+                >
+                  Delete
+                </button>
+              </>
+            )}
           </div>
         );
       },

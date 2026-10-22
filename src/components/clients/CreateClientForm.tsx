@@ -89,7 +89,7 @@ export function CreateClientForm({
       state: '',
       status: CLIENT_STATUSES.ACTIVE,
       contacts: [{ ...DEFAULT_CONTACT_ROW }],
-      departments: [{ ...DEFAULT_DEPARTMENT_ROW }],
+      departments: [],
       darkLogo: null,
       whiteLogo: null,
       checkInStartDay: undefined,
@@ -545,7 +545,6 @@ export function CreateClientForm({
                         aria-label="Delete department"
                         size={40}
                         icon={<Trash2 size={20} aria-hidden />}
-                        disabled={departmentFields.length <= 1}
                         className="text-neutral-grey-3 hover:text-secondary-red-4"
                         onClick={() => handleRemoveDept(index, field.id)}
                       />

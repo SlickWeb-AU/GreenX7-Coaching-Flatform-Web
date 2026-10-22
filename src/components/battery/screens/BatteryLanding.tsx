@@ -13,7 +13,7 @@ import {
 
 interface BatteryLandingProps {
   clientName: string;
-  departmentName: string;
+  departmentName?: string | null;
   clientLogoUrl?: string | null;
   onStart: () => void;
   onHowItWorks: () => void;

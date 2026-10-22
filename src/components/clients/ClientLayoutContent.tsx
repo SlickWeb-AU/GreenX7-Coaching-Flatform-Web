@@ -1,8 +1,8 @@
 'use client';
 
-import { ChevronLeft, Download, Pencil } from 'lucide-react';
+import { ChevronLeft, Download, Pencil, Presentation } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import type { ReactNode } from 'react';
+import { useMemo, type ReactNode } from 'react';
 
 import {
   BaseBreadcrumb,
@@ -15,7 +15,10 @@ import {
 } from '@/components/base';
 import { ROUTES } from '@/config/routes';
 import { CLIENT_STATUSES, CLIENT_TABS } from '@/constants/clients';
+import { useDepartmentShareLinks } from '@/features/admin-clients';
 import { useExportPdf } from '@/hooks/useExportPdf';
+import { normalizeUrl } from '@/lib/utils';
+import { ShareBatteryCheckPopover } from './ShareBatteryCheckPopover';
 import { useClient } from './ClientContext';
 import { useClientHeaderSlot } from './ClientHeaderProvider';
 
@@ -39,6 +42,20 @@ export function ClientLayoutContent({ children }: { children: ReactNode }) {
   // Cùng kỳ với tab Dashboard đang hiện (ClientDashboardTab ghi lên URL)
   const exportMonth = searchParams.get('month') || String(now.getMonth() + 1);
   const exportYear = searchParams.get('year') || String(now.getFullYear());
+  const companyWideDeptId = client?.companyWideDepartmentId || '';
+
+  // Hook first — before any early return (Rules of Hooks).
+  // `enabled` inside guards the fetch until ids exist.
+  const { data: companyWideShareLinks, isLoading: isShareLinksLoading } = useDepartmentShareLinks(
+    clientId,
+    companyWideDeptId,
+  );
+
+  const hasDepartments = (client?.departments?.length ?? 0) > 0;
+  const tabs = useMemo(
+    () => (hasDepartments ? TABS : TABS.filter((t) => t.key !== CLIENT_TABS.DEPARTMENTS)),
+    [hasDepartments],
+  );
 
   if (isEdit) {
     return <>{children}</>;
@@ -50,9 +67,13 @@ export function ClientLayoutContent({ children }: { children: ReactNode }) {
 
   if (!client) return null;
 
+  const presentationUrl = companyWideShareLinks?.presentationUrl || '';
+  const currentTab = searchParams.get('tab') || CLIENT_TABS.DASHBOARD;
   const activeTab = isDeptDetail
     ? CLIENT_TABS.DEPARTMENTS
-    : searchParams.get('tab') || CLIENT_TABS.DASHBOARD;
+    : !hasDepartments && currentTab === CLIENT_TABS.DEPARTMENTS
+      ? CLIENT_TABS.DASHBOARD
+      : currentTab;
 
   const handleTabChange = (tabKey: string) => {
     if (isDeptDetail) {
@@ -103,6 +124,27 @@ export function ClientLayoutContent({ children }: { children: ReactNode }) {
       >
         Edit client
       </BaseButton>
+
+      <BaseButton
+        variant="secondary"
+        size="medium"
+        pill
+        disabled={!presentationUrl}
+        loading={isShareLinksLoading}
+        startIcon={<Presentation size={16} />}
+        onClick={() => {
+          window.open(normalizeUrl(presentationUrl), '_blank', 'noopener,noreferrer');
+        }}
+      >
+        Launch presentation
+      </BaseButton>
+
+      <ShareBatteryCheckPopover
+        departmentName={client.businessName ?? 'Company'}
+        isCompanyWide
+        shareLinks={companyWideShareLinks}
+        isLoading={isShareLinksLoading}
+      />
     </>
   );
 
@@ -135,7 +177,7 @@ export function ClientLayoutContent({ children }: { children: ReactNode }) {
         actions={headerSlot?.actions ?? defaultActions}
       />
 
-      <BaseTabs className="mb-10" items={TABS} activeKey={activeTab} onChange={handleTabChange} />
+      <BaseTabs className="mb-10" items={tabs} activeKey={activeTab} onChange={handleTabChange} />
 
       {children}
     </div>
