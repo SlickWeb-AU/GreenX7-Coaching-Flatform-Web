@@ -70,6 +70,7 @@ export default function LoginPage() {
     if (typeof window === 'undefined') return;
     const url = new URL(window.location.href);
     const errorParam = url.searchParams.get('error');
+
     if (errorParam) {
       let msg = '';
       if (errorParam === 'account_deleted') {

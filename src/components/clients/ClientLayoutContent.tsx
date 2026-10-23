@@ -97,6 +97,8 @@ export function ClientLayoutContent({ children }: { children: ReactNode }) {
     </div>
   );
 
+  const isDashboardOverall = activeTab === CLIENT_TABS.DASHBOARD && !isDeptDetail;
+
   const defaultActions = (
     <>
       <BaseButton
@@ -125,26 +127,30 @@ export function ClientLayoutContent({ children }: { children: ReactNode }) {
         Edit client
       </BaseButton>
 
-      <BaseButton
-        variant="secondary"
-        size="medium"
-        pill
-        disabled={!presentationUrl}
-        loading={isShareLinksLoading}
-        startIcon={<Presentation size={16} />}
-        onClick={() => {
-          window.open(normalizeUrl(presentationUrl), '_blank', 'noopener,noreferrer');
-        }}
-      >
-        Launch presentation
-      </BaseButton>
+      {isDashboardOverall && (
+        <>
+          <BaseButton
+            variant="secondary"
+            size="medium"
+            pill
+            disabled={!presentationUrl}
+            loading={isShareLinksLoading}
+            startIcon={<Presentation size={16} />}
+            onClick={() => {
+              window.open(normalizeUrl(presentationUrl), '_blank', 'noopener,noreferrer');
+            }}
+          >
+            Launch presentation
+          </BaseButton>
 
-      <ShareBatteryCheckPopover
-        departmentName={client.businessName ?? 'Company'}
-        isCompanyWide
-        shareLinks={companyWideShareLinks}
-        isLoading={isShareLinksLoading}
-      />
+          <ShareBatteryCheckPopover
+            departmentName={client.businessName ?? 'Company'}
+            isCompanyWide
+            shareLinks={companyWideShareLinks}
+            isLoading={isShareLinksLoading}
+          />
+        </>
+      )}
     </>
   );
 

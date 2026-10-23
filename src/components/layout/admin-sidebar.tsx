@@ -28,11 +28,10 @@ function SidebarContent({ onNavigate }: SidebarBodyProps) {
   const logout = useMutation({
     mutationFn: authApi.logout,
     onSuccess: () => {
-      setUser(null);
+      queryClient.cancelQueries();
       queryClient.clear();
-      toast.success('Signed out successfully');
-      router.replace(ROUTES.login);
-      router.refresh();
+      setUser(null);
+      window.location.href = ROUTES.login;
     },
     onError: (err) => toast.error(toApiError(err).message),
   });

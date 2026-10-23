@@ -1,7 +1,10 @@
+import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import type { ReactNode } from 'react';
 
 import { AdminShell } from '@/components/layout/admin-shell';
+import { ROUTES } from '@/config/routes';
+import { COOKIE_NAMES } from '@/lib/cookies';
 import { serverGetWithStatus } from '@/lib/server-api';
 import { USER_ROLES, type AuthUser } from '@/types/auth';
 
@@ -13,6 +16,16 @@ import { USER_ROLES, type AuthUser } from '@/types/auth';
  * This check asks the BE directly, so it reflects the true state at request time.
  */
 export default async function AdminLayout({ children }: { children: ReactNode }) {
+  const cookieStore = await cookies();
+  const hasTokens =
+    Boolean(cookieStore.get(COOKIE_NAMES.accessToken)?.value) ||
+    Boolean(cookieStore.get(COOKIE_NAMES.refreshToken)?.value);
+
+  // Nếu hoàn toàn không có token (đã đăng xuất hoặc chưa đăng nhập), điều hướng thẳng về login không kèm lỗi
+  if (!hasTokens) {
+    redirect(ROUTES.login);
+  }
+
   const { data: user, status, errorCode } = await serverGetWithStatus<AuthUser>('/auth/me');
 
   if (!user) {

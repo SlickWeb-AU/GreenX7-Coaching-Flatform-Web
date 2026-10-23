@@ -53,58 +53,52 @@ export function AdminsTable({
     },
   ];
 
-  if (canManage) {
-    columns.push({
-      key: 'actions',
-      title: '',
-      align: 'right',
-      render: (_value, record) => {
-        const isSuperAdminRole = record.role === USER_ROLES.SUPER_ADMIN;
-        const isSelf = Boolean(currentUserId && record.id === currentUserId);
+  columns.push({
+    key: 'actions',
+    title: '',
+    align: 'right',
+    render: (_value, record) => {
+      const isSuperAdminRole = record.role === USER_ROLES.SUPER_ADMIN;
+      const isSelf = Boolean(currentUserId && record.id === currentUserId);
 
-        // SUPER_ADMIN accounts cannot be managed by other users
-        if (isSuperAdminRole && !isSelf) {
-          return null;
-        }
+      const isActive = record.status === USER_STATUSES.ACTIVE;
+      const isBusy = busyId === record.id;
+      const canModifyStatusOrDelete = canManage && !isSuperAdminRole && !isSelf;
 
-        const isActive = record.status === USER_STATUSES.ACTIVE;
-        const isBusy = busyId === record.id;
-
-        return (
-          <div className="flex items-center justify-end gap-4">
-            <button
-              type="button"
-              disabled={isBusy}
-              onClick={() => onEdit?.(record)}
-              className="body-14-bold text-neutral-grey-2 transition-colors hover:text-neutral-grey-1 hover:underline disabled:cursor-not-allowed disabled:no-underline disabled:opacity-40"
-            >
-              Edit
-            </button>
-            {!isSuperAdminRole && !isSelf && (
-              <>
-                <button
-                  type="button"
-                  disabled={isBusy}
-                  onClick={() => onToggleStatus?.(record)}
-                  className="body-14-bold text-brand-green-2 transition-colors hover:underline disabled:cursor-not-allowed disabled:no-underline disabled:opacity-40"
-                >
-                  {isActive ? 'Deactivate' : 'Activate'}
-                </button>
-                <button
-                  type="button"
-                  disabled={isBusy}
-                  onClick={() => onDelete?.(record)}
-                  className="body-14-bold text-secondary-red-4 transition-colors hover:underline disabled:cursor-not-allowed disabled:no-underline disabled:opacity-40"
-                >
-                  Delete
-                </button>
-              </>
-            )}
-          </div>
-        );
-      },
-    });
-  }
+      return (
+        <div className="flex items-center justify-end gap-4">
+          <button
+            type="button"
+            disabled={isBusy}
+            onClick={() => onEdit?.(record)}
+            className="body-14-bold text-neutral-grey-2 transition-colors hover:text-neutral-grey-1 hover:underline disabled:cursor-not-allowed disabled:no-underline disabled:opacity-40"
+          >
+            Edit
+          </button>
+          {canModifyStatusOrDelete && (
+            <>
+              <button
+                type="button"
+                disabled={isBusy}
+                onClick={() => onToggleStatus?.(record)}
+                className="body-14-bold text-brand-green-2 transition-colors hover:underline disabled:cursor-not-allowed disabled:no-underline disabled:opacity-40"
+              >
+                {isActive ? 'Deactivate' : 'Activate'}
+              </button>
+              <button
+                type="button"
+                disabled={isBusy}
+                onClick={() => onDelete?.(record)}
+                className="body-14-bold text-secondary-red-4 transition-colors hover:underline disabled:cursor-not-allowed disabled:no-underline disabled:opacity-40"
+              >
+                Delete
+              </button>
+            </>
+          )}
+        </div>
+      );
+    },
+  });
 
   return (
     <BaseTable
