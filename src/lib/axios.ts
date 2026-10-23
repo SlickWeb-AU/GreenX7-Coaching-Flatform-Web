@@ -95,18 +95,26 @@ http.interceptors.response.use(
   async (error: AxiosError) => {
     const config = error.config as RetriableConfig | undefined;
     const status = error.response?.status;
-    const data = error.response?.data as { errorCode?: string } | undefined;
+    const data = error.response?.data as { errorCode?: string; message?: string } | undefined;
 
-    // Khi tài khoản bị vô hiệu hoá (403 ACCOUNT_INACTIVE), tự động logout
+    // Khi tài khoản bị vô hiệu hoá (ACCOUNT_INACTIVE), tự động logout
     // KHÔNG áp dụng cho auth endpoints (như request-code, verify-code) vì người dùng
     // đang ở màn login, cần hiển thị lỗi tại form đăng nhập (local error) chứ không reload lại trang login.
+    // LƯU Ý: Không được dùng `status === 403` chung chung vì lỗi phân quyền thông thường
+    // (FORBIDDEN: You do not have permission to do this) cũng có status 403.
     const isAuthEndpoint =
       config?.url?.includes('/auth/request-code') ||
       config?.url?.includes('/auth/verify-code') ||
       config?.url?.includes('/auth/refresh');
 
     const isAccountInactive =
-      !isAuthEndpoint && (status === 403 || data?.errorCode === 'ACCOUNT_INACTIVE');
+      !isAuthEndpoint &&
+      (data?.errorCode === 'ACCOUNT_INACTIVE' ||
+        (status === 403 &&
+          Boolean(
+            data?.message?.toLowerCase().includes('deactivated') ||
+            data?.message?.toLowerCase().includes('inactive'),
+          )));
 
     if (isAccountInactive) {
       if (typeof window !== 'undefined' && !isHandlingInactive) {
@@ -138,7 +146,9 @@ http.interceptors.response.use(
         return http.request(config);
       }
 
-      onSessionExpired?.(lastRefreshReason);
+      if (typeof window === 'undefined' || !window.location.pathname.startsWith('/login')) {
+        onSessionExpired?.(lastRefreshReason);
+      }
     }
 
     return Promise.reject(toApiError(error));

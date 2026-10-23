@@ -28,7 +28,7 @@ import {
 
 export default function SettingsPage() {
   const queryClient = useQueryClient();
-  const { user, isSuperAdmin, can } = useAuth();
+  const { user, setUser, isSuperAdmin, can } = useAuth();
   const { showConfirm } = useConfirm();
 
   const canManage = isSuperAdmin || can(PERMISSIONS.ADMIN_MANAGE);
@@ -173,8 +173,15 @@ export default function SettingsPage() {
       firstName: string;
       lastName: string;
     }) => settingsApi.updateAdminUser(id, { firstName, lastName }),
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       toast.success('Administrator updated successfully');
+      if (user && variables.id === user.id) {
+        setUser({
+          ...user,
+          firstName: variables.firstName,
+          lastName: variables.lastName,
+        });
+      }
       setEditingAdmin(null);
       editAdminForm.reset();
       invalidateAdmins();
@@ -467,7 +474,7 @@ export default function SettingsPage() {
         </BaseDialog>
       )}
 
-      {editingAdmin && canManage && (
+      {editingAdmin && (
         <BaseDialog
           title="Edit administrator"
           onClose={() => {
