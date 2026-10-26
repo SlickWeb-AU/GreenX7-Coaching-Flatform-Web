@@ -60,7 +60,7 @@ export function BaseDatePicker({
   className,
   startIcon,
   format = defaultFormat,
-  maxDay = 28,
+  maxDay = 31,
   disableMonthNavigation = false,
 }: BaseDatePickerProps) {
   const generatedId = useId();
@@ -79,8 +79,9 @@ export function BaseDatePicker({
     if (currentValue instanceof Date) return currentValue;
     if (typeof currentValue === 'number') {
       const today = new Date();
-      const safeDay = Math.min(currentValue, maxDay ?? 28);
-      return new Date(today.getFullYear(), today.getMonth(), safeDay);
+      const safeDay = Math.min(currentValue, maxDay ?? 31);
+      const m = disableMonthNavigation ? 0 : today.getMonth();
+      return new Date(today.getFullYear(), m, safeDay);
     }
     const d = new Date(String(currentValue));
     return isNaN(d.getTime()) ? null : d;
@@ -94,8 +95,8 @@ export function BaseDatePicker({
     } else if (typeof value === 'number') {
       setSelectedDate((prev) => {
         const y = prev ? prev.getFullYear() : new Date().getFullYear();
-        const m = prev ? prev.getMonth() : new Date().getMonth();
-        const safeDay = Math.min(value, maxDay ?? 28);
+        const m = disableMonthNavigation ? 0 : prev ? prev.getMonth() : new Date().getMonth();
+        const safeDay = Math.min(value, maxDay ?? 31);
         return new Date(y, m, safeDay);
       });
     } else if (typeof value === 'string') {
@@ -103,8 +104,8 @@ export function BaseDatePicker({
       if (!isNaN(num) && num >= 1 && num <= 31) {
         setSelectedDate((prev) => {
           const y = prev ? prev.getFullYear() : new Date().getFullYear();
-          const m = prev ? prev.getMonth() : new Date().getMonth();
-          const safeDay = Math.min(num, maxDay ?? 28);
+          const m = disableMonthNavigation ? 0 : prev ? prev.getMonth() : new Date().getMonth();
+          const safeDay = Math.min(num, maxDay ?? 31);
           return new Date(y, m, safeDay);
         });
       } else {
@@ -112,20 +113,21 @@ export function BaseDatePicker({
         setSelectedDate(isNaN(d.getTime()) ? null : d);
       }
     }
-  }, [value, maxDay]);
+  }, [value, maxDay, disableMonthNavigation]);
 
   useEffect(() => {
-    if (isOpen && selectedDate) {
+    if (isOpen && selectedDate && !disableMonthNavigation) {
       setViewDate(new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1));
     }
-  }, [isOpen, selectedDate]);
+  }, [isOpen, selectedDate, disableMonthNavigation]);
 
   const currentMonth = viewDate.getMonth();
   const currentYear = viewDate.getFullYear();
 
   const daysInMonth = useMemo(() => {
-    return new Date(currentYear, currentMonth + 1, 0).getDate();
-  }, [currentYear, currentMonth]);
+    const naturalDays = new Date(currentYear, currentMonth + 1, 0).getDate();
+    return disableMonthNavigation ? Math.max(naturalDays, maxDay ?? 31) : naturalDays;
+  }, [currentYear, currentMonth, disableMonthNavigation, maxDay]);
 
   const startingOffset = useMemo(() => {
     const firstDay = new Date(currentYear, currentMonth, 1).getDay();
@@ -182,7 +184,8 @@ export function BaseDatePicker({
 
   const handleSelectDay = (day: number) => {
     if (disabled || (maxDay !== undefined && day > maxDay)) return;
-    const d = new Date(currentYear, currentMonth, day);
+    const m = disableMonthNavigation ? 0 : currentMonth;
+    const d = new Date(currentYear, m, day);
     setSelectedDate(d);
     onChange?.(day, d);
     setIsOpen(false);
@@ -306,9 +309,11 @@ export function BaseDatePicker({
                 const isSelected =
                   !isExceeded &&
                   selectedDate !== null &&
-                  selectedDate.getFullYear() === currentYear &&
-                  selectedDate.getMonth() === currentMonth &&
-                  selectedDate.getDate() === day;
+                  (disableMonthNavigation
+                    ? selectedDate.getDate() === day
+                    : selectedDate.getFullYear() === currentYear &&
+                      selectedDate.getMonth() === currentMonth &&
+                      selectedDate.getDate() === day);
                 const isToday = !isExceeded && isCurrentMonthToday && today.getDate() === day;
 
                 return (
