@@ -593,7 +593,12 @@ export function CreateClientForm({
                   maxDay={CLIENT_CHECK_IN_DAY_MAX}
                   format={formatDayOfMonth}
                   value={field.value}
-                  onChange={field.onChange}
+                  onChange={(val) => {
+                    field.onChange(val);
+                    if (getValues('checkInEndDay') !== undefined) {
+                      trigger('checkInStartDay');
+                    }
+                  }}
                   placeholder="Select date"
                   disableMonthNavigation
                   error={Boolean(errors.checkInStartDay)}
@@ -611,7 +616,12 @@ export function CreateClientForm({
                   maxDay={CLIENT_CHECK_IN_DAY_MAX}
                   format={formatDayOfMonth}
                   value={field.value}
-                  onChange={field.onChange}
+                  onChange={(val) => {
+                    field.onChange(val);
+                    if (getValues('checkInStartDay') !== undefined) {
+                      trigger('checkInStartDay');
+                    }
+                  }}
                   placeholder="Select date"
                   disableMonthNavigation
                   error={Boolean(errors.checkInEndDay)}

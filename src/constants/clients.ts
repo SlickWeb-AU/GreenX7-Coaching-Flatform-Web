@@ -95,8 +95,8 @@ export const CLIENT_COMPANY_SIZE_OPTIONS = [
   { value: 'SIZE_1000_PLUS', label: '1,000+ employees' },
 ];
 
-/** CreateClientDto / UpdateClientDto cap check-in days at 28 */
-export const CLIENT_CHECK_IN_DAY_MAX = 28;
+/** CreateClientDto / UpdateClientDto cap check-in days at 31 */
+export const CLIENT_CHECK_IN_DAY_MAX = 31;
 
 export const DEFAULT_CLIENT_TIMEZONE = 'Australia/Sydney';
 
