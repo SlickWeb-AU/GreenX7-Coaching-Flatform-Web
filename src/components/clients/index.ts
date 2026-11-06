@@ -19,6 +19,7 @@ export * from './ClientHeaderProvider';
 export * from './ClientLayoutContent';
 export * from './ClientDepartmentsTable';
 export * from './ClientCheckInHistoryTable';
+export * from './ResetMonthDataButton';
 export * from './ShareBatteryCheckPopover';
 export * from './ResendReportDialog';
 export * from './ClientDepartmentHeader';

@@ -9,6 +9,7 @@ import type {
   ClientDetail,
   ClientListItem,
   CreateClientPayload,
+  CurrentMonthDataDto,
   CreateContactPayload,
   CreateDepartmentPayload,
   DepartmentDashboardDto,
@@ -16,6 +17,7 @@ import type {
   DepartmentListQuery,
   DepartmentShareLinksDto,
   ReportRecipientDto,
+  ResetCurrentMonthResultDto,
   SendReportResultDto,
   UpdateClientPayload,
   UpdateContactPayload,
@@ -75,6 +77,15 @@ export const clientsApi = {
   ) =>
     get<DepartmentDashboardDto>(`/clients/${id}/departments/${deptId}/dashboard`, {
       params,
+    }),
+  /** Bỏ `departmentId` = Overall (toàn client) */
+  getCurrentMonthData: (id: string, departmentId?: string) =>
+    get<CurrentMonthDataDto>(`/clients/${id}/current-month-data`, {
+      params: departmentId ? { departmentId } : undefined,
+    }),
+  resetCurrentMonthData: (id: string, departmentId?: string) =>
+    del<ResetCurrentMonthResultDto>(`/clients/${id}/current-month-data`, {
+      params: departmentId ? { departmentId } : undefined,
     }),
   getDepartmentShareLinks: (id: string, deptId: string) =>
     get<DepartmentShareLinksDto>(`/clients/${id}/departments/${deptId}/share-links`),

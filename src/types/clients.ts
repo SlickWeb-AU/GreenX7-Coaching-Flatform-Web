@@ -214,6 +214,26 @@ export interface DepartmentDashboardDto extends ClientDashboardDto {
   presentationUrl: string;
 }
 
+/** GET /clients/{id}/current-month-data — popup "Reset this month's data" */
+export interface CurrentMonthDataDto {
+  clientName: string;
+  /** null = Overall (whole client) */
+  departmentName: string | null;
+  periodYear: number | null;
+  periodMonth: number | null;
+  /** "November 2026" */
+  periodLabel: string;
+  /** Submissions that will be deleted */
+  submissionCount: number;
+  canReset: boolean;
+  blockedReason: string | null;
+}
+
+export interface ResetCurrentMonthResultDto {
+  deleted: number;
+  periodLabel: string;
+}
+
 export interface DepartmentShareLinksDto {
   batteryCheckUrl: string;
   liveDashboardUrl: string;

@@ -18,6 +18,7 @@ import { CLIENT_STATUSES, CLIENT_TABS } from '@/constants/clients';
 import { useDepartmentShareLinks } from '@/features/admin-clients';
 import { useExportPdf } from '@/hooks/useExportPdf';
 import { normalizeUrl } from '@/lib/utils';
+import { ResetMonthDataButton } from './ResetMonthDataButton';
 import { ShareBatteryCheckPopover } from './ShareBatteryCheckPopover';
 import { useClient } from './ClientContext';
 import { useClientHeaderSlot } from './ClientHeaderProvider';
@@ -149,6 +150,8 @@ export function ClientLayoutContent({ children }: { children: ReactNode }) {
             shareLinks={companyWideShareLinks}
             isLoading={isShareLinksLoading}
           />
+
+          <ResetMonthDataButton clientId={clientId} />
         </>
       )}
     </>

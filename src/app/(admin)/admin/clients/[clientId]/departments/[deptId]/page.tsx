@@ -23,6 +23,7 @@ import {
   ClientWellbeingCard,
   DepartmentInsightListCard,
   DepartmentLiveDataCard,
+  ResetMonthDataButton,
   ShareBatteryCheckPopover,
   useClient,
   useClientHeader,
@@ -147,6 +148,8 @@ export default function DepartmentDetailPage() {
           shareLinks={shareLinks}
           isLoading={isShareLinksLoading}
         />
+
+        <ResetMonthDataButton clientId={clientId} departmentId={deptId} />
       </>
     ),
     [
