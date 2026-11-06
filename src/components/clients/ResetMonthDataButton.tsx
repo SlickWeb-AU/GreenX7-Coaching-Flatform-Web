@@ -6,7 +6,8 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 
 import { BaseButton } from '@/components/base';
-import { useConfirm } from '@/components/providers';
+import { useAuth, useConfirm } from '@/components/providers';
+import { PERMISSIONS } from '@/config/permissions';
 import { clientsApi } from '@/features/admin-clients';
 import { toApiError } from '@/lib/api-error';
 import { queryKeys } from '@/lib/query-client';
@@ -27,6 +28,9 @@ export function ResetMonthDataButton({ clientId, departmentId }: ResetMonthDataB
   const { showConfirm } = useConfirm();
   const queryClient = useQueryClient();
   const [busy, setBusy] = useState(false);
+  const { isSuperAdmin, can } = useAuth();
+  // Chỉ Super Admin xoá được dữ liệu (BE cũng trả 403 cho Administrator)
+  const canReset = isSuperAdmin || can(PERMISSIONS.CHECKIN_RESET);
 
   const handleClick = async () => {
     setBusy(true);
@@ -94,6 +98,8 @@ export function ResetMonthDataButton({ clientId, departmentId }: ResetMonthDataB
       setBusy(false);
     }
   };
+
+  if (!canReset) return null;
 
   return (
     <BaseButton

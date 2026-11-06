@@ -26,6 +26,8 @@ export const PERMISSIONS = {
   // Check-in cycles
   CHECKIN_READ: 'checkin:read',
   CHECKIN_MANAGE: 'checkin:manage',
+  // Reset this month's Battery Check data (after a test/demo) — Super Admin only
+  CHECKIN_RESET: 'checkin:reset',
 
   // Reports
   DASHBOARD_VIEW: 'dashboard:view',
@@ -45,7 +47,9 @@ export const PERMISSIONS = {
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];
 
 const ALL_PERMISSIONS = Object.values(PERMISSIONS) as Permission[];
-const ADMINISTRATOR_PERMISSIONS = ALL_PERMISSIONS.filter((p) => p !== PERMISSIONS.ADMIN_MANAGE);
+const ADMINISTRATOR_PERMISSIONS = ALL_PERMISSIONS.filter(
+  (p) => p !== PERMISSIONS.ADMIN_MANAGE && p !== PERMISSIONS.CHECKIN_RESET,
+);
 
 export const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
   [USER_ROLES.SUPER_ADMIN]: ALL_PERMISSIONS,
