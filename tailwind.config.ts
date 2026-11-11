@@ -98,6 +98,9 @@ const config: Config = {
       },
       spacing: {
         '1.25': '0.3125rem',
+        '6.5': '1.625rem', // 26px
+        '14.5': '3.625rem', // 58px
+        18: '4.5rem', // 72px
       },
       boxShadow: {
         'pill-tab': '0 0.0625rem 0.1875rem 0 #003F3226',

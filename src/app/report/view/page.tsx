@@ -232,7 +232,7 @@ function ReportViewContent() {
             <img
               src={logo}
               alt={content.businessName}
-              className="h-12 w-auto max-w-[240px] object-contain sm:h-[72px] sm:max-w-[320px]"
+              className="h-12 w-auto max-w-[240px] object-contain sm:h-18 sm:max-w-[320px]"
             />
           ) : (
             <h1 className="heading-32-bold sm:heading-48-bold break-words text-center text-neutral-grey-1">

@@ -108,13 +108,14 @@ export function BatteryOnboardingModal({
             align="left"
             className="items-start text-left"
             logoWrapperClassName="justify-start"
-            logoClassName="h-8 md:h-10"
+            normalHeight="h-8 md:h-10"
+            verticalHeight="h-12 md:h-14"
             nameClassName="heading-24-bold text-neutral-grey-1"
             departmentClassName="text-neutral-grey-1"
           />
           <div className="flex shrink-0 items-center">
             <Gx7BadgeLogo className="text-brand-green-2 md:hidden" width={60} height={58} />
-            <GreenX7LogoDark className="hidden h-auto w-auto md:block md:h-[48px]" />
+            <GreenX7LogoDark className="hidden h-auto w-auto md:block md:h-12" />
           </div>
         </header>
 
