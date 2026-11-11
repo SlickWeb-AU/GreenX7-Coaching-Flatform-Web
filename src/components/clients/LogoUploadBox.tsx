@@ -79,12 +79,12 @@ export function LogoUploadBox({
   };
 
   return (
-    <div className="flex flex-col">
-      <div className="group relative">
+    <div className="flex h-full flex-col">
+      <div className="group relative flex flex-1 flex-col">
         <label
           htmlFor={inputId}
           className={cn(
-            'flex min-h-40 cursor-pointer flex-col items-center justify-center rounded-xl px-6 py-7 text-center transition-all',
+            'flex h-full min-h-40 cursor-pointer flex-col items-center justify-center rounded-xl px-6 py-7 text-center transition-all',
             isReversed
               ? 'border border-dashed border-transparent bg-brand-green-2 hover:border-neutral-grey-6 hover:brightness-105'
               : 'border border-dashed border-neutral-grey-5 bg-neutral-grey-8 hover:border-brand-green-2 hover:bg-neutral-grey-7',

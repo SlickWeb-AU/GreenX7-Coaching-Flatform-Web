@@ -32,7 +32,7 @@ import {
   DepartmentsIcon,
   MonthlyScheduleIcon,
 } from '@/components/icons';
-import { ControlledClientLogoUpload } from './ClientLogoUpload';
+import { ControlledClientLogoUpload } from './ControlledClientLogoUpload';
 import { useEditableRows } from '@/features/admin-clients';
 import {
   clientFormSchema,

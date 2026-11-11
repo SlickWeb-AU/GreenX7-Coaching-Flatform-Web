@@ -10,7 +10,6 @@ export * from './DepartmentInsightListCard';
 export * from './ClientForm';
 export * from './LogoUploadBox';
 export * from './ControlledClientLogoUpload';
-export * from './ClientLogoUpload';
 export * from './ClientsTable';
 export * from './CreateClientForm';
 export * from './EditClientForm';
