@@ -1,3 +1,6 @@
+'use client';
+
+import { useAdaptiveLogoHeight } from '@/hooks/useAdaptiveLogoHeight';
 import { cn, resolveImageUrl } from '@/lib/utils';
 
 export interface ClientDepartmentHeaderProps {
@@ -10,6 +13,8 @@ export interface ClientDepartmentHeaderProps {
   logoClassName?: string;
   nameClassName?: string;
   departmentClassName?: string;
+  normalHeight?: string;
+  verticalHeight?: string;
 }
 
 export function ClientDepartmentHeader({
@@ -22,7 +27,15 @@ export function ClientDepartmentHeader({
   logoClassName,
   nameClassName,
   departmentClassName,
+  normalHeight = 'h-12',
+  verticalHeight = 'h-18',
 }: ClientDepartmentHeaderProps) {
+  const { heightClass, imgRef, handleImageLoad } = useAdaptiveLogoHeight(
+    clientLogoUrl,
+    normalHeight,
+    verticalHeight,
+  );
+
   if (!clientLogoUrl && !clientName && !departmentName) return null;
 
   const alignClasses = {
@@ -37,7 +50,8 @@ export function ClientDepartmentHeader({
       {clientLogoUrl ? (
         <div
           className={cn(
-            'flex h-12 items-center',
+            'flex items-center',
+            heightClass,
             align === 'center' && 'justify-center',
             align === 'right' && 'justify-end',
             logoWrapperClassName,
@@ -45,9 +59,11 @@ export function ClientDepartmentHeader({
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
+            ref={imgRef}
             src={resolveImageUrl(clientLogoUrl)}
             alt={clientName ? `${clientName} logo` : 'Client logo'}
-            className={cn('h-12 w-auto object-contain', logoClassName)}
+            onLoad={handleImageLoad}
+            className={cn('w-auto object-contain', heightClass, logoClassName)}
           />
         </div>
       ) : clientName ? (

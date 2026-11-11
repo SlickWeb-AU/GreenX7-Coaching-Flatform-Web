@@ -1,5 +1,6 @@
 import { AnimatedNumber } from '@/components/base';
 import { BatteryIcon } from '@/components/icons';
+import { useAdaptiveLogoHeight } from '@/hooks/useAdaptiveLogoHeight';
 import { useAnimationTrigger } from '@/hooks/useAnimationTrigger';
 import { cn, resolveImageUrl } from '@/lib/utils';
 import { DeltaRow } from './DeltaRow';
@@ -37,6 +38,11 @@ export function LiveSummaryPanel({
 }: LiveSummaryPanelProps) {
   const active = useAnimationTrigger([score], controlledActive);
   const logoUrl = resolveImageUrl(clientLogoUrl);
+  const {
+    heightClass: logoHeightClass,
+    imgRef: logoRef,
+    handleImageLoad: handleLogoLoad,
+  } = useAdaptiveLogoHeight(clientLogoUrl, 'h-10', 'h-14');
 
   return (
     <div className={cn('flex flex-col justify-between text-white', className)}>
@@ -46,11 +52,13 @@ export function LiveSummaryPanel({
           {logoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
+              ref={logoRef}
               src={logoUrl}
               alt={clientName ?? ''}
+              onLoad={handleLogoLoad}
               // self-start: không để flex-col kéo giãn khung ảnh hết bề ngang làm logo
               // lệch vào giữa, không thẳng hàng với chữ bên dưới
-              className="h-10 w-auto self-start object-contain object-left"
+              className={cn('w-auto self-start object-contain object-left', logoHeightClass)}
             />
           ) : (
             <div className="body-24-bold uppercase tracking-wide text-neutral-grey-8">

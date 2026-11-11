@@ -88,7 +88,8 @@ export function BatteryStatusScreen({
           departmentName={departmentName}
           clientLogoUrl={clientLogoUrl}
           align="center"
-          logoClassName="h-9 md:h-10 w-auto object-contain"
+          normalHeight="h-9 md:h-10"
+          verticalHeight="h-11 md:h-12"
           nameClassName="body-16-bold text-neutral-grey-1"
           departmentClassName="body-14-medium text-neutral-grey-1 mt-0.5"
         />

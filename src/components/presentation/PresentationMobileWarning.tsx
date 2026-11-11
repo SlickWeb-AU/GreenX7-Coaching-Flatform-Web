@@ -5,6 +5,7 @@ import { Check, Presentation } from 'lucide-react';
 import { BaseButton } from '@/components/base';
 import { PRESENTATION_TITLE_SUFFIX } from '@/constants/presentation';
 import { DesktopWarningIllustration, GreenX7LogoDark } from '@/components/icons';
+import { useAdaptiveLogoHeight } from '@/hooks/useAdaptiveLogoHeight';
 import { useOptionalPresentation } from './PresentationContext';
 
 import { cn, resolveImageUrl } from '@/lib/utils';
@@ -76,6 +77,12 @@ export function PresentationMobileWarning({
   const targetUrl = url ?? presentationUrl ?? '';
   const canCopy = targetUrl.length > 0;
 
+  const {
+    heightClass: logoHeightClass,
+    imgRef: logoRef,
+    handleImageLoad: handleLogoLoad,
+  } = useAdaptiveLogoHeight(clientLogoUrl, 'h-6.5', 'h-10');
+
   const handleCopy = async () => {
     if (!canCopy && typeof window !== 'undefined' && !window.location.href) return;
     const copyTarget = canCopy ? targetUrl : window.location.href;
@@ -98,17 +105,19 @@ export function PresentationMobileWarning({
       )}
     >
       <div className="flex w-full items-center justify-between pt-2">
-        <GreenX7LogoDark className="h-[32px] w-auto" />
+        <GreenX7LogoDark className="h-8 w-auto" />
         <div className="flex flex-col items-end text-right">
           {/* Có logo (khách đã upload) thì chỉ hiện logo; chưa có logo mới hiện tên công ty */}
           {clientLogoUrl ? (
-            <div className="flex h-[26px] items-center justify-end">
+            <div className={cn('flex items-center justify-end', logoHeightClass)}>
               {/* Dynamic client logo URL bypasses next/image optimizer */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
+                ref={logoRef}
                 src={resolveImageUrl(clientLogoUrl)}
                 alt={clientName ?? 'Client logo'}
-                className="h-[26px] w-auto object-contain"
+                onLoad={handleLogoLoad}
+                className={cn('w-auto object-contain', logoHeightClass)}
               />
             </div>
           ) : clientName ? (

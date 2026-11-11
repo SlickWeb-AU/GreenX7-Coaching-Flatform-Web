@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useState } from 'react';
 import { Trash2, Upload } from 'lucide-react';
+import { useAdaptiveLogoHeight } from '@/hooks/useAdaptiveLogoHeight';
 import { cn, resolveImageUrl } from '@/lib/utils';
 import { BaseHelperText } from '../base/BaseHelperText';
 
@@ -46,6 +47,11 @@ export function LogoUploadBox({
   const defaultDesc = isReversed ? 'For dark backgrounds.' : 'For light backgrounds.';
 
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const {
+    heightClass: logoHeightClass,
+    imgRef: logoRef,
+    handleImageLoad: handleLogoLoad,
+  } = useAdaptiveLogoHeight(previewUrl, 'max-h-12', 'max-h-18');
 
   useEffect(() => {
     if (!file) {
@@ -90,9 +96,11 @@ export function LogoUploadBox({
           {previewUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
+              ref={logoRef}
               src={previewUrl}
               alt={file?.name ?? title ?? defaultTitle}
-              className="mb-3 max-h-12 w-auto max-w-full object-contain"
+              onLoad={handleLogoLoad}
+              className={cn('mb-3 w-auto max-w-full object-contain', logoHeightClass)}
             />
           ) : (
             <Upload

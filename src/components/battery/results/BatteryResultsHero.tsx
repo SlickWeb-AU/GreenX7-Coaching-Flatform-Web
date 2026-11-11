@@ -53,15 +53,15 @@ export function BatteryResultsHero({
         {/* Top Header */}
         <div className="flex items-center justify-between gap-3 px-6 pt-6 md:px-10 md:pt-8 lg:mb-24">
           <Gx7BadgeLogo className="text-white lg:hidden" width={48} height={46} />
-          <GreenX7LogoLight className="hidden h-[58px] w-auto text-white lg:block" />
+          <GreenX7LogoLight className="hidden h-14.5 w-auto text-white lg:block" />
 
           <ClientDepartmentHeader
             clientName={clientName}
             departmentName={departmentName}
             clientLogoUrl={clientLogoUrl}
             align="right"
-            logoWrapperClassName="h-8 lg:h-[58px]"
-            logoClassName="h-[32px] w-auto object-contain lg:h-[58px]"
+            normalHeight="h-8 lg:h-14.5"
+            verticalHeight="h-10 lg:h-18"
             nameClassName="body-20-bold text-neutral-grey-8 lg:heading-24-bold"
             departmentClassName="body-14-medium text-white/90"
           />
