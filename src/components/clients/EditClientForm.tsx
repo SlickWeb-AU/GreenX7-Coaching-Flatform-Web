@@ -44,7 +44,7 @@ import {
 } from '@/features/admin-clients';
 import { cn } from '@/lib/utils';
 
-import { ControlledClientLogoUpload } from './ClientLogoUpload';
+import { ControlledClientLogoUpload } from './ControlledClientLogoUpload';
 import { DEFAULT_CONTACT_ROW, DEFAULT_DEPARTMENT_ROW } from './CreateClientForm';
 import {
   clientFormSchema,

@@ -108,8 +108,6 @@ export function BatteryOnboardingModal({
             align="left"
             className="items-start text-left"
             logoWrapperClassName="justify-start"
-            normalHeight="h-8 md:h-10"
-            verticalHeight="h-12 md:h-14"
             nameClassName="heading-24-bold text-neutral-grey-1"
             departmentClassName="text-neutral-grey-1"
           />
