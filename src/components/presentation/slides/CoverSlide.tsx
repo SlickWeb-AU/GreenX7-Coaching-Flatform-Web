@@ -27,16 +27,16 @@ export function CoverSlide({
     >
       <header className="z-20 flex w-full flex-shrink-0 items-start justify-between px-10 pt-10">
         <div>
+          <GreenX7LogoLight className="h-12 w-auto" />
+        </div>
+        <div>
           <ClientDepartmentHeader
             clientName={clientName}
             departmentName={departmentName}
             clientLogoUrl={clientLogoUrl}
             departmentClassName="text-neutral-grey-8"
-            align="left"
+            align="right"
           />
-        </div>
-        <div>
-          <GreenX7LogoLight className="h-12 w-auto" />
         </div>
       </header>
 
