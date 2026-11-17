@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Copy, ExternalLink, QrCode, Share2, X } from 'lucide-react';
+import { Copy, Download, ExternalLink, QrCode, Share2, X } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { BaseButton, BaseDialog, BaseIconButton, BasePopover } from '@/components/base';
@@ -26,11 +26,73 @@ export function ShareBatteryCheckPopover({
   className,
 }: ShareBatteryCheckPopoverProps) {
   const [showQrModal, setShowQrModal] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const batteryCheckUrl = shareLinks?.batteryCheckUrl || '';
   const liveDashboardUrl = shareLinks?.liveDashboardUrl || '';
   const presentationUrl = shareLinks?.presentationUrl || '';
   const qrCode = shareLinks?.qrCodeDataUri || shareLinks?.qrCode;
+
+  const handleDownloadQr = async () => {
+    if (!qrCode) {
+      toast.error('No QR code available to download');
+      return;
+    }
+
+    setIsDownloading(true);
+    try {
+      let ext = 'png';
+      if (qrCode.includes('image/svg') || qrCode.endsWith('.svg')) {
+        ext = 'svg';
+      } else if (
+        qrCode.includes('image/jpeg') ||
+        qrCode.endsWith('.jpg') ||
+        qrCode.endsWith('.jpeg')
+      ) {
+        ext = 'jpg';
+      }
+
+      const safeName =
+        departmentName
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .trim()
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-+|-+$/g, '') || 'department';
+      const filename = `${safeName}-qr-code.${ext}`;
+
+      let downloadUrl = qrCode;
+      let blobUrl: string | null = null;
+
+      try {
+        const res = await fetch(qrCode);
+        if (res.ok) {
+          const blob = await res.blob();
+          blobUrl = URL.createObjectURL(blob);
+          downloadUrl = blobUrl;
+        }
+      } catch {
+        // Fall back to direct link download if fetch fails (e.g. CORS or unsupported data URL fetch)
+      }
+
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      if (blobUrl) {
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+      }
+      toast.success('QR code downloaded');
+    } catch {
+      toast.error('Failed to download QR code');
+    } finally {
+      setIsDownloading(false);
+    }
+  };
 
   const handleCopy = async (rawUrl: string | undefined, copyLabel: string) => {
     if (!rawUrl) {
@@ -209,6 +271,19 @@ export function ShareBatteryCheckPopover({
             <p className="body-14-medium mt-4 text-neutral-grey-2">
               Scan this QR code with any camera to open the Battery Check.
             </p>
+            <BaseButton
+              variant="primary"
+              size="medium"
+              pill
+              fullWidth
+              disabled={!qrCode}
+              loading={isDownloading}
+              startIcon={<Download size={16} />}
+              onClick={handleDownloadQr}
+              className="mt-5"
+            >
+              Download QR code
+            </BaseButton>
           </div>
         </BaseDialog>
       )}
