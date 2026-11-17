@@ -47,6 +47,15 @@ export function BasePopover({
     if (!isOpen) return;
 
     const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+      const targetElement =
+        event.target instanceof Element
+          ? event.target
+          : (event.target as Node | null)?.parentElement;
+
+      if (targetElement?.closest?.('[role="dialog"][aria-modal="true"]')) {
+        return;
+      }
+
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         close();
       }
@@ -54,6 +63,9 @@ export function BasePopover({
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
+        if (document.querySelector('[role="dialog"][aria-modal="true"]')) {
+          return;
+        }
         close();
       }
     };
@@ -92,7 +104,7 @@ export function BasePopover({
           aria-modal="false"
           className={cn(
             'absolute z-50 rounded-2xl border border-neutral-grey-6 bg-white p-6 shadow-xl',
-            'duration-150 animate-in fade-in-0 zoom-in-95',
+            'animate-in fade-in-0 zoom-in-95 duration-150',
             alignClass,
             placementClass,
             className,
