@@ -10,18 +10,18 @@ export interface UseAdaptiveLogoHeightOptions {
 
 /**
  * Hook tự động tính toán class chiều cao cho logo dựa trên tỉ lệ ảnh:
- * - Khi chiều ngang < chiều dọc (ảnh đứng/dọc): trả về verticalHeight (ví dụ: 'h-18' hoặc 'h-10').
- * - Bình thường (ảnh ngang hoặc vuông): trả về normalHeight (ví dụ: 'h-12' hoặc 'h-6.5').
+ * - Khi chiều ngang < chiều dọc (ảnh đứng/dọc): trả về verticalHeight (mặc định: 'h-15').
+ * - Bình thường (ảnh ngang hoặc vuông): trả về normalHeight (mặc định: 'h-15').
  */
 export function useAdaptiveLogoHeight(
   srcOrOptions?: string | null | UseAdaptiveLogoHeightOptions,
-  normalHeightParam: string = 'h-12',
-  verticalHeightParam: string = 'h-18',
+  normalHeightParam: string = 'h-15',
+  verticalHeightParam: string = 'h-15',
 ) {
   const isOptions = typeof srcOrOptions === 'object' && srcOrOptions !== null;
   const src = isOptions ? srcOrOptions.src : srcOrOptions;
-  const normalHeight = isOptions ? (srcOrOptions.normalHeight ?? 'h-12') : normalHeightParam;
-  const verticalHeight = isOptions ? (srcOrOptions.verticalHeight ?? 'h-18') : verticalHeightParam;
+  const normalHeight = isOptions ? (srcOrOptions.normalHeight ?? 'h-15') : normalHeightParam;
+  const verticalHeight = isOptions ? (srcOrOptions.verticalHeight ?? 'h-15') : verticalHeightParam;
 
   const [isVertical, setIsVertical] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);

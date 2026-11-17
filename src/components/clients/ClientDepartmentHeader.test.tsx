@@ -14,14 +14,14 @@ describe('ClientDepartmentHeader', () => {
     expect(screen.getByText('Engineering')).toBeDefined();
   });
 
-  it('defaults to horizontal logo height (h-12)', () => {
+  it('defaults to horizontal logo height (h-15)', () => {
     render(<ClientDepartmentHeader clientLogoUrl="https://example.com/logo.png" />);
     const img = screen.getByRole('img');
-    expect(img.className).toContain('h-12');
-    expect(img.parentElement?.className).toContain('h-12');
+    expect(img.className).toContain('h-15');
+    expect(img.parentElement?.className).toContain('h-15');
   });
 
-  it('adjusts height to h-18 (72px) when a vertical logo is loaded', () => {
+  it('keeps height at h-15 by default when a vertical logo is loaded', () => {
     render(<ClientDepartmentHeader clientLogoUrl="https://example.com/logo.png" />);
     const img = screen.getByRole('img') as HTMLImageElement;
 
@@ -30,11 +30,11 @@ describe('ClientDepartmentHeader', () => {
     Object.defineProperty(img, 'naturalHeight', { value: 200, configurable: true });
     fireEvent.load(img);
 
-    expect(img.className).toContain('h-18');
-    expect(img.parentElement?.className).toContain('h-18');
+    expect(img.className).toContain('h-15');
+    expect(img.parentElement?.className).toContain('h-15');
   });
 
-  it('keeps height at h-12 when a horizontal logo is loaded', () => {
+  it('keeps height at h-15 when a horizontal logo is loaded', () => {
     render(<ClientDepartmentHeader clientLogoUrl="https://example.com/logo.png" />);
     const img = screen.getByRole('img') as HTMLImageElement;
 
@@ -43,8 +43,8 @@ describe('ClientDepartmentHeader', () => {
     Object.defineProperty(img, 'naturalHeight', { value: 100, configurable: true });
     fireEvent.load(img);
 
-    expect(img.className).toContain('h-12');
-    expect(img.parentElement?.className).toContain('h-12');
+    expect(img.className).toContain('h-15');
+    expect(img.parentElement?.className).toContain('h-15');
   });
 
   it('supports custom normalHeight and verticalHeight props (e.g. h-8 md:h-10 to h-12 md:h-14)', () => {

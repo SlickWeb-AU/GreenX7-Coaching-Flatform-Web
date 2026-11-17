@@ -91,4 +91,22 @@ describe('useAdaptiveLogoHeight', () => {
 
     expect(result.current.heightClass).toBe('h-16');
   });
+
+  it('defaults to h-15 for both normal and vertical logos', () => {
+    const { result } = renderHook(() => useAdaptiveLogoHeight('https://example.com/logo.png'));
+
+    expect(result.current.heightClass).toBe('h-15');
+
+    act(() => {
+      result.current.handleImageLoad({
+        currentTarget: {
+          naturalWidth: 100,
+          naturalHeight: 200,
+        },
+      } as unknown as SyntheticEvent<HTMLImageElement>);
+    });
+
+    expect(result.current.heightClass).toBe('h-15');
+    expect(result.current.isVertical).toBe(true);
+  });
 });

@@ -100,6 +100,7 @@ const config: Config = {
         '1.25': '0.3125rem',
         '6.5': '1.625rem', // 26px
         '14.5': '3.625rem', // 58px
+        15: '3.75rem', // 60px
         18: '4.5rem', // 72px
       },
       boxShadow: {

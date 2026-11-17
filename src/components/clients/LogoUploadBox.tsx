@@ -51,7 +51,7 @@ export function LogoUploadBox({
     heightClass: logoHeightClass,
     imgRef: logoRef,
     handleImageLoad: handleLogoLoad,
-  } = useAdaptiveLogoHeight(previewUrl, 'max-h-12', 'max-h-18');
+  } = useAdaptiveLogoHeight(previewUrl, 'max-h-15', 'max-h-15');
 
   useEffect(() => {
     if (!file) {
