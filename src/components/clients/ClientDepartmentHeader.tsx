@@ -27,8 +27,8 @@ export function ClientDepartmentHeader({
   logoClassName,
   nameClassName,
   departmentClassName,
-  normalHeight = 'h-12',
-  verticalHeight = 'h-18',
+  normalHeight = 'h-15',
+  verticalHeight = 'h-15',
 }: ClientDepartmentHeaderProps) {
   const { heightClass, imgRef, handleImageLoad } = useAdaptiveLogoHeight(
     clientLogoUrl,
