@@ -85,4 +85,26 @@ describe('ClientLogoDeviceSettings', () => {
     fireEvent.click(resetBtn);
     expect(onChange).toHaveBeenCalledWith({ ...CLIENT_LOGO_HEIGHT_DEFAULTS });
   });
+
+  it('renders "No image" when no logo is provided and renders uploaded logos when present', () => {
+    const { rerender } = render(<ClientLogoDeviceSettings />);
+
+    expect(screen.queryByRole('img')).toBeNull();
+    expect(screen.getAllByText('No image')).toHaveLength(2);
+
+    rerender(
+      <ClientLogoDeviceSettings
+        darkLogoUrl="https://example.com/dark.png"
+        whiteLogoUrl="https://example.com/white.png"
+      />,
+    );
+
+    expect(screen.queryByText('No image')).toBeNull();
+    expect(screen.getByAltText('Dark logo preview').getAttribute('src')).toBe(
+      'https://example.com/dark.png',
+    );
+    expect(screen.getByAltText('White logo preview').getAttribute('src')).toBe(
+      'https://example.com/white.png',
+    );
+  });
 });
