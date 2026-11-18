@@ -10,6 +10,7 @@ import { BaseBreadcrumb, BaseButton, BaseHeader, BaseLoading } from '@/component
 import { ROUTES } from '@/config/routes';
 
 import { EditClientForm } from '@/components/clients';
+import { CLIENT_LOGO_HEIGHT_DEFAULTS } from '@/constants/clients';
 import { clientsApi } from '@/features/admin-clients';
 import { settingsApi } from '@/features/admin-settings';
 import { toApiError } from '@/lib/api-error';
@@ -63,6 +64,9 @@ export default function EditClientPage() {
       checkInStartDay: data.checkInStartDay,
       checkInEndDay: data.checkInEndDay,
       autoSendReport: data.autoSendReport,
+      logoHeightDesktop: data.logoHeightDesktop ?? CLIENT_LOGO_HEIGHT_DEFAULTS.desktop,
+      logoHeightTablet: data.logoHeightTablet ?? CLIENT_LOGO_HEIGHT_DEFAULTS.tablet,
+      logoHeightMobile: data.logoHeightMobile ?? CLIENT_LOGO_HEIGHT_DEFAULTS.mobile,
     };
   }, [data]);
 
@@ -82,6 +86,9 @@ export default function EditClientPage() {
         checkInStartDay: payload.checkInStartDay,
         checkInEndDay: payload.checkInEndDay,
         autoSendReport: payload.autoSendReport,
+        logoHeightDesktop: payload.logoHeightDesktop,
+        logoHeightTablet: payload.logoHeightTablet,
+        logoHeightMobile: payload.logoHeightMobile,
       });
 
       return updated;

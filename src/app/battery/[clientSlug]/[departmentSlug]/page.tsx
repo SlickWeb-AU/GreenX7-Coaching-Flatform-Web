@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 
 import { BaseLoading } from '@/components/base';
 import { BatteryCheckFlow, BatteryStatusScreen } from '@/components/battery';
+import { ClientBrandingProvider } from '@/components/providers';
 import { BATTERY_CHECK_STATES } from '@/constants/battery';
 import { useBatteryState } from '@/features/battery-check';
 import { getOrCreateDeviceId } from '@/lib/battery';
@@ -46,14 +47,17 @@ function BatteryCheckPageContent() {
 
   if (isClosed) {
     return (
-      <BatteryStatusScreen
-        variant="closed"
-        clientName={stateData?.branding?.clientName}
-        departmentName={stateData?.branding?.departmentName}
-        clientLogoUrl={stateData?.branding?.darkLogoUrl || stateData?.branding?.whiteLogoUrl}
-        nextOpensAt={stateData?.nextOpensAt}
-        timeZone={stateData?.timezone}
-      />
+      <ClientBrandingProvider
+        branding={stateData?.branding}
+        clientSlug={clientSlug}
+        departmentSlug={departmentSlug}
+      >
+        <BatteryStatusScreen
+          variant="closed"
+          nextOpensAt={stateData?.nextOpensAt}
+          timeZone={stateData?.timezone}
+        />
+      </ClientBrandingProvider>
     );
   }
 
@@ -80,23 +84,32 @@ function BatteryCheckPageContent() {
 
   if (stateData.state === BATTERY_CHECK_STATES.ALREADY_SUBMITTED) {
     return (
-      <BatteryStatusScreen
-        variant="submitted"
-        clientName={stateData.branding.clientName}
-        departmentName={stateData.branding.departmentName}
-        clientLogoUrl={stateData.branding.darkLogoUrl || stateData.branding.whiteLogoUrl}
-        periodMonth={stateData.periodMonth}
-        periodYear={stateData.periodYear}
-      />
+      <ClientBrandingProvider
+        branding={stateData.branding}
+        clientSlug={clientSlug}
+        departmentSlug={departmentSlug}
+      >
+        <BatteryStatusScreen
+          variant="submitted"
+          periodMonth={stateData.periodMonth}
+          periodYear={stateData.periodYear}
+        />
+      </ClientBrandingProvider>
     );
   }
 
   return (
-    <BatteryCheckFlow
+    <ClientBrandingProvider
+      branding={stateData.branding}
       clientSlug={clientSlug}
       departmentSlug={departmentSlug}
-      stateData={stateData}
-    />
+    >
+      <BatteryCheckFlow
+        clientSlug={clientSlug}
+        departmentSlug={departmentSlug}
+        stateData={stateData}
+      />
+    </ClientBrandingProvider>
   );
 }
 

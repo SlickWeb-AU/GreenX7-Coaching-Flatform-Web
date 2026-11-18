@@ -11,10 +11,9 @@ import {
   GreenX7LogoLight,
 } from '@/components/icons';
 import { reportApi } from '@/features/report';
-import { useAdaptiveLogoHeight } from '@/hooks/useAdaptiveLogoHeight';
 import { toApiError } from '@/lib/api-error';
 import { reportPasswordKey, reportSessionKey } from '@/lib/report-auth';
-import { cn, resolveImageUrl } from '@/lib/utils';
+import { resolveImageUrl } from '@/lib/utils';
 import type { ReportGateDto } from '@/types/reports';
 
 /** Design 16 (Failed): câu ngắn cho sai mật khẩu */
@@ -42,12 +41,6 @@ function ReportPasswordContent() {
   const [loading, setLoading] = useState(false);
   const [gate, setGate] = useState<ReportGateDto | null>(null);
   const [linkInvalid, setLinkInvalid] = useState(false);
-
-  const {
-    heightClass: logoHeightClass,
-    imgRef: logoRef,
-    handleImageLoad: handleLogoLoad,
-  } = useAdaptiveLogoHeight(gate?.whiteLogoUrl, 'h-10', 'h-14');
 
   // Logo công ty ở góc khối xanh (design 16 - Logo); link hỏng thì báo ngay,
   // khỏi để người nhận gõ mật khẩu rồi mới biết
@@ -115,11 +108,9 @@ function ReportPasswordContent() {
             (resolveImageUrl(gate.whiteLogoUrl) ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                ref={logoRef}
                 src={resolveImageUrl(gate.whiteLogoUrl) as string}
                 alt={gate.businessName}
-                onLoad={handleLogoLoad}
-                className={cn('w-auto max-w-[160px] object-contain', logoHeightClass)}
+                className="h-10 w-auto max-w-[160px] object-contain"
               />
             ) : (
               <span className="body-18-bold truncate uppercase text-neutral-white-solid">

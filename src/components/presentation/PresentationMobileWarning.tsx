@@ -5,7 +5,9 @@ import { Check, Presentation } from 'lucide-react';
 import { BaseButton } from '@/components/base';
 import { PRESENTATION_TITLE_SUFFIX } from '@/constants/presentation';
 import { DesktopWarningIllustration, GreenX7LogoDark } from '@/components/icons';
-import { useAdaptiveLogoHeight } from '@/hooks/useAdaptiveLogoHeight';
+import { useOptionalClientBranding } from '@/components/providers';
+import { getResponsiveLogoHeightProps } from '@/lib/branding';
+import type { ClientLogoHeights } from '@/types';
 import { useOptionalPresentation } from './PresentationContext';
 
 import { cn, resolveImageUrl } from '@/lib/utils';
@@ -31,6 +33,8 @@ export interface PresentationMobileWarningProps {
   departmentName?: string;
   /** Dynamic client logo URL */
   clientLogoUrl?: string | null;
+  /** Per-device logo heights (px) */
+  logoHeights?: ClientLogoHeights | null;
   /** Whether to show the copy link CTA button (defaults to true) */
   showCopyButton?: boolean;
   /** Label for the copy CTA button */
@@ -55,6 +59,7 @@ export function PresentationMobileWarning({
   clientName: propClientName,
   departmentName: propDeptName,
   clientLogoUrl: propLogoUrl,
+  logoHeights: propLogoHeights,
   showCopyButton = true,
   copyButtonText = 'Copy presentation link',
   copiedFeedbackText = 'Link copied. Open it on a desktop or laptop.',
@@ -63,10 +68,19 @@ export function PresentationMobileWarning({
 }: PresentationMobileWarningProps) {
   const [copied, setCopied] = useState(false);
   const pres = useOptionalPresentation();
+  const branding = useOptionalClientBranding();
 
-  const clientName = propClientName ?? pres?.clientName;
-  const departmentName = propDeptName ?? pres?.departmentName;
-  const clientLogoUrl = propLogoUrl !== undefined ? propLogoUrl : (pres?.clientLogoUrl ?? null);
+  const clientName = propClientName ?? pres?.clientName ?? branding?.clientName ?? undefined;
+  const departmentName =
+    propDeptName ?? pres?.departmentName ?? branding?.departmentName ?? undefined;
+  const clientLogoUrl =
+    propLogoUrl !== undefined
+      ? propLogoUrl
+      : (pres?.clientLogoUrl ?? branding?.whiteLogoUrl ?? branding?.darkLogoUrl ?? null);
+  const logoHeights =
+    propLogoHeights !== undefined
+      ? propLogoHeights
+      : (pres?.logoHeights ?? branding?.logoHeights ?? null);
 
   // Resolve item title: explicit itemTitle > presentationTitle > derived fallback
   const resolvedTitle =
@@ -77,11 +91,8 @@ export function PresentationMobileWarning({
   const targetUrl = url ?? presentationUrl ?? '';
   const canCopy = targetUrl.length > 0;
 
-  const {
-    heightClass: logoHeightClass,
-    imgRef: logoRef,
-    handleImageLoad: handleLogoLoad,
-  } = useAdaptiveLogoHeight(clientLogoUrl, 'h-6.5', 'h-10');
+  const { style: customHeightStyle, heightClass: resolvedLogoHeightClass } =
+    getResponsiveLogoHeightProps(logoHeights, 'h-6.5');
 
   const handleCopy = async () => {
     if (!canCopy && typeof window !== 'undefined' && !window.location.href) return;
@@ -109,15 +120,16 @@ export function PresentationMobileWarning({
         <div className="flex flex-col items-end text-right">
           {/* Có logo (khách đã upload) thì chỉ hiện logo; chưa có logo mới hiện tên công ty */}
           {clientLogoUrl ? (
-            <div className={cn('flex items-center justify-end', logoHeightClass)}>
+            <div
+              style={customHeightStyle}
+              className={cn('flex items-center justify-end', resolvedLogoHeightClass)}
+            >
               {/* Dynamic client logo URL bypasses next/image optimizer */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                ref={logoRef}
                 src={resolveImageUrl(clientLogoUrl)}
                 alt={clientName ?? 'Client logo'}
-                onLoad={handleLogoLoad}
-                className={cn('w-auto object-contain', logoHeightClass)}
+                className={cn('w-auto object-contain', resolvedLogoHeightClass)}
               />
             </div>
           ) : clientName ? (

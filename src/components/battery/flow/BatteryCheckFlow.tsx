@@ -13,7 +13,6 @@ import {
   getOrCreateDeviceId,
   isDraftFresh,
 } from '@/lib/battery';
-import { formatSlugLabel } from '@/lib/utils';
 import {
   BatteryLanding,
   BatteryLoadingStep,
@@ -31,17 +30,6 @@ export interface BatteryCheckFlowProps {
 }
 
 export function BatteryCheckFlow({ clientSlug, departmentSlug, stateData }: BatteryCheckFlowProps) {
-  const isCompanyWide =
-    stateData?.branding.isCompanyWide ||
-    departmentSlug === 'company-wide' ||
-    stateData?.branding.departmentName === null;
-  const clientName = stateData?.branding.clientName ?? formatSlugLabel(clientSlug);
-  const departmentName = isCompanyWide
-    ? null
-    : (stateData?.branding.departmentName ?? formatSlugLabel(departmentSlug));
-  const clientLogoUrl = stateData?.branding.whiteLogoUrl || stateData?.branding.darkLogoUrl || null;
-  const statusLogoUrl = stateData?.branding.darkLogoUrl || stateData?.branding.whiteLogoUrl || null;
-
   const prompts = useMemo(
     () =>
       (stateData?.areas?.length
@@ -179,9 +167,6 @@ export function BatteryCheckFlow({ clientSlug, departmentSlug, stateData }: Batt
     return (
       <BatteryStatusScreen
         variant="submitted"
-        clientName={clientName}
-        departmentName={departmentName}
-        clientLogoUrl={statusLogoUrl}
         periodMonth={stateData?.periodMonth}
         periodYear={stateData?.periodYear}
       />
@@ -192,9 +177,6 @@ export function BatteryCheckFlow({ clientSlug, departmentSlug, stateData }: Batt
     return (
       <BatteryStatusScreen
         variant="closed"
-        clientName={clientName}
-        departmentName={departmentName}
-        clientLogoUrl={statusLogoUrl}
         nextOpensAt={stateData?.nextOpensAt}
         timeZone={stateData?.timezone}
       />
@@ -205,17 +187,11 @@ export function BatteryCheckFlow({ clientSlug, departmentSlug, stateData }: Batt
     return (
       <>
         <BatteryLanding
-          clientName={clientName}
-          departmentName={departmentName}
-          clientLogoUrl={clientLogoUrl}
           onStart={() => setStep(BATTERY_STEPS.QUESTIONS)}
           onHowItWorks={() => setShowHowItWorks(true)}
         />
         <BatteryOnboardingModal
           open={showHowItWorks}
-          clientName={clientName}
-          departmentName={departmentName}
-          clientLogoUrl={statusLogoUrl}
           onClose={() => setShowHowItWorks(false)}
           onStart={() => {
             setShowHowItWorks(false);
@@ -252,13 +228,7 @@ export function BatteryCheckFlow({ clientSlug, departmentSlug, stateData }: Batt
         : (calculateBatteryScore(scores) ?? 0);
     return (
       <>
-        <BatteryLoadingStep
-          score={preview}
-          clientName={clientName}
-          departmentName={departmentName}
-          clientLogoUrl={statusLogoUrl}
-          onDone={() => setAnimDone(true)}
-        />
+        <BatteryLoadingStep score={preview} onDone={() => setAnimDone(true)} />
         {submitFailed && (
           <div className="fixed inset-x-0 bottom-6 z-50 mx-auto flex w-fit max-w-[90vw] items-center gap-3 rounded-xl bg-neutral-grey-1 px-4 py-3 text-white shadow-lg">
             <span className="body-14-medium">Could not submit. Check connection.</span>
@@ -280,12 +250,5 @@ export function BatteryCheckFlow({ clientSlug, departmentSlug, stateData }: Batt
 
   if (!submitResult) return null;
 
-  return (
-    <BatteryResultsView
-      result={submitResult}
-      clientName={clientName}
-      departmentName={departmentName}
-      clientLogoUrl={clientLogoUrl}
-    />
-  );
+  return <BatteryResultsView result={submitResult} />;
 }

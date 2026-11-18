@@ -1,5 +1,6 @@
 import { BaseButton, BaseDivider } from '@/components/base';
 import { ClientDepartmentHeader } from '@/components/clients';
+import { useOptionalClientBranding } from '@/components/providers';
 import {
   BatteryStatusBottomRightWave,
   BatteryStatusCalendarIcon,
@@ -15,9 +16,6 @@ export type BatteryStatusVariant = 'closed' | 'submitted';
 
 export interface BatteryStatusScreenProps {
   variant: BatteryStatusVariant;
-  clientName?: string | null;
-  departmentName?: string | null;
-  clientLogoUrl?: string | null;
   nextOpensAt?: string | Date | null;
   timeZone?: string | null;
   periodMonth?: number | null;
@@ -29,9 +27,6 @@ export interface BatteryStatusScreenProps {
 
 export function BatteryStatusScreen({
   variant,
-  clientName,
-  departmentName,
-  clientLogoUrl,
   nextOpensAt,
   timeZone,
   periodMonth,
@@ -40,12 +35,13 @@ export function BatteryStatusScreen({
   onReturn,
   className,
 }: BatteryStatusScreenProps) {
+  const branding = useOptionalClientBranding();
   const isSubmitted = variant === 'submitted';
 
   // Subtitle resolution for submitted check-in
   const monthName = periodName || getMonthName(periodMonth);
   const periodLabel = [monthName, periodYear].filter(Boolean).join(' ');
-  const targetLabel = clientName || departmentName;
+  const targetLabel = branding?.clientName || branding?.departmentName;
   const checkInTarget = targetLabel
     ? `Your anonymous response is included in ${targetLabel}’s ${periodLabel ? `${periodLabel} ` : ''}check-in.`
     : 'Your anonymous response is included in this check-in.';
@@ -81,15 +77,11 @@ export function BatteryStatusScreen({
       {/* Header: Logo GreenX (dark) with 32px bottom margin, followed by Client & Department */}
       <header className="relative z-10 mx-auto flex w-full max-w-md flex-col items-center">
         <div className="mb-8 flex items-center justify-center">
-          <GreenX7LogoDark className="h-7 w-auto" />
+          <GreenX7LogoDark className="h-10 w-auto" />
         </div>
         <ClientDepartmentHeader
-          clientName={clientName}
-          departmentName={departmentName}
-          clientLogoUrl={clientLogoUrl}
+          surface="light"
           align="center"
-          normalHeight="h-9 md:h-10"
-          verticalHeight="h-11 md:h-12"
           nameClassName="body-16-bold text-neutral-grey-1"
           departmentClassName="body-14-medium text-neutral-grey-1 mt-0.5"
         />

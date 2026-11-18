@@ -2,7 +2,9 @@
 
 import { createContext, useContext, type ReactNode } from 'react';
 
+import { ClientBrandingProvider } from '@/components/providers';
 import { useBatteryLive } from '@/features/battery-check';
+import { resolveLogoHeights } from '@/lib/branding';
 import { resolveLiveLogoUrl, resolveLiveNames, resolvePreviousMonthLabel } from '@/lib/live';
 import type { PresentationContextValue } from '@/types';
 
@@ -28,6 +30,7 @@ export function PresentationProvider({
   const fullDisplayName = `${clientName} ${departmentName}`.trim();
 
   const clientLogoUrl = resolveLiveLogoUrl(data);
+  const logoHeights = resolveLogoHeights(data?.branding);
   const previousMonthLabel = resolvePreviousMonthLabel(data);
 
   const value: PresentationContextValue = {
@@ -43,10 +46,15 @@ export function PresentationProvider({
     departmentName,
     fullDisplayName,
     clientLogoUrl,
+    logoHeights,
     previousMonthLabel,
   };
 
-  return <PresentationContext.Provider value={value}>{children}</PresentationContext.Provider>;
+  return (
+    <ClientBrandingProvider branding={data?.branding}>
+      <PresentationContext.Provider value={value}>{children}</PresentationContext.Provider>
+    </ClientBrandingProvider>
+  );
 }
 
 export function usePresentation() {

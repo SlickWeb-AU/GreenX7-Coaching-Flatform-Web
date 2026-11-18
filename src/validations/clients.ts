@@ -2,6 +2,9 @@ import { z } from 'zod';
 
 import {
   CLIENT_CHECK_IN_DAY_MAX,
+  CLIENT_LOGO_HEIGHT_DEFAULTS,
+  CLIENT_LOGO_HEIGHT_MAX,
+  CLIENT_LOGO_HEIGHT_MIN,
   CLIENT_LOGO_MAX_SIZE_BYTES,
   CLIENT_STATUSES,
 } from '@/constants/clients';
@@ -72,6 +75,24 @@ export const clientFormSchema = z
       .default([]),
     darkLogo: clientLogoSchema,
     whiteLogo: clientLogoSchema,
+    logoHeightDesktop: z
+      .number()
+      .int()
+      .min(CLIENT_LOGO_HEIGHT_MIN)
+      .max(CLIENT_LOGO_HEIGHT_MAX)
+      .default(CLIENT_LOGO_HEIGHT_DEFAULTS.desktop),
+    logoHeightTablet: z
+      .number()
+      .int()
+      .min(CLIENT_LOGO_HEIGHT_MIN)
+      .max(CLIENT_LOGO_HEIGHT_MAX)
+      .default(CLIENT_LOGO_HEIGHT_DEFAULTS.tablet),
+    logoHeightMobile: z
+      .number()
+      .int()
+      .min(CLIENT_LOGO_HEIGHT_MIN)
+      .max(CLIENT_LOGO_HEIGHT_MAX)
+      .default(CLIENT_LOGO_HEIGHT_DEFAULTS.mobile),
     checkInStartDay: z.preprocess(
       (val) => (val === '' || val === null || val === undefined ? undefined : Number(val)),
       z.number().min(1).max(CLIENT_CHECK_IN_DAY_MAX).optional(),

@@ -23,9 +23,6 @@ export interface BatteryResultsHeroProps {
   zoneDescription: string;
   introMessage: string;
   strongestAreas: BatteryAreaResultDto[];
-  clientName?: string | null;
-  departmentName?: string | null;
-  clientLogoUrl?: string | null;
 }
 
 export function BatteryResultsHero({
@@ -35,9 +32,6 @@ export function BatteryResultsHero({
   zoneDescription,
   introMessage,
   strongestAreas,
-  clientName,
-  departmentName,
-  clientLogoUrl,
 }: BatteryResultsHeroProps) {
   const active = useAnimationTrigger([average]);
   const displayScore = Math.round(average);
@@ -56,12 +50,7 @@ export function BatteryResultsHero({
           <GreenX7LogoLight className="hidden h-14.5 w-auto text-white lg:block" />
 
           <ClientDepartmentHeader
-            clientName={clientName}
-            departmentName={departmentName}
-            clientLogoUrl={clientLogoUrl}
             align="right"
-            normalHeight="h-8 lg:h-14.5"
-            verticalHeight="h-10 lg:h-18"
             nameClassName="body-20-bold text-neutral-grey-8 lg:heading-24-bold"
             departmentClassName="body-14-medium text-white/90"
           />

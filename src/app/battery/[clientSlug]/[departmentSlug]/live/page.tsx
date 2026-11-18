@@ -8,6 +8,7 @@ import { LiveDashboardHeader } from '@/components/dashboard/LiveDashboardHeader'
 import { LiveSummaryPanel } from '@/components/dashboard/LiveSummaryPanel';
 import { TeamBatteryCard } from '@/components/dashboard/TeamBatteryCard';
 import { PresentationMobileWarning } from '@/components/presentation/PresentationMobileWarning';
+import { ClientBrandingProvider } from '@/components/providers';
 import { useBatteryLive } from '@/features/battery-check';
 import { useAnimationTrigger } from '@/hooks/useAnimationTrigger';
 import {
@@ -40,7 +41,7 @@ function LiveDashboardContent() {
   const dashboardTitle = `${clientName.toUpperCase()} — LIVE DASHBOARD`;
 
   return (
-    <>
+    <ClientBrandingProvider branding={data?.branding}>
       <PresentationMobileWarning
         title="Open this dashboard on a desktop"
         description="Live Dashboard is designed for desktop screens. Copy this link and open on a larger screen for the best viewing experience."
@@ -84,7 +85,7 @@ function LiveDashboardContent() {
           </span>
         </footer>
       </div>
-    </>
+    </ClientBrandingProvider>
   );
 }
 
