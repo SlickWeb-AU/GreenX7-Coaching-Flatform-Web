@@ -1,116 +1,118 @@
 'use client';
 
-import { Leaf, PanelLeftClose, PanelLeftOpen, X } from 'lucide-react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { CircleUser, LogOut } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
+import { BaseButton } from '@/components/base';
+import { GreenX7LogoDark } from '@/components/icons';
 import { NavLink } from '@/components/layout/nav-link';
-import { Button } from '@/components/ui/button';
 import { ADMIN_NAVIGATION } from '@/config/navigation';
 import { ROUTES } from '@/config/routes';
-import { useAuth } from '@/features/auth/auth-provider';
-import { cn } from '@/lib/utils';
-import { useUiStore } from '@/stores/ui.store';
+import { USER_ROLE_LABELS } from '@/constants';
+import { authApi } from '@/features/auth';
+import { toApiError } from '@/lib/api-error';
+import { useAuth } from '@/components/providers';
 
-function SidebarBody({ collapsed, onNavigate }: { collapsed: boolean; onNavigate?: () => void }) {
-  const { can } = useAuth();
+interface SidebarBodyProps {
+  onNavigate?: () => void;
+}
+
+function SidebarContent({ onNavigate }: SidebarBodyProps) {
+  const { user, setUser, can } = useAuth();
+  const router = useRouter();
+  const queryClient = useQueryClient();
+
+  const logout = useMutation({
+    mutationFn: authApi.logout,
+    onSuccess: () => {
+      queryClient.cancelQueries();
+      queryClient.clear();
+      setUser(null);
+      window.location.href = ROUTES.login;
+    },
+    onError: (err) => toast.error(toApiError(err).message),
+  });
 
   return (
-    <nav className="flex-1 space-y-6 overflow-y-auto px-3 py-4">
-      {ADMIN_NAVIGATION.map((group, index) => {
-        // Lọc theo quyền TRƯỚC khi render tiêu đề nhóm, tránh hiện nhóm rỗng
-        const visibleItems = group.items.filter(
-          (item) => !item.permissions || can(item.permissions),
-        );
-        if (!visibleItems.length) return null;
+    <div className="flex h-full flex-col justify-between px-4 py-6">
+      {/* Top section: Logo & Nav items */}
+      <div className="flex flex-col">
+        {/* Logo */}
+        <div className="mb-12">
+          <Link href={ROUTES.admin.dashboard} className="inline-block">
+            <GreenX7LogoDark className="h-7 w-auto" />
+          </Link>
+        </div>
 
-        return (
-          <div key={group.title ?? index} className="space-y-1">
-            {group.title && !collapsed && (
-              <p className="px-3 pb-1 text-xs font-semibold uppercase tracking-wider text-sidebar-foreground/50">
-                {group.title}
-              </p>
-            )}
-            {visibleItems.map((item) => (
-              <NavLink key={item.href} item={item} collapsed={collapsed} onNavigate={onNavigate} />
-            ))}
-          </div>
-        );
-      })}
-    </nav>
+        {/* Navigation list */}
+        <nav className="space-y-1.5">
+          {ADMIN_NAVIGATION.map((group, index) => {
+            const visibleItems = group.items.filter(
+              (item) => !item.permissions || can(item.permissions),
+            );
+            if (!visibleItems.length) return null;
+
+            return (
+              <div key={group.title ?? index} className="space-y-1">
+                {visibleItems.map((item) => (
+                  <NavLink key={item.href} item={item} onNavigate={onNavigate} />
+                ))}
+              </div>
+            );
+          })}
+        </nav>
+      </div>
+
+      {/* Bottom section: User Info & Sign Out */}
+      <div className="space-y-1">
+        <div className="mb-4 border-t border-neutral-grey-5" />
+
+        {/* User profile */}
+        {(() => {
+          const displayName =
+            [user?.firstName, user?.lastName].filter(Boolean).join(' ') ||
+            user?.email ||
+            'Administrator';
+
+          return (
+            <div className="flex items-center gap-3 px-4">
+              <CircleUser size={32} className="shrink-0 text-neutral-grey-3" aria-hidden />
+              <div className="min-w-0 flex-1">
+                <p className="body-14-bold truncate text-neutral-grey-1" title={displayName}>
+                  {displayName}
+                </p>
+                <p className="body-12-medium truncate text-neutral-grey-3">
+                  {(user?.role && USER_ROLE_LABELS[user.role]) || user?.role || '—'}
+                </p>
+              </div>
+            </div>
+          );
+        })()}
+
+        {/* Sign out button */}
+        <BaseButton
+          variant="ghost"
+          size="medium"
+          fullWidth
+          className="justify-start gap-3"
+          onClick={() => logout.mutate()}
+          disabled={logout.isPending}
+          startIcon={<LogOut size={20} className="shrink-0" aria-hidden />}
+        >
+          Sign Out
+        </BaseButton>
+      </div>
+    </div>
   );
 }
 
 export function AdminSidebar() {
-  const { sidebarCollapsed, toggleSidebar, mobileSidebarOpen, setMobileSidebarOpen } = useUiStore();
-
   return (
-    <>
-      {/* Sidebar cố định — desktop */}
-      <aside
-        className={cn(
-          'fixed inset-y-0 left-0 z-30 hidden flex-col border-r border-sidebar-border bg-sidebar transition-[width] duration-200 lg:flex',
-          sidebarCollapsed ? 'w-16' : 'w-64',
-        )}
-      >
-        <div className="flex h-16 items-center justify-between border-b border-sidebar-border px-3">
-          <Link
-            href={ROUTES.admin.dashboard}
-            className={cn('flex items-center gap-2 text-white', sidebarCollapsed && 'justify-center')}
-          >
-            <Leaf className="h-6 w-6 shrink-0" aria-hidden />
-            {!sidebarCollapsed && <span className="font-semibold">GreenX7</span>}
-          </Link>
-        </div>
-
-        <SidebarBody collapsed={sidebarCollapsed} />
-
-        <div className="border-t border-sidebar-border p-2">
-          <button
-            type="button"
-            onClick={toggleSidebar}
-            className="flex w-full items-center justify-center gap-2 rounded-md px-3 py-2 text-sm text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent/60 hover:text-white"
-            aria-label={sidebarCollapsed ? 'Mở rộng menu' : 'Thu gọn menu'}
-          >
-            {sidebarCollapsed ? (
-              <PanelLeftOpen className="h-4 w-4" />
-            ) : (
-              <>
-                <PanelLeftClose className="h-4 w-4" />
-                Thu gọn
-              </>
-            )}
-          </button>
-        </div>
-      </aside>
-
-      {/* Drawer — mobile */}
-      {mobileSidebarOpen && (
-        <div className="fixed inset-0 z-40 lg:hidden">
-          <button
-            type="button"
-            className="absolute inset-0 bg-black/50"
-            onClick={() => setMobileSidebarOpen(false)}
-            aria-label="Đóng menu"
-          />
-          <aside className="relative flex h-full w-64 animate-slide-up flex-col bg-sidebar">
-            <div className="flex h-16 items-center justify-between border-b border-sidebar-border px-4">
-              <span className="flex items-center gap-2 font-semibold text-white">
-                <Leaf className="h-5 w-5" aria-hidden />
-                GreenX7
-              </span>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-white hover:bg-sidebar-accent"
-                onClick={() => setMobileSidebarOpen(false)}
-              >
-                <X />
-              </Button>
-            </div>
-            <SidebarBody collapsed={false} onNavigate={() => setMobileSidebarOpen(false)} />
-          </aside>
-        </div>
-      )}
-    </>
+    <aside className="fixed inset-y-0 left-0 z-30 hidden w-56 flex-col border-r-0.5 border-neutral-grey-5 bg-neutral-grey-7 lg:flex">
+      <SidebarContent />
+    </aside>
   );
 }

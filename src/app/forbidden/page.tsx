@@ -1,29 +1,24 @@
 import { ShieldOff } from 'lucide-react';
-import Link from 'next/link';
 
-import { Button } from '@/components/ui/button';
+import { BaseLink } from '@/components/base';
 import { ROUTES } from '@/config/routes';
 
-export const metadata = { title: 'Không có quyền truy cập' };
+export const metadata = { title: 'Access Denied' };
 
 export default function ForbiddenPage() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 text-center">
-      <div className="rounded-full bg-destructive/10 p-4">
-        <ShieldOff className="h-8 w-8 text-destructive" aria-hidden />
+      <div className="rounded-full bg-secondary-red-2 p-4">
+        <ShieldOff className="h-8 w-8 text-secondary-red-4" aria-hidden />
       </div>
-      <h1 className="text-2xl font-semibold">Bạn không có quyền truy cập</h1>
-      <p className="max-w-md text-muted-foreground">
-        Khu vực này chỉ dành cho tài khoản có quyền phù hợp. Nếu bạn cho rằng đây là nhầm lẫn,
-        hãy liên hệ quản trị viên.
+      <h1 className="heading-24-bold text-neutral-grey-1">Access Denied</h1>
+      <p className="max-w-md text-neutral-grey-3">
+        This area is restricted to authorized accounts only. If you believe this is an error, please
+        contact your administrator.
       </p>
       <div className="flex gap-2">
-        <Button asChild variant="outline">
-          <Link href={ROUTES.home}>Về trang chủ</Link>
-        </Button>
-        <Button asChild>
-          <Link href={ROUTES.shop.products}>Xem sản phẩm</Link>
-        </Button>
+        <BaseLink href={ROUTES.home}>Back to home</BaseLink>
+        <BaseLink href={ROUTES.admin.dashboard}>Back to dashboard</BaseLink>
       </div>
     </main>
   );

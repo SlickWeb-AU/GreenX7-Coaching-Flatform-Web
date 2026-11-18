@@ -1,7 +1,7 @@
 name: Deploy Frontend
 
 # Merge vào develop => tự động deploy.
-# main để dành cho production (thêm environment protection rule khi cần duyệt tay).
+# Đây là site DEV (Singapore). Production Sydney deploy bằng deploy-prod.yml (branch main).
 on:
   push:
     branches: [develop]
@@ -52,6 +52,10 @@ jobs:
         with:
           context: .
           push: true
+          # NEXT_PUBLIC_* gắn vào JS lúc build. Đổi domain: Settings → Secrets and
+          # variables → Actions → Variables → NEXT_PUBLIC_GREENX7_URL, rồi build lại.
+          build-args: |
+            NEXT_PUBLIC_GREENX7_URL=${{ vars.NEXT_PUBLIC_GREENX7_URL || 'https://www.greenx7.com' }}
           # Gắn 2 tag: SHA để rollback chính xác, latest để server pull nhanh
           tags: |
             ${{ env.REGISTRY }}/${{ steps.meta.outputs.image_name }}:${{ steps.meta.outputs.short_sha }}
@@ -63,7 +67,8 @@ jobs:
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
-    # Tạo environment "production" trong Settings để thêm bước duyệt tay nếu muốn
+    # Tên "production" là lịch sử, thực ra là site DEV: secret SSH_*/GHCR_TOKEN nằm trong
+    # environment này (GitHub không cho đổi tên environment). Prod Sydney dùng environment "prod".
     environment: production
 
     steps:
@@ -96,6 +101,10 @@ jobs:
               STATUS=$(docker inspect --format='{{.State.Health.Status}}' greenx7-web-1 2>/dev/null || echo starting)
               if [ "$STATUS" = "healthy" ]; then
                 echo "✅ web healthy sau $((i * 5))s"
+                # nginx chỉ tra IP của container lúc khởi động rồi giữ mãi. Container
+                # tạo lại mà đổi IP thì nginx vẫn gọi IP cũ -> cả site 502 (08/10/2026).
+                # Reload để tra lại; không làm rớt kết nối đang mở.
+                docker compose -f docker-compose.prod.yml --env-file .env exec -T nginx nginx -s reload
                 exit 0
               fi
               sleep 5

@@ -32,12 +32,14 @@ export const http = axios.create({
 // ---------------------------------------------------------------------------
 
 let refreshPromise: Promise<boolean> | null = null;
-let onSessionExpired: (() => void) | null = null;
+let onSessionExpired: ((reason?: string) => void) | null = null;
 
 /** Cho AuthProvider đăng ký hành vi khi phiên hết hạn hẳn (clear state + điều hướng) */
-export function setSessionExpiredHandler(handler: () => void): void {
+export function setSessionExpiredHandler(handler: (reason?: string) => void): void {
   onSessionExpired = handler;
 }
+
+let lastRefreshReason: string = 'session_expired';
 
 async function refreshSession(): Promise<boolean> {
   refreshPromise ??= (async () => {
@@ -46,8 +48,27 @@ async function refreshSession(): Promise<boolean> {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
       });
+      if (!response.ok) {
+        try {
+          const body = (await response.json()) as { errorCode?: string };
+          if (response.status === 403 || body.errorCode === 'ACCOUNT_INACTIVE') {
+            lastRefreshReason = 'account_inactive';
+          } else if (
+            body.errorCode === 'TOKEN_INVALID' ||
+            body.errorCode === 'NOT_FOUND' ||
+            body.errorCode === 'ACCOUNT_BANNED'
+          ) {
+            lastRefreshReason = 'account_deleted';
+          } else {
+            lastRefreshReason = 'session_expired';
+          }
+        } catch {
+          lastRefreshReason = 'session_expired';
+        }
+      }
       return response.ok;
     } catch {
+      lastRefreshReason = 'session_expired';
       return false;
     } finally {
       // Nhả khoá ở tick kế tiếp để các request đang chờ kịp đọc kết quả
@@ -60,23 +81,62 @@ async function refreshSession(): Promise<boolean> {
   return refreshPromise;
 }
 
+/** Endpoint không cần đăng nhập — 401 của chúng không liên quan tới phiên admin */
+const PUBLIC_API_PREFIXES = ['/reports/', '/battery-check/'];
+
 interface RetriableConfig extends AxiosRequestConfig {
   _retried?: boolean;
 }
+
+let isHandlingInactive = false;
 
 http.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     const config = error.config as RetriableConfig | undefined;
     const status = error.response?.status;
+    const data = error.response?.data as { errorCode?: string; message?: string } | undefined;
+
+    // Khi tài khoản bị vô hiệu hoá (ACCOUNT_INACTIVE), tự động logout
+    // KHÔNG áp dụng cho auth endpoints (như request-code, verify-code) vì người dùng
+    // đang ở màn login, cần hiển thị lỗi tại form đăng nhập (local error) chứ không reload lại trang login.
+    // LƯU Ý: Không được dùng `status === 403` chung chung vì lỗi phân quyền thông thường
+    // (FORBIDDEN: You do not have permission to do this) cũng có status 403.
+    const isAuthEndpoint =
+      config?.url?.includes('/auth/request-code') ||
+      config?.url?.includes('/auth/verify-code') ||
+      config?.url?.includes('/auth/refresh');
+
+    const isAccountInactive =
+      !isAuthEndpoint &&
+      (data?.errorCode === 'ACCOUNT_INACTIVE' ||
+        (status === 403 &&
+          Boolean(
+            data?.message?.toLowerCase().includes('deactivated') ||
+            data?.message?.toLowerCase().includes('inactive'),
+          )));
+
+    if (isAccountInactive) {
+      if (typeof window !== 'undefined' && !isHandlingInactive) {
+        isHandlingInactive = true;
+        window.location.href = '/api/auth/logout?reason=account_inactive';
+      }
+      return Promise.reject(toApiError(error));
+    }
 
     const shouldRefresh =
       status === 401 &&
       config &&
       !config._retried &&
-      // Không refresh cho chính các endpoint auth (tránh vòng lặp vô tận)
-      !config.url?.includes('/auth/login') &&
-      !config.url?.includes('/auth/refresh');
+      // Do not refresh for auth endpoints themselves (prevents infinite loop)
+      !config.url?.includes('/auth/request-code') &&
+      !config.url?.includes('/auth/verify-code') &&
+      !config.url?.includes('/auth/refresh') &&
+      // API công khai (trang báo cáo, Battery Check): 401 nghĩa là sai mật khẩu /
+      // link hỏng, không phải hết phiên. Làm mới phiên rồi đẩy sang /login thì
+      // người nhận báo cáo (không có tài khoản) gõ sai mật khẩu là bị đưa sang
+      // trang đăng nhập admin thay vì thấy thông báo lỗi.
+      !PUBLIC_API_PREFIXES.some((prefix) => config.url?.startsWith(prefix));
 
     if (shouldRefresh) {
       config._retried = true;
@@ -86,7 +146,9 @@ http.interceptors.response.use(
         return http.request(config);
       }
 
-      onSessionExpired?.();
+      if (typeof window === 'undefined' || !window.location.pathname.startsWith('/login')) {
+        onSessionExpired?.(lastRefreshReason);
+      }
     }
 
     return Promise.reject(toApiError(error));

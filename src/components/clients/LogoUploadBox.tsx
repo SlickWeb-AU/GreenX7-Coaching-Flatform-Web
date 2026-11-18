@@ -1,0 +1,160 @@
+'use client';
+
+import { useEffect, useId, useState } from 'react';
+import { Trash2, Upload } from 'lucide-react';
+import { useAdaptiveLogoHeight } from '@/hooks/useAdaptiveLogoHeight';
+import { cn, resolveImageUrl } from '@/lib/utils';
+import { BaseHelperText } from '../base/BaseHelperText';
+
+export type LogoUploadVariant = 'dark' | 'reversed' | 'white';
+
+export interface LogoUploadBoxProps {
+  id?: string;
+  variant?: LogoUploadVariant;
+  title?: string;
+  description?: string;
+  inputLabel?: string;
+  file?: File | null;
+  currentUrl?: string | null;
+  onChange?: (file: File | null) => void;
+  onDelete?: () => void;
+  error?: boolean;
+  helperText?: string;
+  className?: string;
+  disabled?: boolean;
+}
+
+export function LogoUploadBox({
+  id,
+  variant = 'dark',
+  title,
+  description,
+  inputLabel,
+  file,
+  currentUrl,
+  onChange,
+  onDelete,
+  error = false,
+  helperText,
+  className,
+  disabled = false,
+}: LogoUploadBoxProps) {
+  const generatedId = useId();
+  const inputId = id ?? generatedId;
+  const isReversed = variant === 'reversed' || variant === 'white';
+
+  const defaultTitle = isReversed ? 'White / reversed logo' : 'Dark logo';
+  const defaultDesc = isReversed ? 'For dark backgrounds.' : 'For light backgrounds.';
+
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const {
+    heightClass: logoHeightClass,
+    imgRef: logoRef,
+    handleImageLoad: handleLogoLoad,
+  } = useAdaptiveLogoHeight(previewUrl, 'max-h-15', 'max-h-15');
+
+  useEffect(() => {
+    if (!file) {
+      setPreviewUrl(currentUrl ? resolveImageUrl(currentUrl) : null);
+      return;
+    }
+    const url = URL.createObjectURL(file);
+    setPreviewUrl(url);
+    return () => {
+      URL.revokeObjectURL(url);
+    };
+  }, [file, currentUrl]);
+
+  const hasLogo = Boolean(file || currentUrl);
+
+  const handleClear = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (disabled) return;
+    if (onDelete) {
+      onDelete();
+    } else {
+      onChange?.(null);
+    }
+  };
+
+  return (
+    <div className="flex h-full flex-col">
+      <div className="group relative flex flex-1 flex-col">
+        <label
+          htmlFor={inputId}
+          className={cn(
+            'flex h-full min-h-40 cursor-pointer flex-col items-center justify-center rounded-xl px-6 py-7 text-center transition-all',
+            isReversed
+              ? 'border border-dashed border-transparent bg-brand-green-2 hover:border-neutral-grey-6 hover:brightness-105'
+              : 'border border-dashed border-neutral-grey-5 bg-neutral-grey-8 hover:border-brand-green-2 hover:bg-neutral-grey-7',
+            error &&
+              'border-secondary-red-4 focus-within:border-secondary-red-4 hover:border-secondary-red-4',
+            className,
+          )}
+        >
+          {previewUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              ref={logoRef}
+              src={previewUrl}
+              alt={file?.name ?? title ?? defaultTitle}
+              onLoad={handleLogoLoad}
+              className={cn('mb-3 w-auto max-w-full object-contain', logoHeightClass)}
+            />
+          ) : (
+            <Upload
+              size={24}
+              className={cn('mb-3', isReversed ? 'text-neutral-grey-7' : 'text-neutral-grey-3')}
+              aria-hidden
+            />
+          )}
+          <span
+            className={cn(
+              'body-16-bold',
+              isReversed ? 'text-neutral-grey-7' : 'text-neutral-grey-1',
+            )}
+          >
+            {title ?? defaultTitle}
+          </span>
+          <p
+            className={cn(
+              'body-14-regular mt-1',
+              isReversed ? 'text-neutral-grey-8' : 'text-neutral-grey-3',
+            )}
+          >
+            {description ?? defaultDesc}
+          </p>
+          <input
+            id={inputId}
+            type="file"
+            aria-label={inputLabel ?? title ?? defaultTitle}
+            aria-invalid={error}
+            accept="image/png,image/svg+xml"
+            disabled={disabled}
+            className="sr-only"
+            onChange={(event) => onChange?.(event.target.files?.[0] ?? null)}
+          />
+        </label>
+
+        {hasLogo && (
+          <button
+            type="button"
+            onClick={handleClear}
+            disabled={disabled}
+            aria-label={`Clear ${title ?? defaultTitle}`}
+            className={cn(
+              'absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-lg opacity-0 transition-all focus:opacity-100 group-hover:opacity-100',
+              isReversed
+                ? 'text-white hover:bg-black/20 hover:text-secondary-red-4'
+                : 'text-neutral-grey-2 hover:bg-black/5 hover:text-secondary-red-4',
+            )}
+          >
+            <Trash2 size={20} aria-hidden />
+          </button>
+        )}
+      </div>
+      <BaseHelperText helperText={helperText} error={error} />
+    </div>
+  );
+}

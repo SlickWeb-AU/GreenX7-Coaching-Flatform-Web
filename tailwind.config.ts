@@ -17,95 +17,137 @@ const config: Config = {
     container: {
       center: true,
       padding: { DEFAULT: '1rem', sm: '1.5rem', lg: '2rem' },
-      screens: { '2xl': '1400px' },
+      screens: { '2xl': '87.5rem' },
     },
     extend: {
       colors: {
-        border: 'hsl(var(--border))',
-        input: 'hsl(var(--input))',
-        ring: 'hsl(var(--ring))',
-        background: 'hsl(var(--background))',
-        foreground: 'hsl(var(--foreground))',
-        primary: {
-          DEFAULT: 'hsl(var(--primary))',
-          foreground: 'hsl(var(--primary-foreground))',
-          50: 'hsl(var(--primary-50))',
-          100: 'hsl(var(--primary-100))',
-          500: 'hsl(var(--primary-500))',
-          600: 'hsl(var(--primary-600))',
-          700: 'hsl(var(--primary-700))',
-        },
         secondary: {
-          DEFAULT: 'hsl(var(--secondary))',
-          foreground: 'hsl(var(--secondary-foreground))',
+          green: {
+            1: '#9ACC63',
+            2: '#E6F2D8',
+            4: '#087452',
+          },
+          yellow: {
+            1: '#EBD343',
+            2: '#FAF4D0',
+            3: '#9E892E',
+          },
+          orange: {
+            1: '#F09E5D',
+            2: '#FBE7D7',
+          },
+          cyan: {
+            1: '#5FC8C9',
+            2: '#D7F1F2',
+            3: '#418382',
+          },
+          violet: {
+            1: '#AC8ED4',
+            2: '#EBE4F5',
+          },
+          rose: {
+            1: '#EE8F9F',
+            2: '#FCDADD',
+          },
+          red: {
+            1: '#F56C77',
+            2: '#FBE3E7',
+            4: '#B43E47',
+          },
+          teal: {
+            1: '#83ADB9',
+            2: '#E1EBEE',
+          },
         },
-        destructive: {
-          DEFAULT: 'hsl(var(--destructive))',
-          foreground: 'hsl(var(--destructive-foreground))',
+        neutral: {
+          600: '#1F313D',
+          black: '#1A1A1A',
+          white: {
+            solid: '#FFFFFF',
+          },
+          grey: {
+            1: '#12211C',
+            2: '#53635C',
+            3: '#6A7A72',
+            4: '#BFCFC5',
+            5: '#CBD1CD',
+            6: '#DFE5E1',
+            7: '#EDF3EF',
+            8: '#F6F8F5',
+          },
         },
-        success: {
-          DEFAULT: 'hsl(var(--success))',
-          foreground: 'hsl(var(--success-foreground))',
+        forest: {
+          light: '#E7F1E5',
         },
-        warning: {
-          DEFAULT: 'hsl(var(--warning))',
-          foreground: 'hsl(var(--warning-foreground))',
+        brand: {
+          green: {
+            1: '#004736',
+            2: '#005943',
+            3: '#63D556',
+            4: '#C7E3A9',
+            5: '#CFE4CA',
+            dark: '#001F17',
+          },
         },
-        muted: {
-          DEFAULT: 'hsl(var(--muted))',
-          foreground: 'hsl(var(--muted-foreground))',
-        },
-        accent: {
-          DEFAULT: 'hsl(var(--accent))',
-          foreground: 'hsl(var(--accent-foreground))',
-        },
-        popover: {
-          DEFAULT: 'hsl(var(--popover))',
-          foreground: 'hsl(var(--popover-foreground))',
-        },
-        card: {
-          DEFAULT: 'hsl(var(--card))',
-          foreground: 'hsl(var(--card-foreground))',
-        },
-        sidebar: {
-          DEFAULT: 'hsl(var(--sidebar))',
-          foreground: 'hsl(var(--sidebar-foreground))',
-          accent: 'hsl(var(--sidebar-accent))',
-          border: 'hsl(var(--sidebar-border))',
-        },
+      },
+      borderWidth: {
+        '0.5': '0.5px',
       },
       borderRadius: {
-        lg: 'var(--radius)',
-        md: 'calc(var(--radius) - 2px)',
-        sm: 'calc(var(--radius) - 4px)',
+        pill: '99px',
+      },
+      spacing: {
+        '1.25': '0.3125rem',
+        '6.5': '1.625rem', // 26px
+        '14.5': '3.625rem', // 58px
+        15: '3.75rem', // 60px
+        18: '4.5rem', // 72px
+      },
+      boxShadow: {
+        'pill-tab': '0 0.0625rem 0.1875rem 0 #003F3226',
+        'live-dot': '0 0 0 0.25rem #58E3AA2B',
+      },
+      maxWidth: {
+        '1440': '90rem',
+        '1600': '1600px',
       },
       fontFamily: {
-        sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
+        satoshi: ['var(--font-satoshi)', 'sans-serif'],
+      },
+      letterSpacing: {
+        'tight-4': '-0.04em', // -4%
+        'tight-3': '-0.03em', // -3%
+        'tight-2': '-0.02em', // -2%
+        'tight-1': '-0.01em', // -1%
       },
       keyframes: {
-        'accordion-down': {
-          from: { height: '0' },
-          to: { height: 'var(--radix-accordion-content-height)' },
-        },
-        'accordion-up': {
-          from: { height: 'var(--radix-accordion-content-height)' },
-          to: { height: '0' },
-        },
         'fade-in': { from: { opacity: '0' }, to: { opacity: '1' } },
+        'dialog-in': {
+          from: { opacity: '0', transform: 'scale(0.95)' },
+          to: { opacity: '1', transform: 'scale(1)' },
+        },
         'slide-up': {
           from: { opacity: '0', transform: 'translateY(8px)' },
           to: { opacity: '1', transform: 'translateY(0)' },
         },
+        'slide-left': {
+          from: { opacity: '0', transform: 'translateX(24px)' },
+          to: { opacity: '1', transform: 'translateX(0)' },
+        },
+        'slide-right': {
+          from: { opacity: '0', transform: 'translateX(-24px)' },
+          to: { opacity: '1', transform: 'translateX(0)' },
+        },
       },
       animation: {
-        'accordion-down': 'accordion-down 0.2s ease-out',
-        'accordion-up': 'accordion-up 0.2s ease-out',
         'fade-in': 'fade-in 0.2s ease-out',
+        'dialog-in': 'dialog-in 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
         'slide-up': 'slide-up 0.25s ease-out',
+        'slide-left': 'slide-left 0.25s ease-out',
+        'slide-right': 'slide-right 0.25s ease-out',
       },
     },
   },
-  plugins: [require('tailwindcss-animate')],
 };
 
 export default config;

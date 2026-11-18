@@ -1,0 +1,163 @@
+'use client';
+
+import { AnimatedNumber, BaseCard, BaseTrend } from '@/components/base';
+import { BoltIcon, HeartIcon } from '@/components/icons';
+import { AREA_BADGE, AREA_BAR_COLORS, AREA_COLOR, AREA_ICON_MAP } from '@/constants/dashboard';
+import { useAnimationTrigger } from '@/hooks/useAnimationTrigger';
+import { cn, formatScoreToPercent } from '@/lib/utils';
+import type { WellbeingItemData } from '@/types';
+
+export interface ClientWellbeingCardProps {
+  items?: WellbeingItemData[];
+  previousMonthLabel?: string;
+  className?: string;
+  /** `pill`: viên đặc "+2%" như màn báo cáo gửi khách (17); mặc định mũi tên như màn quản trị */
+  deltaVariant?: 'arrow' | 'pill';
+  active?: boolean;
+}
+
+function DeltaPill({
+  value,
+  className,
+}: {
+  value?: number | null;
+  className?: string;
+  active?: boolean;
+}) {
+  const rounded = value !== null && value !== undefined ? Math.round(value) : null;
+
+  if (rounded === null) {
+    return <span className={cn('body-12-bold text-neutral-grey-3', className)}>—</span>;
+  }
+
+  return (
+    <span
+      className={cn(
+        'body-12-bold rounded-pill px-1.5 py-0.5 text-white',
+        rounded < 0 ? 'bg-secondary-red-4' : 'bg-secondary-green-4',
+      )}
+    >
+      {rounded > 0 ? '+' : ''}
+      {rounded}%
+    </span>
+  );
+}
+
+function ClientWellbeingRow({
+  item,
+  active,
+  Delta,
+}: {
+  item: WellbeingItemData;
+  active: boolean;
+  Delta: React.ComponentType<{ value?: number | null; className?: string; active?: boolean }>;
+}) {
+  const areaKey = item.area;
+  const Icon = AREA_ICON_MAP[areaKey] ?? HeartIcon;
+  const displayScore = formatScoreToPercent(item.score);
+
+  return (
+    <div className="flex items-center justify-between">
+      {/* Area Info & Progress bar */}
+      <div className="flex min-w-0 flex-1 items-center gap-1.5 pr-1.5 sm:gap-4 sm:pr-12">
+        {/* 24px icon + label (gap 8px) */}
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <div
+            className={cn(
+              'flex h-6 w-6 shrink-0 items-center justify-center rounded-full',
+              AREA_BADGE[areaKey] ?? 'bg-neutral-grey-7',
+            )}
+          >
+            <Icon size={14} color={AREA_COLOR[areaKey]} aria-hidden="true" />
+          </div>
+
+          <div className="body-14-bold w-[88px] shrink-0 text-neutral-grey-1 sm:w-24">
+            {item.label ?? item.area}
+          </div>
+        </div>
+
+        {/* Progress bar + Score cluster (gap 8px) */}
+        {/* Thanh tiến độ co lại trước, điểm luôn hiện */}
+        <div className="flex min-w-fit flex-1 items-center gap-2">
+          <div
+            className={cn(
+              'h-1.5 min-w-0 flex-1 overflow-hidden rounded-full',
+              AREA_BADGE[areaKey] ?? 'bg-neutral-grey-7',
+            )}
+          >
+            <div
+              className={cn(
+                'linear h-full rounded-full transition-all duration-[3000ms]',
+                AREA_BAR_COLORS[areaKey] ?? 'bg-brand-green-2',
+              )}
+              style={{
+                width: active ? `${Math.min(100, Math.max(0, displayScore ?? 0))}%` : '0%',
+              }}
+            />
+          </div>
+
+          {/* Score + Bolt icon (gap 4px, size 10) */}
+          <div className="body-14-bold flex shrink-0 items-center gap-1 text-neutral-grey-1">
+            <AnimatedNumber value={displayScore} active={active} />
+            <BoltIcon size={10} aria-hidden="true" />
+          </div>
+        </div>
+      </div>
+
+      {/* Comparison columns (gap 12px) */}
+      <div className="flex shrink-0 items-center gap-1.5 sm:gap-3">
+        <div className="flex w-[52px] items-center justify-end sm:w-20">
+          <Delta value={item.vsPreviousMonth} active={active} />
+        </div>
+
+        <div className="flex w-[58px] items-center justify-end sm:w-24">
+          <Delta value={item.vsFirstCheck} active={active} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function ClientWellbeingCard({
+  items,
+  previousMonthLabel = '',
+  className,
+  deltaVariant = 'arrow',
+  active: controlledActive,
+}: ClientWellbeingCardProps) {
+  const active = useAnimationTrigger(items && items.length > 0 ? [items] : [], controlledActive);
+  const Delta = deltaVariant === 'pill' ? DeltaPill : BaseTrend;
+  if (!items || items.length === 0) {
+    return <BaseCard title="Wellbeing areas" isEmpty className={cn('flex flex-col', className)} />;
+  }
+
+  return (
+    <BaseCard title="Wellbeing areas" className={cn('flex flex-col', className)}>
+      {/* Điện thoại (bug 388): cột so sánh hẹp lại cho cả hàng nằm gọn trong thẻ từ màn
+          360px; màn hẹp hơn nữa thì cuộn ngang trong thẻ thay vì tràn ra ngoài */}
+      <div className="-mx-1 overflow-x-auto px-1">
+        <div className="min-w-[278px]">
+          {/* Header */}
+          <div className="body-12-bold mb-2 flex items-center justify-between text-neutral-grey-3">
+            <div className="flex-1">Area</div>
+            <div className="flex items-center gap-1.5 sm:gap-3">
+              <div className="w-[52px] text-center sm:w-20">
+                {previousMonthLabel ? `vs. ${previousMonthLabel}` : 'vs. Previous'}
+              </div>
+              <div className="w-[58px] text-center sm:w-24">vs. First Check</div>
+            </div>
+          </div>
+
+          {/* Rows */}
+          <div className="flex flex-col gap-2">
+            {items.map((item) => (
+              <ClientWellbeingRow key={item.area} item={item} active={active} Delta={Delta} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </BaseCard>
+  );
+}
+
+export default ClientWellbeingCard;

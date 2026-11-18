@@ -1,0 +1,14 @@
+export type BaseVariant = 'primary' | 'secondary' | 'ghost' | 'outline' | 'custom';
+
+export type BaseSize = 'small' | 'medium' | 'mediumPlus' | 'large' | 'xlarge' | 'presentation';
+
+export type PageItem = number | '…';
+
+export interface BaseButtonStyleOptions {
+  variant?: BaseVariant;
+  size?: BaseSize;
+  pill?: boolean;
+  fullWidth?: boolean;
+  className?: string;
+  medium16Bold?: boolean;
+}

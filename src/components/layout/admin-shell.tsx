@@ -2,26 +2,24 @@
 
 import type { ReactNode } from 'react';
 
-import { AdminHeader } from '@/components/layout/admin-header';
 import { AdminSidebar } from '@/components/layout/admin-sidebar';
-import { cn } from '@/lib/utils';
-import { useUiStore } from '@/stores/ui.store';
+import { PresentationMobileWarning } from '@/components/presentation/PresentationMobileWarning';
 
-/**
- * Phần khung admin buộc phải là client component vì lề trái của vùng nội dung
- * phụ thuộc trạng thái thu gọn sidebar (zustand). Layout cha vẫn là server component
- * để còn kiểm tra quyền trước khi render.
- */
 export function AdminShell({ children }: { children: ReactNode }) {
-  const sidebarCollapsed = useUiStore((state) => state.sidebarCollapsed);
-
   return (
-    <div className="min-h-screen bg-muted/30">
-      <AdminSidebar />
-      <div className={cn('transition-[padding] duration-200', sidebarCollapsed ? 'lg:pl-16' : 'lg:pl-64')}>
-        <AdminHeader />
-        <main className="space-y-6 p-4 lg:p-6">{children}</main>
+    <>
+      <PresentationMobileWarning
+        title="Desktop Screen Required"
+        description="The GreenX7 Admin Portal is designed specifically for desktop viewports to give you the best experience for data analytics, client management, and reporting."
+        helperNotice="Please access this page from a laptop, desktop computer, or expand your browser window."
+        showCopyButton={false}
+      />
+      <div className="hidden min-h-screen bg-neutral-grey-8 lg:block">
+        <AdminSidebar />
+        <div className="lg:pl-56">
+          <main className="p-4 lg:p-10 xl:p-12">{children}</main>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

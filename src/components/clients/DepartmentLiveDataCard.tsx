@@ -1,0 +1,70 @@
+'use client';
+
+import { ExternalLink } from 'lucide-react';
+import Link from 'next/link';
+
+import { AnimatedNumber } from '@/components/base';
+import { LiveIndicator } from '@/components/dashboard';
+import { cn } from '@/lib/utils';
+
+export interface DepartmentLiveDataCardProps {
+  participantCount?: number | null;
+  dashboardHref?: string;
+  className?: string;
+  active?: boolean;
+}
+
+export function DepartmentLiveDataCard({
+  participantCount = null,
+  dashboardHref,
+  className,
+  active,
+}: DepartmentLiveDataCardProps) {
+  return (
+    <div
+      className={cn(
+        'flex flex-col items-center justify-between rounded-2xl border-4 border-brand-green-4 bg-white p-3 text-center shadow-none',
+        className,
+      )}
+    >
+      {/* Top cluster: Live data badge + Participant count */}
+      <div className="flex flex-col items-center">
+        <div className="body-12-bold mb-[14px] inline-flex h-[18px] items-center gap-1 rounded-full bg-brand-green-4 px-1">
+          <LiveIndicator />
+          <span className="text-brand-green-2">LIVE DATA</span>
+        </div>
+
+        <div className="body-14-bold flex flex-col items-center justify-center text-center text-neutral-grey-1">
+          <span>
+            <AnimatedNumber value={participantCount} active={active} /> participants
+          </span>
+          <span>received</span>
+        </div>
+      </div>
+
+      <div className="flex w-full flex-col items-center">
+        <div className="w-full border-t border-neutral-grey-6" />
+        <div className="mt-3">
+          {dashboardHref ? (
+            <Link
+              href={dashboardHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="body-14-bold inline-flex items-center gap-1 text-brand-green-2 transition-colors hover:underline"
+            >
+              <span>Open dashboard</span>
+              <ExternalLink size={15} aria-hidden="true" />
+            </Link>
+          ) : (
+            <span className="body-14-bold inline-flex cursor-not-allowed items-center gap-1 text-neutral-grey-4">
+              <span>Open dashboard</span>
+              <ExternalLink size={15} aria-hidden="true" />
+            </span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default DepartmentLiveDataCard;
