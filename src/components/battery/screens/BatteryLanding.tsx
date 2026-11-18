@@ -12,20 +12,11 @@ import {
 } from '@/components/icons';
 
 interface BatteryLandingProps {
-  clientName: string;
-  departmentName?: string | null;
-  clientLogoUrl?: string | null;
   onStart: () => void;
   onHowItWorks: () => void;
 }
 
-export function BatteryLanding({
-  clientName,
-  departmentName,
-  clientLogoUrl,
-  onStart,
-  onHowItWorks,
-}: BatteryLandingProps) {
+export function BatteryLanding({ onStart, onHowItWorks }: BatteryLandingProps) {
   return (
     <main className="relative flex h-dvh w-full flex-col justify-between overflow-hidden bg-brand-green-2 text-white">
       <div className="relative z-10 mx-auto flex w-full max-w-1440 flex-1 flex-col justify-between px-[60px] pb-6 pt-9 md:px-[80px]">
@@ -43,9 +34,6 @@ export function BatteryLanding({
 
         <header className="relative z-10 flex w-full items-center justify-center md:justify-start">
           <ClientDepartmentHeader
-            clientName={clientName}
-            departmentName={departmentName}
-            clientLogoUrl={clientLogoUrl}
             align="left"
             className="items-center text-center md:items-start md:text-left"
             logoWrapperClassName="justify-center md:justify-start"

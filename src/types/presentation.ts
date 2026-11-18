@@ -1,6 +1,11 @@
 import type { ComponentType, ReactNode, SVGProps } from 'react';
 
-import type { DepartmentDashboardDto, DepartmentShareLinksDto, WellbeingArea } from './clients';
+import type {
+  ClientLogoHeights,
+  DepartmentDashboardDto,
+  DepartmentShareLinksDto,
+  WellbeingArea,
+} from './clients';
 
 export interface InsightBadgeItem {
   area: string;
@@ -27,6 +32,9 @@ export interface BatteryBranding {
   isCompanyWide?: boolean;
   darkLogoUrl?: string | null;
   whiteLogoUrl?: string | null;
+  logoHeightDesktop?: number;
+  logoHeightTablet?: number;
+  logoHeightMobile?: number;
 }
 
 export interface BatteryPeriod {
@@ -54,6 +62,7 @@ export interface BaseSlideProps {
   clientName?: string;
   departmentName?: string;
   clientLogoUrl?: string | null;
+  logoHeights?: ClientLogoHeights | null;
   controls?: ReactNode;
   className?: string;
 }
@@ -62,6 +71,7 @@ export interface SlideLayoutContextValue {
   clientName?: string;
   departmentName?: string;
   clientLogoUrl?: string | null;
+  logoHeights?: ClientLogoHeights | null;
   controls?: ReactNode;
 }
 
@@ -78,6 +88,7 @@ export interface PresentationContextValue {
   departmentName: string;
   fullDisplayName: string;
   clientLogoUrl: string | null;
+  logoHeights: ClientLogoHeights | null;
   previousMonthLabel: string | null;
 }
 

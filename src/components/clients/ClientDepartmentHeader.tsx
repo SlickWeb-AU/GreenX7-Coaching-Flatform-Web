@@ -1,42 +1,54 @@
 'use client';
 
-import { useAdaptiveLogoHeight } from '@/hooks/useAdaptiveLogoHeight';
+import { useOptionalClientBranding } from '@/components/providers';
+import { getResponsiveLogoHeightProps } from '@/lib/branding';
 import { cn, resolveImageUrl } from '@/lib/utils';
+import type { ClientLogoHeights } from '@/types';
 
 export interface ClientDepartmentHeaderProps {
   clientName?: string | null;
   departmentName?: string | null;
   clientLogoUrl?: string | null;
+  logoHeights?: ClientLogoHeights | null;
+  /** Surface behind the header when reading logo URL from ClientBrandingContext */
+  surface?: 'dark' | 'light';
   align?: 'left' | 'center' | 'right';
   className?: string;
   logoWrapperClassName?: string;
   logoClassName?: string;
   nameClassName?: string;
   departmentClassName?: string;
-  normalHeight?: string;
-  verticalHeight?: string;
 }
 
 export function ClientDepartmentHeader({
-  clientName,
-  departmentName,
-  clientLogoUrl,
+  clientName: propClientName,
+  departmentName: propDepartmentName,
+  clientLogoUrl: propClientLogoUrl,
+  logoHeights: propLogoHeights,
+  surface = 'dark',
   align = 'center',
   className,
   logoWrapperClassName,
   logoClassName,
   nameClassName,
   departmentClassName,
-  normalHeight = 'h-15',
-  verticalHeight = 'h-15',
 }: ClientDepartmentHeaderProps) {
-  const { heightClass, imgRef, handleImageLoad } = useAdaptiveLogoHeight(
-    clientLogoUrl,
-    normalHeight,
-    verticalHeight,
-  );
+  const branding = useOptionalClientBranding();
+  const clientName = propClientName !== undefined ? propClientName : branding?.clientName;
+  const departmentName =
+    propDepartmentName !== undefined ? propDepartmentName : branding?.departmentName;
+  const logoHeights = propLogoHeights !== undefined ? propLogoHeights : branding?.logoHeights;
+  const clientLogoUrl =
+    propClientLogoUrl !== undefined
+      ? propClientLogoUrl
+      : ((surface === 'light'
+          ? branding?.darkLogoUrl || branding?.whiteLogoUrl
+          : branding?.whiteLogoUrl || branding?.darkLogoUrl) ?? null);
 
   if (!clientLogoUrl && !clientName && !departmentName) return null;
+
+  const { style: customHeightStyle, heightClass: resolvedHeightClass } =
+    getResponsiveLogoHeightProps(logoHeights, 'h-15');
 
   const alignClasses = {
     left: 'items-start text-left',
@@ -49,9 +61,10 @@ export function ClientDepartmentHeader({
       {/* Có logo (khách đã upload) thì chỉ hiện logo; chưa có logo mới hiện tên công ty */}
       {clientLogoUrl ? (
         <div
+          style={customHeightStyle}
           className={cn(
             'flex items-center',
-            heightClass,
+            resolvedHeightClass,
             align === 'center' && 'justify-center',
             align === 'right' && 'justify-end',
             logoWrapperClassName,
@@ -59,11 +72,9 @@ export function ClientDepartmentHeader({
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            ref={imgRef}
             src={resolveImageUrl(clientLogoUrl)}
             alt={clientName ? `${clientName} logo` : 'Client logo'}
-            onLoad={handleImageLoad}
-            className={cn('w-auto object-contain', heightClass, logoClassName)}
+            className={cn('w-auto max-w-full object-contain', resolvedHeightClass, logoClassName)}
           />
         </div>
       ) : clientName ? (

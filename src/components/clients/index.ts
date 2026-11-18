@@ -9,6 +9,7 @@ export * from './DepartmentLiveDataCard';
 export * from './DepartmentInsightListCard';
 export * from './ClientForm';
 export * from './LogoUploadBox';
+export * from './ClientLogoDeviceSettings';
 export * from './ControlledClientLogoUpload';
 export * from './ClientsTable';
 export * from './CreateClientForm';

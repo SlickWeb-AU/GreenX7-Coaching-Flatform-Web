@@ -12,17 +12,9 @@ import { BatteryScoreBreakdown } from './BatteryScoreBreakdown';
 
 export interface BatteryResultsViewProps {
   result: BatterySubmitResult;
-  clientName?: string | null;
-  departmentName?: string | null;
-  clientLogoUrl?: string | null;
 }
 
-export function BatteryResultsView({
-  result,
-  clientName,
-  departmentName,
-  clientLogoUrl,
-}: BatteryResultsViewProps) {
+export function BatteryResultsView({ result }: BatteryResultsViewProps) {
   const emailMutation = useMutation({
     mutationFn: (email: string) => batteryCheckApi.sendResultsEmail(email, result.resultToken),
     onError: (err) => toast.error(err instanceof Error ? err.message : 'Failed to send results'),
@@ -39,9 +31,6 @@ export function BatteryResultsView({
             zoneDescription={result.zoneDescription}
             introMessage={result.introMessage}
             strongestAreas={result.strongestAreas}
-            clientName={clientName}
-            departmentName={departmentName}
-            clientLogoUrl={clientLogoUrl}
           />
         </div>
       </section>

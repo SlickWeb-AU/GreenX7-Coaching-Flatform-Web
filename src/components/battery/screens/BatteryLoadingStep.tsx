@@ -12,19 +12,10 @@ import { ANIMATION_DURATION_MS } from '@/constants/dashboard';
 
 interface BatteryLoadingStepProps {
   score: number;
-  clientName?: string | null;
-  departmentName?: string | null;
-  clientLogoUrl?: string | null;
   onDone: () => void;
 }
 
-export function BatteryLoadingStep({
-  score,
-  clientName,
-  departmentName,
-  clientLogoUrl,
-  onDone,
-}: BatteryLoadingStepProps) {
+export function BatteryLoadingStep({ score, onDone }: BatteryLoadingStepProps) {
   const [currentScore, setCurrentScore] = useState(0);
 
   useEffect(() => {
@@ -81,9 +72,7 @@ export function BatteryLoadingStep({
         <footer className="flex w-full items-end justify-between pt-6">
           <div className="flex items-center">
             <ClientDepartmentHeader
-              clientName={clientName}
-              departmentName={departmentName}
-              clientLogoUrl={clientLogoUrl}
+              surface="light"
               align="left"
               nameClassName="text-neutral-grey-1"
               departmentClassName="text-neutral-grey-1"

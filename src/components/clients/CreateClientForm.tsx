@@ -34,6 +34,7 @@ import {
 } from '@/components/icons';
 import { ControlledClientLogoUpload } from './ControlledClientLogoUpload';
 import { useEditableRows } from '@/features/admin-clients';
+import { CLIENT_LOGO_HEIGHT_DEFAULTS } from '@/constants/clients';
 import {
   clientFormSchema,
   type ClientContactFormValue,
@@ -92,6 +93,9 @@ export function CreateClientForm({
       departments: [],
       darkLogo: null,
       whiteLogo: null,
+      logoHeightDesktop: CLIENT_LOGO_HEIGHT_DEFAULTS.desktop,
+      logoHeightTablet: CLIENT_LOGO_HEIGHT_DEFAULTS.tablet,
+      logoHeightMobile: CLIENT_LOGO_HEIGHT_DEFAULTS.mobile,
       checkInStartDay: undefined,
       checkInEndDay: undefined,
       autoSendReport: true,
