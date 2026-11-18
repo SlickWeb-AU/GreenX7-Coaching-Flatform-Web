@@ -30,9 +30,9 @@ export const CLIENT_LOGO_MAX_SIZE_BYTES = 2 * 1024 * 1024; // 2MB
 export const CLIENT_LOGO_HEIGHT_MIN = 24;
 export const CLIENT_LOGO_HEIGHT_MAX = 96;
 export const CLIENT_LOGO_HEIGHT_DEFAULTS = {
-  desktop: 48,
-  tablet: 40,
-  mobile: 32,
+  desktop: 60,
+  tablet: 60,
+  mobile: 48,
 } as const;
 
 export const WELLBEING_AREAS = {
