@@ -67,8 +67,9 @@ jobs:
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
-    # Environment "dev" — secret SSH_* cấp repo trỏ tới server dev Singapore
-    environment: dev
+    # Tên "production" là lịch sử, thực ra là site DEV: secret SSH_*/GHCR_TOKEN nằm trong
+    # environment này (GitHub không cho đổi tên environment). Prod Sydney dùng environment "prod".
+    environment: production
 
     steps:
       - name: SSH vào server và cập nhật service

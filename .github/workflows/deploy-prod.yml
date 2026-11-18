@@ -115,7 +115,11 @@ jobs:
             set -euo pipefail
             cd /opt/greenx7
 
-            echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+            # Đăng nhập GHCR bằng token tạm của lần chạy này, trong thư mục cấu hình docker
+            # riêng rồi xoá: không ghi đè thông tin đăng nhập lâu dài đang có trên server.
+            export DOCKER_CONFIG="$(mktemp -d)"
+            trap 'rm -rf "$DOCKER_CONFIG"' EXIT
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
 
             echo "==> Đang chạy: $(grep -E '^WEB_TAG=' .env)"
             sed -i "s|^WEB_TAG=.*|WEB_TAG=${{ steps.tag.outputs.value }}|" .env
