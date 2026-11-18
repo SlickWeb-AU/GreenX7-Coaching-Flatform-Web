@@ -107,4 +107,34 @@ describe('ClientLogoDeviceSettings', () => {
       'https://example.com/white.png',
     );
   });
+
+  it('displays min/max bounds and prevents Enter from submitting the parent form', () => {
+    const onChange = vi.fn();
+    const onSubmit = vi.fn((e: React.FormEvent) => e.preventDefault());
+
+    render(
+      <form onSubmit={onSubmit}>
+        <ClientLogoDeviceSettings
+          heights={{ desktop: 60, tablet: 60, mobile: 48 }}
+          onChange={onChange}
+        />
+      </form>,
+    );
+
+    expect(screen.getByText(`${CLIENT_LOGO_HEIGHT_MIN}px`)).toBeDefined();
+    expect(screen.getByText(`${CLIENT_LOGO_HEIGHT_MAX}px`)).toBeDefined();
+
+    const numberInput = screen.getByLabelText('Desktop logo height in pixels') as HTMLInputElement;
+    fireEvent.change(numberInput, { target: { value: '200' } });
+    const wasAllowed = fireEvent.keyDown(numberInput, { key: 'Enter', code: 'Enter' });
+
+    expect(wasAllowed).toBe(false);
+    expect(onSubmit).not.toHaveBeenCalled();
+    expect(onChange).toHaveBeenCalledWith({
+      desktop: CLIENT_LOGO_HEIGHT_MAX,
+      tablet: 60,
+      mobile: 48,
+    });
+    expect(numberInput.value).toBe(String(CLIENT_LOGO_HEIGHT_MAX));
+  });
 });

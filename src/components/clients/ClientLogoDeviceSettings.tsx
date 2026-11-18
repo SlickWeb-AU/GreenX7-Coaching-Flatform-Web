@@ -88,16 +88,25 @@ export function ClientLogoDeviceSettings({
         </div>
 
         <div className="flex items-center gap-2.5">
-          <input
-            type="range"
-            min={CLIENT_LOGO_HEIGHT_MIN}
-            max={CLIENT_LOGO_HEIGHT_MAX}
-            step={1}
-            value={currentHeight}
-            onChange={(e) => setDeviceHeight(Number(e.target.value))}
-            aria-label={`${currentConfig.label} logo height slider`}
-            className="h-2 w-52 cursor-pointer accent-brand-green-2 sm:w-64 md:w-72"
-          />
+          <div className="flex w-52 flex-col gap-1 sm:w-64 md:w-72">
+            <div className="body-12-medium flex items-center justify-between tabular-nums text-neutral-grey-3">
+              <span>{CLIENT_LOGO_HEIGHT_MIN}px</span>
+              <span>{CLIENT_LOGO_HEIGHT_MAX}px</span>
+            </div>
+            <input
+              type="range"
+              min={CLIENT_LOGO_HEIGHT_MIN}
+              max={CLIENT_LOGO_HEIGHT_MAX}
+              step={1}
+              value={currentHeight}
+              onChange={(e) => setDeviceHeight(Number(e.target.value))}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') e.preventDefault();
+              }}
+              aria-label={`${currentConfig.label} logo height slider`}
+              className="h-2 w-full cursor-pointer accent-brand-green-2"
+            />
+          </div>
           <div className="flex h-9 w-20 shrink-0 items-center rounded-lg border border-neutral-grey-6 bg-white px-2 focus-within:border-brand-green-2">
             <input
               type="number"
@@ -106,6 +115,12 @@ export function ClientLogoDeviceSettings({
               value={inputValue}
               onChange={(e) => handleNumberChange(e.target.value)}
               onBlur={handleNumberBlur}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleNumberBlur();
+                }
+              }}
               aria-label={`${currentConfig.label} logo height in pixels`}
               className="body-14-medium w-full bg-transparent text-right tabular-nums text-neutral-grey-1 outline-none"
             />
