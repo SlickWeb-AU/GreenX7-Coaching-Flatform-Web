@@ -2,10 +2,10 @@ name: Deploy Frontend (Production)
 
 # Production Sydney — https://coaching.greenx7.com
 #
-# Merge develop vào main => build image => DỪNG chờ duyệt (environment "prod",
-# required reviewers) => duyệt xong mới deploy.
+# Merge vào main => build image => TỰ deploy. Không có bước duyệt: merge vào main
+# chính là quyết định lên prod.
 # Rollback: Actions → "Deploy Frontend (Production)" → Run workflow trên main,
-# điền tag (SHA rút gọn) của bản cũ => bỏ qua build, vẫn phải duyệt.
+# điền tag (SHA rút gọn) của bản cũ => bỏ qua build.
 on:
   push:
     branches: [main]
@@ -72,7 +72,7 @@ jobs:
     # Chạy cả khi build bị bỏ qua (rollback theo tag có sẵn)
     if: always() && (needs.build-and-push.result == 'success' || needs.build-and-push.result == 'skipped')
     runs-on: ubuntu-latest
-    # Environment "prod": chỉ nhận branch main, bắt buộc có người duyệt
+    # Environment "prod": chỉ nhận branch main, giữ secret SSH của prod
     environment:
       name: prod
       url: https://coaching.greenx7.com
