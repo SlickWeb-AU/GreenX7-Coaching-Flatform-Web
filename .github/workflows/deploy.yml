@@ -1,7 +1,7 @@
 name: Deploy Frontend
 
 # Merge vào develop => tự động deploy.
-# main để dành cho production (thêm environment protection rule khi cần duyệt tay).
+# Đây là site DEV (Singapore). Production Sydney deploy bằng deploy-prod.yml (branch main).
 on:
   push:
     branches: [develop]
@@ -67,8 +67,8 @@ jobs:
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
-    # Tạo environment "production" trong Settings để thêm bước duyệt tay nếu muốn
-    environment: production
+    # Environment "dev" — secret SSH_* cấp repo trỏ tới server dev Singapore
+    environment: dev
 
     steps:
       - name: SSH vào server và cập nhật service
