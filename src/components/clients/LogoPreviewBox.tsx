@@ -1,6 +1,5 @@
 'use client';
 
-import { Leaf } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export interface LogoPreviewBoxProps {
@@ -21,23 +20,21 @@ export function LogoPreviewBox({ surface, alt, logoUrl, height }: LogoPreviewBox
         isDark ? 'bg-brand-green-2' : 'border border-neutral-grey-6 bg-neutral-grey-8',
       )}
     >
-      <div className="flex min-w-0 items-center justify-center">
-        {logoUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
+      {logoUrl ? (
+        <div className="flex min-w-0 items-center justify-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={logoUrl}
             alt={alt}
             style={{ height: `${height}px` }}
             className="w-auto max-w-full object-contain transition-all"
           />
-        ) : (
-          <Leaf
-            size={height}
-            aria-hidden
-            className={cn('transition-all', isDark ? 'text-white' : 'text-brand-green-2')}
-          />
-        )}
-      </div>
+        </div>
+      ) : (
+        <span className={cn('body-14-medium', isDark ? 'text-white/70' : 'text-neutral-grey-3')}>
+          No image
+        </span>
+      )}
     </div>
   );
 }
