@@ -81,9 +81,13 @@ describe('ClientLogoDeviceSettings', () => {
       mobile: 40,
     });
 
-    const resetBtn = screen.getByRole('button', { name: /Reset logo sizes to defaults/i });
+    const resetBtn = screen.getByRole('button', { name: /Reset Desktop logo size to default/i });
     fireEvent.click(resetBtn);
-    expect(onChange).toHaveBeenCalledWith({ ...CLIENT_LOGO_HEIGHT_DEFAULTS });
+    expect(onChange).toHaveBeenCalledWith({
+      desktop: CLIENT_LOGO_HEIGHT_DEFAULTS.desktop,
+      tablet: 50,
+      mobile: 40,
+    });
   });
 
   it('renders "No image" when no logo is provided and renders uploaded logos when present', () => {
