@@ -42,6 +42,9 @@ export interface BatteryBrandingDto {
   isCompanyWide?: boolean;
   darkLogoUrl: string | null;
   whiteLogoUrl: string | null;
+  logoHeightDesktop?: number;
+  logoHeightTablet?: number;
+  logoHeightMobile?: number;
 }
 
 export interface BatteryAreaPromptDto {

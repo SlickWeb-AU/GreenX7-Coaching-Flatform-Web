@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useId, useState } from 'react';
+import { useId } from 'react';
 import { Trash2, Upload } from 'lucide-react';
-import { useAdaptiveLogoHeight } from '@/hooks/useAdaptiveLogoHeight';
-import { cn, resolveImageUrl } from '@/lib/utils';
+import { useResolvedLogoUrl } from '@/hooks/useResolvedLogoUrl';
+import { cn } from '@/lib/utils';
 import { BaseHelperText } from '../base/BaseHelperText';
 
 export type LogoUploadVariant = 'dark' | 'reversed' | 'white';
@@ -46,24 +46,7 @@ export function LogoUploadBox({
   const defaultTitle = isReversed ? 'White / reversed logo' : 'Dark logo';
   const defaultDesc = isReversed ? 'For dark backgrounds.' : 'For light backgrounds.';
 
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const {
-    heightClass: logoHeightClass,
-    imgRef: logoRef,
-    handleImageLoad: handleLogoLoad,
-  } = useAdaptiveLogoHeight(previewUrl, 'max-h-15', 'max-h-15');
-
-  useEffect(() => {
-    if (!file) {
-      setPreviewUrl(currentUrl ? resolveImageUrl(currentUrl) : null);
-      return;
-    }
-    const url = URL.createObjectURL(file);
-    setPreviewUrl(url);
-    return () => {
-      URL.revokeObjectURL(url);
-    };
-  }, [file, currentUrl]);
+  const previewUrl = useResolvedLogoUrl(file, currentUrl);
 
   const hasLogo = Boolean(file || currentUrl);
 
@@ -96,11 +79,9 @@ export function LogoUploadBox({
           {previewUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              ref={logoRef}
               src={previewUrl}
               alt={file?.name ?? title ?? defaultTitle}
-              onLoad={handleLogoLoad}
-              className={cn('mb-3 w-auto max-w-full object-contain', logoHeightClass)}
+              className="mb-3 max-h-15 w-auto max-w-full object-contain"
             />
           ) : (
             <Upload

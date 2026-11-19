@@ -1,14 +1,17 @@
 import { AnimatedNumber } from '@/components/base';
 import { BatteryIcon } from '@/components/icons';
-import { useAdaptiveLogoHeight } from '@/hooks/useAdaptiveLogoHeight';
+import { useOptionalClientBranding } from '@/components/providers';
 import { useAnimationTrigger } from '@/hooks/useAnimationTrigger';
+import { getResponsiveLogoHeightProps } from '@/lib/branding';
 import { cn, resolveImageUrl } from '@/lib/utils';
+import type { ClientLogoHeights } from '@/types';
 import { DeltaRow } from './DeltaRow';
 import { LiveIndicator } from './LiveIndicator';
 
 export interface LiveSummaryPanelProps {
   clientName?: string | null;
   clientLogoUrl?: string | null;
+  logoHeights?: ClientLogoHeights | null;
   departmentName?: string | null;
   score?: number | null;
   zoneLabel?: string | null;
@@ -25,6 +28,7 @@ export interface LiveSummaryPanelProps {
 export function LiveSummaryPanel({
   clientName,
   clientLogoUrl,
+  logoHeights: propLogoHeights,
   departmentName,
   score,
   zoneLabel,
@@ -36,13 +40,14 @@ export function LiveSummaryPanel({
   className,
   active: controlledActive,
 }: LiveSummaryPanelProps) {
+  const branding = useOptionalClientBranding();
   const active = useAnimationTrigger([score], controlledActive);
   const logoUrl = resolveImageUrl(clientLogoUrl);
-  const {
-    heightClass: logoHeightClass,
-    imgRef: logoRef,
-    handleImageLoad: handleLogoLoad,
-  } = useAdaptiveLogoHeight(clientLogoUrl, 'h-10', 'h-14');
+  const logoHeights =
+    propLogoHeights !== undefined ? propLogoHeights : (branding?.logoHeights ?? null);
+
+  const { style: customHeightStyle, heightClass: resolvedLogoHeightClass } =
+    getResponsiveLogoHeightProps(logoHeights, 'h-10');
 
   return (
     <div className={cn('flex flex-col justify-between text-white', className)}>
@@ -52,13 +57,15 @@ export function LiveSummaryPanel({
           {logoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              ref={logoRef}
               src={logoUrl}
               alt={clientName ?? ''}
-              onLoad={handleLogoLoad}
+              style={customHeightStyle}
               // self-start: không để flex-col kéo giãn khung ảnh hết bề ngang làm logo
               // lệch vào giữa, không thẳng hàng với chữ bên dưới
-              className={cn('w-auto self-start object-contain object-left', logoHeightClass)}
+              className={cn(
+                'w-auto max-w-full self-start object-contain object-left',
+                resolvedLogoHeightClass,
+              )}
             />
           ) : (
             <div className="body-24-bold uppercase tracking-wide text-neutral-grey-8">

@@ -52,6 +52,31 @@ export interface ClientDepartment {
   batteryScore?: number | null;
 }
 
+export interface ClientLogoHeights {
+  desktop: number;
+  tablet: number;
+  mobile: number;
+}
+
+export interface ClientBrandingContextValue {
+  clientName?: string | null;
+  departmentName?: string | null;
+  darkLogoUrl?: string | null;
+  whiteLogoUrl?: string | null;
+  logoHeights?: ClientLogoHeights | null;
+}
+
+export interface ApiBrandingLike {
+  clientName?: string | null;
+  departmentName?: string | null;
+  isCompanyWide?: boolean;
+  darkLogoUrl?: string | null;
+  whiteLogoUrl?: string | null;
+  logoHeightDesktop?: number | null;
+  logoHeightTablet?: number | null;
+  logoHeightMobile?: number | null;
+}
+
 export interface ClientDetail {
   id: string;
   slug?: string;
@@ -62,6 +87,9 @@ export interface ClientDetail {
   status: ClientStatus;
   darkLogoUrl?: string | null;
   whiteLogoUrl?: string | null;
+  logoHeightDesktop?: number;
+  logoHeightTablet?: number;
+  logoHeightMobile?: number;
   checkInStartDay: number;
   checkInEndDay: number;
   timezone: string;
@@ -85,6 +113,9 @@ export interface CreateClientPayload {
   checkInStartDay?: number;
   checkInEndDay?: number;
   autoSendReport: boolean;
+  logoHeightDesktop?: number;
+  logoHeightTablet?: number;
+  logoHeightMobile?: number;
 }
 
 /** Matches UpdateClientDto (PATCH /clients/{id}) — no contacts/departments/timezone */
@@ -97,6 +128,9 @@ export interface UpdateClientPayload {
   checkInStartDay?: number;
   checkInEndDay?: number;
   autoSendReport: boolean;
+  logoHeightDesktop?: number;
+  logoHeightTablet?: number;
+  logoHeightMobile?: number;
 }
 
 export interface CreateContactPayload {

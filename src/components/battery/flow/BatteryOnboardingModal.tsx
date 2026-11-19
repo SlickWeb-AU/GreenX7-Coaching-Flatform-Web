@@ -35,20 +35,11 @@ const STEPS = [
 
 interface BatteryOnboardingModalProps {
   open: boolean;
-  clientName?: string | null;
-  departmentName?: string | null;
-  clientLogoUrl?: string | null;
   onClose?: () => void;
   onStart: () => void;
 }
 
-export function BatteryOnboardingModal({
-  open,
-  clientName,
-  departmentName,
-  clientLogoUrl,
-  onStart,
-}: BatteryOnboardingModalProps) {
+export function BatteryOnboardingModal({ open, onStart }: BatteryOnboardingModalProps) {
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState<'right' | 'left'>('right');
   const [paused, setPaused] = useState(false);
@@ -102,9 +93,7 @@ export function BatteryOnboardingModal({
       <div className="mx-auto flex min-h-screen w-full max-w-1600 flex-col justify-between px-6 pb-8 pt-8 md:px-12 md:pb-12 md:pt-12 lg:px-16 lg:pb-16 lg:pt-16">
         <header className="mb-0 flex w-full items-center justify-between md:mb-[60px] lg:mb-0 [@media(min-height:700px)]:mb-16">
           <ClientDepartmentHeader
-            clientName={clientName}
-            departmentName={departmentName}
-            clientLogoUrl={clientLogoUrl}
+            surface="light"
             align="left"
             className="items-start text-left"
             logoWrapperClassName="justify-start"
