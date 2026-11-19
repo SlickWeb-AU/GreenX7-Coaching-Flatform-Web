@@ -87,6 +87,7 @@ export function DeckShell({
             width: canvas.width,
             height: canvas.height,
             transform: `scale(${canvas.scale})`,
+            ['--deck-scale' as string]: canvas.scale,
           }}
         >
           <div
@@ -94,8 +95,8 @@ export function DeckShell({
             className={cn(
               'h-full w-full transition-all duration-300 ease-out',
               direction === 'next'
-                ? 'duration-300 animate-in fade-in slide-in-from-right-10'
-                : 'duration-300 animate-in fade-in slide-in-from-left-10',
+                ? 'animate-in fade-in slide-in-from-right-10 duration-300'
+                : 'animate-in fade-in slide-in-from-left-10 duration-300',
             )}
           >
             {content}

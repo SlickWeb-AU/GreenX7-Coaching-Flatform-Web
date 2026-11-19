@@ -47,6 +47,6 @@ export function getResponsiveLogoHeightProps(
       '--logo-h-desktop': `${logoHeights.desktop}px`,
     } as CSSProperties,
     heightClass:
-      'h-[var(--logo-h-mobile)] md:h-[var(--logo-h-tablet)] lg:h-[var(--logo-h-desktop)]',
+      'h-[var(--logo-h-mobile)] md:h-[var(--logo-h-tablet)] lg:h-[calc(var(--logo-h-desktop)/var(--deck-scale,1))]',
   };
 }
