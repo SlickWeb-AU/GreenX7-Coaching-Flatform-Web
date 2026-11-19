@@ -129,8 +129,8 @@ export function ClientLogoDeviceSettings({
           <button
             type="button"
             onClick={handleReset}
-            title="Reset defaults"
-            aria-label="Reset logo sizes to defaults"
+            title={`Reset ${currentConfig.label} to default`}
+            aria-label={`Reset ${currentConfig.label} logo size to default`}
             className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-neutral-grey-3 transition-colors hover:bg-neutral-grey-7 hover:text-neutral-grey-1"
           >
             <RotateCcw size={16} aria-hidden />

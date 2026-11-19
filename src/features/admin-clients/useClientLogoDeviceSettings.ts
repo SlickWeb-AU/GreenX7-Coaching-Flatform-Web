@@ -85,7 +85,7 @@ export function useClientLogoDeviceSettings({
 
   const handleReset = () => {
     const defaults = getDefaultHeights();
-    commitHeights(defaults);
+    commitHeights({ ...heights, [activeDevice]: defaults[activeDevice] });
     setInputValue(String(defaults[activeDevice]));
   };
 
