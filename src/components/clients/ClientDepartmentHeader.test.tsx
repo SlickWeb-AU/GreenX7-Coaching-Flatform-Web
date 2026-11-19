@@ -36,7 +36,7 @@ describe('ClientDepartmentHeader', () => {
     expect(wrapper.style.getPropertyValue('--logo-h-mobile')).toBe('36px');
     expect(img.className).toContain('h-[var(--logo-h-mobile)]');
     expect(img.className).toContain('md:h-[var(--logo-h-tablet)]');
-    expect(img.className).toContain('lg:h-[var(--logo-h-desktop)]');
+    expect(img.className).toContain('lg:h-[calc(var(--logo-h-desktop)/var(--deck-scale,1))]');
   });
 
   it('reads branding, surface logo, and logoHeights from ClientBrandingProvider', () => {
